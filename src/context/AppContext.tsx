@@ -53,6 +53,10 @@ interface AppContextType {
   openTaskModal: (id: string) => void;
   closeTaskModal: () => void;
 
+  selectedProjectId: string | null;
+  openProjectDetail: (id: string) => void;
+  closeProjectDetail: () => void;
+
   selectedMemberId: string | null;
   openMemberModal: (id: string) => void;
   closeMemberModal: () => void;
@@ -131,25 +135,66 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | null>(null);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#/project/') || hash.startsWith('#/projects/')) {
+      const parts = hash.split('/');
+      return parts[2] || null;
+    }
+    return null;
+  });
+
   // Navigation via Hash
   const [activeTab, setActiveTabState] = useState<string>(() => {
-    const hash = window.location.hash.replace('#/', '');
+    const hash = window.location.hash;
+    if (hash.startsWith('#/project/') || hash.startsWith('#/projects/')) {
+      return 'projects';
+    }
+    const cleanTab = hash.replace('#/', '');
     const validTabs = ['home', 'tasks', 'calendar', 'projects', 'insights', 'team', 'settings'];
-    return validTabs.includes(hash) ? hash : 'home';
+    return validTabs.includes(cleanTab) ? cleanTab : 'home';
   });
 
   const setActiveTab = (tab: string) => {
     window.location.hash = `#/${tab}`;
     setActiveTabState(tab);
+    if (tab !== 'projects') {
+      setSelectedProjectId(null);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openProjectDetail = (id: string) => {
+    setSelectedProjectId(id);
+    setActiveTabState('projects');
+    window.location.hash = `#/projects/${id}`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const closeProjectDetail = () => {
+    setSelectedProjectId(null);
+    window.location.hash = `#/projects`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.replace('#/', '');
+      const hash = window.location.hash;
+      if (hash.startsWith('#/projects/') || hash.startsWith('#/project/')) {
+        const id = hash.split('/')[2];
+        if (id) {
+          setSelectedProjectId(id);
+          setActiveTabState('projects');
+          return;
+        }
+      }
+      const cleanTab = hash.replace('#/', '');
       const validTabs = ['home', 'tasks', 'calendar', 'projects', 'insights', 'team', 'settings'];
-      if (validTabs.includes(hash)) {
-        setActiveTabState(hash);
+      if (validTabs.includes(cleanTab)) {
+        setActiveTabState(cleanTab);
+        if (cleanTab !== 'projects') {
+          setSelectedProjectId(null);
+        }
       }
     };
     window.addEventListener('hashchange', handleHashChange);
@@ -706,6 +751,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectedTaskId,
         openTaskModal: (id: string) => setSelectedTaskId(id),
         closeTaskModal: () => setSelectedTaskId(null),
+
+        selectedProjectId,
+        openProjectDetail,
+        closeProjectDetail,
 
         selectedMemberId,
         openMemberModal: (id: string) => setSelectedMemberId(id),

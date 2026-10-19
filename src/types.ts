@@ -33,6 +33,13 @@ export interface Task {
   daysOpen?: number;
 }
 
+export interface MilestoneItem {
+  id: string;
+  title: string;
+  date: string;
+  status: 'done' | 'next' | 'pending';
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -41,14 +48,18 @@ export interface Project {
   status: 'In progress' | 'In review' | 'Planning' | 'Shipped' | 'Em andamento' | 'Em revisão' | 'Planejamento' | 'Entregue';
   color: string;
   icon: string;
+  startDate?: string;
+  startDisplay?: string;
   dueDate: string;
   dueDisplay: string;
+  daysLeft?: number;
   nextMilestone: {
     title: string;
     dueDate: string;
     dueDisplay: string;
     progress: number; // 0-100
   };
+  milestones?: MilestoneItem[];
   starred: boolean;
   leadId: string;
   memberIds: string[];

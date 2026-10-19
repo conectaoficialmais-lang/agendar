@@ -15,6 +15,29 @@ import {
 import { useApp } from '../context/AppContext';
 import { ACCENTS } from '../themeUtils';
 
+const MONTH_NAMES = [
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
+];
+
+interface CalendarDayCell {
+  day: number;
+  month: 'prev' | 'curr' | 'next';
+  dateStr: string; // "YYYY-MM-DD"
+  isToday: boolean;
+  isSelected: boolean;
+}
+
 export const CalendarView: React.FC = () => {
   const {
     events,
@@ -30,10 +53,18 @@ export const CalendarView: React.FC = () => {
   } = useApp();
 
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
-  const [selectedDay, setSelectedDay] = useState<number>(19); // 19 de Outubro é hoje
+  // Mês e ano em visualização no calendário (inicia em Outubro de 2026)
+  const [viewDate, setViewDate] = useState<Date>(() => new Date(2026, 9, 19));
+  // Data específica selecionada (YYYY-MM-DD)
+  const [selectedDateStr, setSelectedDateStr] = useState<string>('2026-10-19');
   const [scheduleFilter, setScheduleFilter] = useState<'all' | 'events' | 'tasks'>('all');
 
   const currentAccent = ACCENTS[preferences.accent] || ACCENTS.blue;
+
+  const currentYear = viewDate.getFullYear();
+  const currentMonth = viewDate.getMonth(); // 0 a 11
+  const monthTitle = `${MONTH_NAMES[currentMonth]} de ${currentYear}`;
+  const currentMonthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
 
   const typeBadges: Record<string, string> = {
     Reunião: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
@@ -46,54 +77,158 @@ export const CalendarView: React.FC = () => {
     'Focus block': 'bg-purple-500/15 text-purple-300 border-purple-500/30',
   };
 
-  // Helper para obter eventos de um dia específico de Outubro 2026
-  const getDayEvents = (day: number) => {
-    const dateStr = `2026-10-${day.toString().padStart(2, '0')}`;
+  // Obter eventos para uma data específica (YYYY-MM-DD)
+  const getDayEvents = (dateStr: string) => {
     return events.filter((e) => e.date === dateStr);
   };
 
-  // Helper para obter tarefas com prazo para um dia específico
-  const getDayTasks = (day: number) => {
-    const dateStr = `2026-10-${day.toString().padStart(2, '0')}`;
+  // Obter tarefas com prazo para uma data específica (YYYY-MM-DD)
+  const getDayTasks = (dateStr: string) => {
     return tasks.filter((t) => {
       if (t.dueDate === dateStr) return true;
-      if (day === 19 && (t.dueDisplay === 'Hoje' || t.dueDisplay === 'Today')) return true;
+      if (dateStr === '2026-10-19' && (t.dueDisplay === 'Hoje' || t.dueDisplay === 'Today')) return true;
       return false;
     });
   };
 
-  interface CalendarCell {
-    day: number;
-    month: 'prev' | 'curr' | 'next';
-    isToday?: boolean;
-  }
+  // Gerador dinâmico de grade mensal para qualquer ano e mês
+  const generateMonthGrid = (year: number, month: number): CalendarDayCell[] => {
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const totalDays = lastDay.getDate();
 
-  // Grade de 35 células para o mês de Outubro 2026 (Segunda a Domingo)
-  // Outubro de 2026 começa numa Quinta-feira (dia 1). Logo:
-  // Seg 28 Set, Ter 29 Set, Qua 30 Set são do mês anterior.
-  const calendarCells: CalendarCell[] = [
-    { day: 28, month: 'prev', isToday: false },
-    { day: 29, month: 'prev', isToday: false },
-    { day: 30, month: 'prev', isToday: false },
-    ...Array.from({ length: 31 }, (_, i) => ({
-      day: i + 1,
-      month: 'curr' as const,
-      isToday: i + 1 === 19,
-    })),
-    { day: 1, month: 'next', isToday: false },
-  ];
+    // Dia da semana de início (Segunda = 0, Domingo = 6)
+    const startDayIndex = (firstDay.getDay() + 6) % 7;
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    const cells: CalendarDayCell[] = [];
 
-  const selectedDateEvents = getDayEvents(selectedDay);
-  const selectedDateTasks = getDayTasks(selectedDay);
+    // Dias do mês anterior
+    for (let i = startDayIndex - 1; i >= 0; i--) {
+      const d = prevMonthLastDay - i;
+      const prevDate = new Date(year, month - 1, d);
+      const dateStr = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      cells.push({
+        day: d,
+        month: 'prev',
+        dateStr,
+        isToday: dateStr === '2026-10-19',
+        isSelected: dateStr === selectedDateStr,
+      });
+    }
 
-  const weekDays = [
-    { name: 'Seg', day: 19, isToday: true },
-    { name: 'Ter', day: 20 },
-    { name: 'Qua', day: 21 },
-    { name: 'Qui', day: 22 },
-    { name: 'Sex', day: 23 },
-    { name: 'Sáb', day: 24 },
-    { name: 'Dom', day: 25 },
+    // Dias do mês atual
+    for (let d = 1; d <= totalDays; d++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      cells.push({
+        day: d,
+        month: 'curr',
+        dateStr,
+        isToday: dateStr === '2026-10-19',
+        isSelected: dateStr === selectedDateStr,
+      });
+    }
+
+    // Dias do mês seguinte para completar matriz de 35 ou 42 células
+    const remaining = (7 - (cells.length % 7)) % 7;
+    const targetLength = cells.length + remaining < 35 ? 35 : cells.length + remaining;
+    const nextDaysNeeded = targetLength - cells.length;
+
+    for (let d = 1; d <= nextDaysNeeded; d++) {
+      const nextDate = new Date(year, month + 1, d);
+      const dateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      cells.push({
+        day: d,
+        month: 'next',
+        dateStr,
+        isToday: dateStr === '2026-10-19',
+        isSelected: dateStr === selectedDateStr,
+      });
+    }
+
+    return cells;
+  };
+
+  // Gerador de semana centrado na data selecionada
+  const getWeekDays = (refDateStr: string) => {
+    const [y, m, d] = refDateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    const dayOfWeek = (date.getDay() + 6) % 7; // Segunda = 0
+    const monday = new Date(date);
+    monday.setDate(date.getDate() - dayOfWeek);
+
+    const names = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+    return Array.from({ length: 7 }, (_, i) => {
+      const dayDate = new Date(monday);
+      dayDate.setDate(monday.getDate() + i);
+      const dateStr = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, '0')}-${String(dayDate.getDate()).padStart(2, '0')}`;
+      return {
+        name: names[i],
+        day: dayDate.getDate(),
+        dateStr,
+        isToday: dateStr === '2026-10-19',
+        isSelected: dateStr === selectedDateStr,
+      };
+    });
+  };
+
+  // Navegações de mês
+  const handlePrevMonth = () => {
+    if (viewMode === 'month') {
+      setViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    } else {
+      // Na semana, recua 7 dias
+      const [y, m, d] = selectedDateStr.split('-').map(Number);
+      const prevWeek = new Date(y, m - 1, d - 7);
+      const str = `${prevWeek.getFullYear()}-${String(prevWeek.getMonth() + 1).padStart(2, '0')}-${String(prevWeek.getDate()).padStart(2, '0')}`;
+      setSelectedDateStr(str);
+      setViewDate(prevWeek);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (viewMode === 'month') {
+      setViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    } else {
+      // Na semana, avança 7 dias
+      const [y, m, d] = selectedDateStr.split('-').map(Number);
+      const nextWeek = new Date(y, m - 1, d + 7);
+      const str = `${nextWeek.getFullYear()}-${String(nextWeek.getMonth() + 1).padStart(2, '0')}-${String(nextWeek.getDate()).padStart(2, '0')}`;
+      setSelectedDateStr(str);
+      setViewDate(nextWeek);
+    }
+  };
+
+  const handleGoToToday = () => {
+    const today = new Date(2026, 9, 19);
+    setViewDate(today);
+    setSelectedDateStr('2026-10-19');
+  };
+
+  const calendarGrid = generateMonthGrid(currentYear, currentMonth);
+  const weekDays = getWeekDays(selectedDateStr);
+
+  const selectedDateEvents = getDayEvents(selectedDateStr);
+  const selectedDateTasks = getDayTasks(selectedDateStr);
+
+  // Formatar data selecionada para exibição em português
+  const [selY, selM, selD] = selectedDateStr.split('-').map(Number);
+  const formattedSelectedDate = `${selD} de ${MONTH_NAMES[selM - 1]} de ${selY}`;
+  const isSelectedDateToday = selectedDateStr === '2026-10-19';
+
+  // Eventos do mês atual
+  const monthEventsCount = events.filter((e) => e.date.startsWith(currentMonthPrefix)).length;
+  const monthTasksCount = tasks.filter(
+    (t) => t.dueDate.startsWith(currentMonthPrefix) && t.status !== 'done'
+  ).length;
+
+  // Lista de meses rápidos sugeridos (Outubro 2026 até Março 2027)
+  const quickMonths = [
+    { label: 'Out 2026', year: 2026, month: 9 },
+    { label: 'Nov 2026', year: 2026, month: 10 },
+    { label: 'Dez 2026', year: 2026, month: 11 },
+    { label: 'Jan 2027', year: 2027, month: 0 },
+    { label: 'Fev 2027', year: 2027, month: 1 },
+    { label: 'Mar 2027', year: 2027, month: 2 },
   ];
 
   return (
@@ -101,38 +236,44 @@ export const CalendarView: React.FC = () => {
       {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
-            <span>Outubro de 2026</span>
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <span>{monthTitle}</span>
+            </h1>
+
+            {/* Setas de Mês Seguinte / Anterior Rápidas */}
+            <div className="flex items-center gap-1 p-1 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl">
+              <button
+                onClick={handlePrevMonth}
+                className="p-1.5 rounded-xl hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+                title="Mês anterior"
+              >
+                <ChevronLeft size={17} />
+              </button>
+              <button
+                onClick={handleNextMonth}
+                className="p-1.5 rounded-xl hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+                title="Mês seguinte"
+              >
+                <ChevronRight size={17} />
+              </button>
+            </div>
+          </div>
+
           <p className="text-white/60 text-sm mt-1">
-            {events.length} compromissos e {tasks.filter((t) => t.status !== 'done').length} tarefas abertas sincronizados
+            {monthEventsCount} compromissos e {monthTasksCount} tarefas abertas em {MONTH_NAMES[currentMonth]}
           </p>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
-          {/* Navegação de Data */}
-          <div className="flex items-center gap-1 p-1 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl text-white">
-            <button
-              onClick={() => setSelectedDay((d) => Math.max(1, d - 1))}
-              className="p-1.5 rounded-xl hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-              title="Dia anterior"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <button
-              onClick={() => setSelectedDay(19)}
-              className="px-3 py-1 rounded-xl text-xs font-semibold hover:bg-white/10 transition-colors"
-            >
-              Hoje
-            </button>
-            <button
-              onClick={() => setSelectedDay((d) => Math.min(31, d + 1))}
-              className="p-1.5 rounded-xl hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-              title="Próximo dia"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
+          {/* Botão Hoje */}
+          <button
+            onClick={handleGoToToday}
+            className="px-3.5 py-1.5 rounded-2xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white/90 border border-white/10 backdrop-blur-xl transition-all"
+            title="Voltar para 19 de Outubro de 2026"
+          >
+            Hoje
+          </button>
 
           {/* Alternador Mês / Semana */}
           <div className="flex items-center p-1 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl">
@@ -158,7 +299,7 @@ export const CalendarView: React.FC = () => {
             </button>
           </div>
 
-          {/* Botão Adicionar */}
+          {/* Botões Adicionar */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => openQuickAdd('event')}
@@ -178,6 +319,33 @@ export const CalendarView: React.FC = () => {
         </div>
       </div>
 
+      {/* Barra de Acesso Rápido a Meses Futuros */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <span className="text-[11px] font-semibold text-white/40 uppercase tracking-wider mr-1 shrink-0">
+          Explorar meses:
+        </span>
+        {quickMonths.map((qm) => {
+          const isCurrentActiveMonth = currentYear === qm.year && currentMonth === qm.month;
+          return (
+            <button
+              key={qm.label}
+              onClick={() => {
+                setViewDate(new Date(qm.year, qm.month, 1));
+                const newDateStr = `${qm.year}-${String(qm.month + 1).padStart(2, '0')}-01`;
+                setSelectedDateStr(newDateStr);
+              }}
+              className={`px-3 py-1 rounded-xl text-xs font-medium shrink-0 transition-all ${
+                isCurrentActiveMonth
+                  ? 'bg-white/20 text-white border border-white/30 shadow-sm font-semibold'
+                  : 'bg-white/[0.03] text-white/60 hover:text-white hover:bg-white/[0.08] border border-white/5'
+              }`}
+            >
+              {qm.label}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Grade Principal: Grade à Esquerda + Painel de Agenda à Direita */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Grade do Calendário (Mês / Semana) */}
@@ -195,28 +363,34 @@ export const CalendarView: React.FC = () => {
                 <span>Dom</span>
               </div>
 
-              {/* Células de dias */}
+              {/* Células de dias dinâmicas do mês */}
               <div className="grid grid-cols-7 gap-2 pt-3">
-                {calendarCells.map((cell, idx) => {
-                  const isCurrentMonth = cell.month === 'curr';
+                {calendarGrid.map((cell, idx) => {
+                  const isCurrentMonthCell = cell.month === 'curr';
                   const isToday = cell.isToday;
-                  const isSelected = selectedDay === cell.day && isCurrentMonth;
-                  const dayEvents = isCurrentMonth ? getDayEvents(cell.day) : [];
-                  const dayTasks = isCurrentMonth ? getDayTasks(cell.day) : [];
+                  const isSelected = selectedDateStr === cell.dateStr;
+                  const dayEvents = getDayEvents(cell.dateStr);
+                  const dayTasks = getDayTasks(cell.dateStr);
                   const totalItems = dayEvents.length + dayTasks.length;
 
                   return (
                     <div
                       key={idx}
-                      onClick={() => isCurrentMonth && setSelectedDay(cell.day)}
-                      className={`min-h-[80px] p-2 rounded-2xl transition-all cursor-pointer flex flex-col justify-between group ${
+                      onClick={() => {
+                        setSelectedDateStr(cell.dateStr);
+                        if (!isCurrentMonthCell) {
+                          const [y, m, d] = cell.dateStr.split('-').map(Number);
+                          setViewDate(new Date(y, m - 1, d));
+                        }
+                      }}
+                      className={`min-h-[82px] p-2 rounded-2xl transition-all cursor-pointer flex flex-col justify-between group ${
                         isToday
-                          ? 'bg-blue-600/20 border-2 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] ring-1 ring-blue-400/40'
+                          ? 'bg-blue-600/25 border-2 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] ring-1 ring-blue-400/40'
                           : isSelected
-                          ? 'bg-white/15 border border-white/30 shadow-md ring-1 ring-white/15'
-                          : isCurrentMonth
+                          ? 'bg-white/20 border border-white/35 shadow-md ring-1 ring-white/20'
+                          : isCurrentMonthCell
                           ? 'bg-white/[0.02] hover:bg-white/[0.06] border border-white/5'
-                          : 'opacity-25 bg-transparent border border-transparent pointer-events-none'
+                          : 'opacity-35 bg-white/[0.008] border border-white/[0.03] hover:opacity-60'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -226,9 +400,9 @@ export const CalendarView: React.FC = () => {
                               ? 'text-blue-300 font-extrabold'
                               : isSelected
                               ? 'text-white font-extrabold'
-                              : isCurrentMonth
-                              ? 'text-white/80'
-                              : 'text-white/30'
+                              : isCurrentMonthCell
+                              ? 'text-white/85'
+                              : 'text-white/40'
                           }`}
                         >
                           {cell.day}
@@ -283,15 +457,15 @@ export const CalendarView: React.FC = () => {
               </div>
             </div>
           ) : (
-            /* Visão em Semana */
+            /* Visão em Semana Dinâmica */
             <div className="space-y-4">
               <div className="grid grid-cols-7 gap-2 text-center pb-2 border-b border-white/5 text-[11px] font-bold text-white/60">
                 {weekDays.map((item) => (
                   <div
-                    key={item.name}
-                    onClick={() => setSelectedDay(item.day)}
+                    key={item.dateStr}
+                    onClick={() => setSelectedDateStr(item.dateStr)}
                     className={`p-2 rounded-xl cursor-pointer transition-all ${
-                      selectedDay === item.day
+                      selectedDateStr === item.dateStr
                         ? 'bg-blue-500/25 text-white ring-1 ring-blue-400/50'
                         : item.isToday
                         ? 'bg-white/10 text-blue-300'
@@ -306,15 +480,15 @@ export const CalendarView: React.FC = () => {
 
               <div className="grid grid-cols-7 gap-2 min-h-[380px]">
                 {weekDays.map((w) => {
-                  const dayEvs = getDayEvents(w.day);
-                  const dayTsks = getDayTasks(w.day);
+                  const dayEvs = getDayEvents(w.dateStr);
+                  const dayTsks = getDayTasks(w.dateStr);
 
                   return (
                     <div
-                      key={w.day}
-                      onClick={() => setSelectedDay(w.day)}
+                      key={w.dateStr}
+                      onClick={() => setSelectedDateStr(w.dateStr)}
                       className={`p-1.5 rounded-2xl transition-all cursor-pointer flex flex-col gap-1.5 ${
-                        selectedDay === w.day
+                        selectedDateStr === w.dateStr
                           ? 'bg-blue-500/10 border border-blue-500/30'
                           : w.isToday
                           ? 'bg-white/[0.04] border border-white/15'
@@ -380,13 +554,13 @@ export const CalendarView: React.FC = () => {
           )}
         </div>
 
-        {/* Painel Direito: Agenda do Dia Selecionado */}
+        {/* Painel Direito: Agenda da Data Selecionada */}
         <div className="lg:col-span-5 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl p-6 space-y-5">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <span>{selectedDay} de Outubro</span>
-                {selectedDay === 19 && (
+                <span>{formattedSelectedDate}</span>
+                {isSelectedDateToday && (
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
                     Hoje
                   </span>
@@ -440,7 +614,7 @@ export const CalendarView: React.FC = () => {
                 )}
 
                 {selectedDateEvents.map((ev) => {
-                  const isAroundNow = selectedDay === 19 && ev.startHour === 11.0;
+                  const isAroundNow = isSelectedDateToday && ev.startHour === 11.0;
 
                   return (
                     <div key={ev.id} className="space-y-2">
@@ -550,7 +724,7 @@ export const CalendarView: React.FC = () => {
               </div>
             )}
 
-            {/* Seção de Tarefas para o dia */}
+            {/* Seção de Tarefas para a data selecionada */}
             {(scheduleFilter === 'all' || scheduleFilter === 'tasks') && (
               <div className="space-y-3 pt-2">
                 {selectedDateTasks.length > 0 && (
@@ -634,7 +808,7 @@ export const CalendarView: React.FC = () => {
               <div className="p-8 text-center rounded-2xl bg-white/[0.02] border border-white/5">
                 <CalendarIcon size={28} className="mx-auto text-white/20 mb-2" />
                 <p className="text-xs text-white/50 font-medium">
-                  Nenhum compromisso ou tarefa para {selectedDay} de Outubro.
+                  Nenhum compromisso ou tarefa para {formattedSelectedDate}.
                 </p>
                 <div className="mt-3 flex items-center justify-center gap-2">
                   <button

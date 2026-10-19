@@ -16,6 +16,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { ACCENTS } from '../themeUtils';
 import { Project } from '../types';
+import { ProjectDetailView } from './ProjectDetailView';
 
 export const ProjectsView: React.FC = () => {
   const {
@@ -27,9 +28,16 @@ export const ProjectsView: React.FC = () => {
     preferences,
     getProjectStats,
     deleteProject,
+    selectedProjectId,
+    openProjectDetail,
   } = useApp();
   const [statusFilter, setStatusFilter] = useState<'Todos' | 'Ativos' | 'Planejamento' | 'Entregues'>('Todos');
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+
+  // Se houver um projeto selecionado, renderizar a visão detalhada do projeto
+  if (selectedProjectId) {
+    return <ProjectDetailView projectId={selectedProjectId} />;
+  }
 
   const currentAccent = ACCENTS[preferences.accent] || ACCENTS.blue;
 
@@ -185,14 +193,15 @@ export const ProjectsView: React.FC = () => {
           return (
             <div
               key={proj.id}
-              className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl glass-card-hover space-y-5 flex flex-col justify-between"
+              onClick={() => openProjectDetail(proj.id)}
+              className="p-6 rounded-3xl bg-[#141622]/70 hover:bg-[#141622]/90 backdrop-blur-2xl border border-white/10 hover:border-white/20 shadow-xl glass-card-hover space-y-5 flex flex-col justify-between cursor-pointer transition-all group"
             >
               <div>
                 {/* Linha Superior: Ícone, Título & Status, Ações (Estrela + Excluir) */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3.5">
                     <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shrink-0"
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shrink-0 group-hover:scale-105 transition-transform"
                       style={{
                         backgroundColor: `${proj.color}25`,
                         color: proj.color,
@@ -203,7 +212,9 @@ export const ProjectsView: React.FC = () => {
                     </div>
 
                     <div>
-                      <h3 className="text-base font-bold text-white leading-tight">{proj.name}</h3>
+                      <h3 className="text-base font-bold text-white group-hover:text-blue-300 transition-colors leading-tight flex items-center gap-2">
+                        <span>{proj.name}</span>
+                      </h3>
                       <div className="flex items-center gap-2 mt-1">
                         <span
                           className="w-2 h-2 rounded-full"
@@ -222,7 +233,10 @@ export const ProjectsView: React.FC = () => {
 
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => toggleProjectStar(proj.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleProjectStar(proj.id);
+                      }}
                       className="p-2 rounded-xl text-white/40 hover:text-amber-400 hover:bg-white/5 transition-colors"
                       title={proj.starred ? 'Desmarcar favorito' : 'Favoritar projeto'}
                     >
@@ -232,7 +246,10 @@ export const ProjectsView: React.FC = () => {
                       />
                     </button>
                     <button
-                      onClick={() => setProjectToDelete(proj)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setProjectToDelete(proj);
+                      }}
                       className="p-2 rounded-xl text-white/40 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
                       title="Excluir projeto"
                     >

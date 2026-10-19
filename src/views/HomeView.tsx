@@ -38,6 +38,7 @@ export const HomeView: React.FC = () => {
     setFocusDurationMinutes,
     setFocusTaskId,
     openMemberModal,
+    openProjectDetail,
     doneTodayCount,
     doneThisWeekCount,
     openTasksCount,
@@ -457,8 +458,11 @@ export const HomeView: React.FC = () => {
                 return (
                   <div
                     key={proj.id}
-                    onClick={() => setActiveTab('projects')}
-                    className="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    onClick={() => {
+                      openProjectDetail(proj.id);
+                      setActiveTab('projects');
+                    }}
+                    className="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                   >
                     <div className="flex items-center gap-3">
                       <div
