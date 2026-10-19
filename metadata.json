@@ -1,0 +1,6 @@
+{
+  "name": "Pane - Team Workspace & Focus",
+  "description": "A glassmorphism productivity manager for teams, tasks, projects, calendar, and focus.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
