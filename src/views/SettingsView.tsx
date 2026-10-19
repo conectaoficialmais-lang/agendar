@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   User,
   Bell,
@@ -13,6 +13,9 @@ import {
   Sun,
   Moon,
   Laptop,
+  Camera,
+  Upload,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { WALLPAPERS, ACCENTS } from '../themeUtils';
@@ -35,7 +38,57 @@ export const SettingsView: React.FC = () => {
   const [profileName, setProfileName] = useState(currentUser.name);
   const [profileEmail, setProfileEmail] = useState(currentUser.email);
   const [profileRole, setProfileRole] = useState(currentUser.role);
+  const [profileAvatar, setProfileAvatar] = useState(currentUser.avatar);
   const [profileSaved, setProfileSaved] = useState(false);
+  const [customAvatarUrl, setCustomAvatarUrl] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const PRESET_AVATARS = [
+    { name: 'Lin (Padrão)', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80' },
+    { name: 'Alex', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80' },
+    { name: 'Sofia', url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80' },
+    { name: 'Marco', url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80' },
+    { name: 'Elena', url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=80' },
+    { name: 'Lucas', url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&auto=format&fit=crop&q=80' },
+    { name: 'Nia', url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80' },
+    { name: 'Dev 3D', url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80' },
+  ];
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Por favor, escolha uma imagem de até 5MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (result) {
+        setProfileAvatar(result);
+        updateUserProfile({ avatar: result });
+        setProfileSaved(true);
+        setTimeout(() => setProfileSaved(false), 2500);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSelectPreset = (url: string) => {
+    setProfileAvatar(url);
+    updateUserProfile({ avatar: url });
+    setProfileSaved(true);
+    setTimeout(() => setProfileSaved(false), 2500);
+  };
+
+  const handleApplyCustomUrl = () => {
+    if (!customAvatarUrl.trim()) return;
+    setProfileAvatar(customAvatarUrl.trim());
+    updateUserProfile({ avatar: customAvatarUrl.trim() });
+    setCustomAvatarUrl('');
+    setProfileSaved(true);
+    setTimeout(() => setProfileSaved(false), 2500);
+  };
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
@@ -47,6 +100,7 @@ export const SettingsView: React.FC = () => {
       name: profileName,
       email: profileEmail,
       role: profileRole,
+      avatar: profileAvatar,
     });
     setProfileSaved(true);
     setTimeout(() => setProfileSaved(false), 2500);
@@ -141,19 +195,107 @@ export const SettingsView: React.FC = () => {
               <p className="text-xs text-white/50">Como a equipe vê você no workspace</p>
             </div>
 
-            <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5">
-              <div className="relative">
-                <img
-                  src={currentUser.avatar}
-                  alt={currentUser.name}
-                  className="w-16 h-16 rounded-2xl object-cover ring-2 ring-white/20"
-                />
-                <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 ring-2 ring-[#141622]" />
+            {/* Card com Foto de Perfil e Controles */}
+            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="relative group shrink-0">
+                    <img
+                      src={profileAvatar || currentUser.avatar}
+                      alt={currentUser.name}
+                      className="w-16 h-16 rounded-2xl object-cover ring-2 ring-white/20 shadow-md group-hover:brightness-90 transition-all"
+                    />
+                    <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 ring-2 ring-[#141622]" />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity text-white"
+                      title="Enviar nova foto"
+                    >
+                      <Camera size={20} />
+                    </button>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-bold text-white">{currentUser.name}</h3>
+                    <p className="text-xs text-white/60">{currentUser.role}</p>
+                    <p className="text-[11px] text-white/40">{currentUser.email}</p>
+                  </div>
+                </div>
+
+                {/* Botão de Upload de Foto */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-3.5 py-2 rounded-xl text-xs font-semibold text-white/90 bg-white/10 hover:bg-white/15 border border-white/10 transition-all flex items-center gap-1.5"
+                  >
+                    <Upload size={13} />
+                    <span>Carregar do dispositivo</span>
+                  </button>
+                </div>
               </div>
-              <div>
-                <h3 className="text-base font-bold text-white">{currentUser.name}</h3>
-                <p className="text-xs text-white/60">{currentUser.role}</p>
-                <p className="text-[11px] text-white/40">{currentUser.email}</p>
+
+              {/* Seletor de Avatares Predefinidos */}
+              <div className="pt-3 border-t border-white/5 space-y-2">
+                <label className="block text-[11px] font-semibold text-white/50 uppercase tracking-wider">
+                  Ou escolha um avatar predefinido
+                </label>
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  {PRESET_AVATARS.map((preset) => {
+                    const isSelected = (profileAvatar || currentUser.avatar) === preset.url;
+                    return (
+                      <button
+                        key={preset.name}
+                        type="button"
+                        onClick={() => handleSelectPreset(preset.url)}
+                        className={`relative rounded-xl transition-all p-0.5 ${
+                          isSelected
+                            ? 'ring-2 ring-blue-500 scale-105'
+                            : 'opacity-70 hover:opacity-100 ring-1 ring-white/10'
+                        }`}
+                        title={preset.name}
+                      >
+                        <img
+                          src={preset.url}
+                          alt={preset.name}
+                          className="w-9 h-9 rounded-lg object-cover"
+                        />
+                        {isSelected && (
+                          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-blue-500 text-white flex items-center justify-center text-[9px]">
+                            <Check size={9} strokeWidth={3} />
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Inserir URL personalizada */}
+              <div className="pt-2 flex items-center gap-2">
+                <input
+                  type="url"
+                  value={customAvatarUrl}
+                  onChange={(e) => setCustomAvatarUrl(e.target.value)}
+                  placeholder="Ou cole a URL de uma imagem..."
+                  className="flex-1 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs placeholder-white/30 focus:outline-none focus:border-blue-500"
+                />
+                <button
+                  type="button"
+                  disabled={!customAvatarUrl.trim()}
+                  onClick={handleApplyCustomUrl}
+                  className="px-3 py-1.5 rounded-xl text-xs font-semibold text-white/80 bg-white/10 hover:bg-white/15 disabled:opacity-30 transition-all"
+                >
+                  Aplicar URL
+                </button>
               </div>
             </div>
 

@@ -91,12 +91,16 @@ interface AppContextType {
   toggleProjectStar: (projectId: string) => void;
   addProject: (project: Omit<Project, 'id'>) => Project;
   updateProject: (projectId: string, patch: Partial<Project>) => void;
+  deleteProject: (projectId: string) => void;
 
   // Calendar actions
   addCalendarEvent: (event: Omit<CalendarEvent, 'id'>) => CalendarEvent;
+  deleteCalendarEvent: (eventId: string) => void;
 
   // Team & Member actions
   updateUserProfile: (patch: Partial<TeamMember>) => void;
+  deleteTeamMember: (memberId: string) => void;
+  addTeamMember: (member: Omit<TeamMember, 'id'>) => TeamMember;
 
   // Preferences
   updatePreferences: (patch: Partial<UserPreferences>) => void;
@@ -487,6 +491,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setProjects((prev) => prev.map((p) => (p.id === projectId ? { ...p, ...patch } : p)));
   };
 
+  const deleteProject = (projectId: string) => {
+    const projToDelete = projects.find((p) => p.id === projectId);
+    setProjects((prev) => prev.filter((p) => p.id !== projectId));
+    // Cleanly remove associated tasks
+    setTasks((prev) => prev.filter((t) => t.projectId !== projectId));
+    setNotifications((prev) => [
+      {
+        id: `notif-${Date.now()}`,
+        title: 'Projeto excluído',
+        subtitle: projToDelete ? `Projeto "${projToDelete.name}" foi removido com sucesso` : 'Projeto removido',
+        time: 'Agora',
+        read: false,
+        type: 'system',
+        linkTab: 'projects',
+      },
+      ...prev,
+    ]);
+  };
+
   const addCalendarEvent = (eventData: Omit<CalendarEvent, 'id'>): CalendarEvent => {
     const newEv: CalendarEvent = {
       ...eventData,
@@ -496,10 +519,77 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newEv;
   };
 
+  const deleteCalendarEvent = (eventId: string) => {
+    const ev = events.find((e) => e.id === eventId);
+    setEvents((prev) => prev.filter((e) => e.id !== eventId));
+    setNotifications((prev) => [
+      {
+        id: `notif-${Date.now()}`,
+        title: 'Evento removido',
+        subtitle: ev ? `"${ev.title}" foi removido da agenda` : 'Evento removido',
+        time: 'Agora',
+        read: false,
+        type: 'system',
+        linkTab: 'calendar',
+      },
+      ...prev,
+    ]);
+  };
+
   const updateUserProfile = (patch: Partial<TeamMember>) => {
     setMembers((prev) =>
       prev.map((m) => (m.isCurrentUser ? { ...m, ...patch } : m))
     );
+  };
+
+  const deleteTeamMember = (memberId: string) => {
+    const mem = members.find((m) => m.id === memberId);
+    if (mem?.isCurrentUser) {
+      return;
+    }
+    setMembers((prev) => prev.filter((m) => m.id !== memberId));
+    if (selectedMemberId === memberId) {
+      setSelectedMemberId(null);
+    }
+    setProjects((prev) =>
+      prev.map((p) => ({
+        ...p,
+        memberIds: p.memberIds.filter((id) => id !== memberId),
+      }))
+    );
+    setNotifications((prev) => [
+      {
+        id: `notif-${Date.now()}`,
+        title: 'Membro removido',
+        subtitle: mem ? `${mem.name} foi removido da equipe` : 'Membro removido',
+        time: 'Agora',
+        read: false,
+        type: 'system',
+        linkTab: 'team',
+      },
+      ...prev,
+    ]);
+  };
+
+  const addTeamMember = (memberData: Omit<TeamMember, 'id'>): TeamMember => {
+    const newMember: TeamMember = {
+      ...memberData,
+      id: `mem-${Date.now()}`,
+    };
+    setMembers((prev) => [...prev, newMember]);
+    setNotifications((prev) => [
+      {
+        id: `notif-${Date.now()}`,
+        title: 'Novo membro na equipe',
+        subtitle: `${newMember.name} foi adicionado(a) ao workspace`,
+        time: 'Agora',
+        read: false,
+        type: 'system',
+        linkTab: 'team',
+      },
+      ...prev,
+    ]);
+    return newMember;
   };
 
   const updatePreferences = (patch: Partial<UserPreferences>) => {
@@ -644,9 +734,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleProjectStar,
         addProject,
         updateProject,
+        deleteProject,
 
         addCalendarEvent,
+        deleteCalendarEvent,
         updateUserProfile,
+        deleteTeamMember,
+        addTeamMember,
         updatePreferences,
         toggleTheme,
 

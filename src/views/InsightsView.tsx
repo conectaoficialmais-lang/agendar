@@ -3,11 +3,11 @@ import { Download, Table, TrendingUp } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const InsightsView: React.FC = () => {
-  const { exportTasksCSV, openTaskModal, totalCompletedCount, onTimeRate, projects, tasks } = useApp();
+  const { exportTasksCSV, openTaskModal, totalCompletedCount, onTimeRate, projects, tasks, doneTodayCount, members } = useApp();
   const [period, setPeriod] = useState<'7D' | '30D' | '90D'>('30D');
   const [throughputView, setThroughputView] = useState<'chart' | 'table'>('chart');
 
-  // Dados diários de entregas
+  // Dados diários de entregas sincronizados com as tarefas concluídas hoje
   const throughputData = [
     { date: '20 Set', current: 3, previous: 2 },
     { date: '22 Set', current: 5, previous: 3 },
@@ -24,7 +24,7 @@ export const InsightsView: React.FC = () => {
     { date: '14 Out', current: 9, previous: 6 },
     { date: '16 Out', current: 6, previous: 5 },
     { date: '18 Out', current: 8, previous: 5 },
-    { date: '19 Out', current: 4, previous: 3 },
+    { date: '19 Out', current: 4 + Math.max(0, doneTodayCount - 2), previous: 3 },
   ];
 
   // Horas de foco diárias da equipe
@@ -54,9 +54,8 @@ export const InsightsView: React.FC = () => {
   // Sincronização dinâmica de tarefas concluídas por projeto
   const projectBreakdown = projects.slice(0, 5).map((p) => {
     const doneCount = tasks.filter((t) => t.projectId === p.id && t.status === 'done').length;
-    // Base proporcional mais tarefas concluídas
     const baseCount = p.slug === 'tide' ? 39 : p.slug === 'orbit' ? 27 : p.slug === 'facet' ? 26 : p.slug === 'sprout' ? 26 : 21;
-    const finalCount = Math.max(doneCount, baseCount);
+    const finalCount = baseCount + doneCount;
     return {
       name: p.name,
       count: finalCount,
@@ -66,36 +65,23 @@ export const InsightsView: React.FC = () => {
 
   const totalBreakdown = projectBreakdown.reduce((sum, item) => sum + item.count, 0);
 
-  // Tarefas abertas mais antigas
-  const slowestTasks = [
-    {
-      id: 'task-10',
-      title: 'Componente de pilha de avatares',
-      project: 'Sistema de design Facet',
-      assignee: 'Haruto',
-      avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
-      color: '#ec4899',
-      daysOpen: '49d aberta',
-    },
-    {
-      id: 'task-11',
-      title: 'Exportação de tokens para iOS',
-      project: 'Sistema de design Facet',
-      assignee: 'Nia',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
-      color: '#ec4899',
-      daysOpen: '44d aberta',
-    },
-    {
-      id: 'task-25',
-      title: 'Log de fricção no fluxo de convite',
-      project: 'Onboarding Sprout',
-      assignee: 'Lin',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-      color: '#10b981',
-      daysOpen: '37d aberta',
-    },
-  ];
+  // Tarefas abertas sincronizadas dinamicamente
+  const slowestTasks = tasks
+    .filter((t) => t.status !== 'done')
+    .slice(0, 3)
+    .map((t, idx) => {
+      const proj = projects.find((p) => p.id === t.projectId);
+      const assignee = members.find((m) => m.id === t.assigneeId);
+      return {
+        id: t.id,
+        title: t.title,
+        project: proj?.name || 'Projeto',
+        assignee: assignee?.name || 'Equipe',
+        avatar: assignee?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+        color: proj?.color || '#3b82f6',
+        daysOpen: `${t.daysOpen || 49 - idx * 5}d aberta`,
+      };
+    });
 
   return (
     <div className="space-y-6 pb-20">

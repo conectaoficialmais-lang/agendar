@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { X, Clock, Briefcase, CheckSquare, Send, Sparkles } from 'lucide-react';
+import { X, Clock, Briefcase, CheckSquare, Send, Sparkles, Trash2, AlertTriangle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const MemberModal: React.FC = () => {
-  const { selectedMemberId, closeMemberModal, members, tasks, openTaskModal } = useApp();
+  const { selectedMemberId, closeMemberModal, members, tasks, openTaskModal, deleteTeamMember } = useApp();
   const [message, setMessage] = useState('');
   const [sentToast, setSentToast] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (!selectedMemberId) return null;
 
@@ -164,6 +165,52 @@ export const MemberModal: React.FC = () => {
             </p>
           )}
         </div>
+
+        {/* Zona de Ação: Excluir Membro da Equipe */}
+        {!member.isCurrentUser && (
+          <div className="pt-3 border-t border-white/10">
+            {showDeleteConfirm ? (
+              <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-2">
+                <div className="flex items-center gap-2 text-rose-300 text-xs font-semibold">
+                  <AlertTriangle size={15} />
+                  <span>Deseja remover {member.name} da equipe?</span>
+                </div>
+                <p className="text-[11px] text-white/50 leading-relaxed">
+                  As tarefas atribuídas a este membro permanecerão no workspace, mas o membro não terá mais acesso.
+                </p>
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-3 py-1.5 rounded-xl text-xs text-white/70 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      deleteTeamMember(member.id);
+                      closeMemberModal();
+                    }}
+                    className="px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-md transition-all flex items-center gap-1"
+                  >
+                    <Trash2 size={12} />
+                    Confirmar Exclusão
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="w-full py-2 px-3 rounded-xl text-xs font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all flex items-center justify-center gap-2"
+              >
+                <Trash2 size={14} />
+                <span>Excluir membro da equipe</span>
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="fixed inset-0 -z-10" onClick={closeMemberModal} />

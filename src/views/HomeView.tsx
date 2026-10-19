@@ -18,6 +18,7 @@ export const HomeView: React.FC = () => {
   const {
     tasks,
     projects,
+    events,
     members,
     currentUser,
     toggleTaskComplete,
@@ -54,6 +55,11 @@ export const HomeView: React.FC = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Eventos de hoje dinâmicos
+  const todayEvents = events.filter((e) => e.date === '2026-10-19');
+  const nextMeeting = todayEvents[0];
+  const otherTodayEvents = todayEvents.slice(1);
+
   // Tarefas para hoje do usuário logado
   const todayTasks = tasks.filter(
     (t) =>
@@ -70,7 +76,7 @@ export const HomeView: React.FC = () => {
             Bom dia, {currentUser.name.split(' ')[0]}
           </h1>
           <p className="text-white/60 text-sm mt-1">
-            Segunda-feira, 19 de outubro · 4 reuniões e {openTasksCount} tarefas restantes hoje
+            Segunda-feira, 19 de outubro · {todayEvents.length} reuniões e {openTasksCount} tarefas restantes hoje
           </p>
         </div>
 
@@ -195,7 +201,13 @@ export const HomeView: React.FC = () => {
                     stroke="#10b981"
                     strokeWidth="8"
                     strokeDasharray="150.79"
-                    strokeDashoffset={150.79 * (1 - 1 / 4)}
+                    strokeDashoffset={
+                      150.79 *
+                      (1 -
+                        (todayEvents.length > 0
+                          ? Math.min(1, 1 / todayEvents.length)
+                          : 0))
+                    }
                     strokeLinecap="round"
                     fill="none"
                     className="transition-all duration-700 ease-out"
@@ -231,7 +243,7 @@ export const HomeView: React.FC = () => {
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
                     <span className="text-white/80 font-medium">Reuniões</span>
                   </div>
-                  <span className="font-bold text-white">1/4 realizadas</span>
+                  <span className="font-bold text-white">1/{todayEvents.length || 1} realizadas</span>
                 </div>
               </div>
             </div>
@@ -354,67 +366,74 @@ export const HomeView: React.FC = () => {
             </div>
 
             {/* Card Destacado da Próxima Reunião */}
-            <div className="p-4 rounded-2xl bg-blue-600/15 border border-blue-500/30 text-white shadow-lg relative overflow-hidden">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/30 text-blue-200 mb-1.5">
-                    em 33 min
-                  </span>
-                  <h4 className="text-base font-bold text-white">Revisão e alinhamento Tide</h4>
-                  <p className="text-xs text-blue-200/80 mt-0.5">
-                    11:00 – 11:45 · Chamada de vídeo
-                  </p>
+            {nextMeeting ? (
+              <div className="p-4 rounded-2xl bg-blue-600/15 border border-blue-500/30 text-white shadow-lg relative overflow-hidden">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/30 text-blue-200 mb-1.5">
+                      em breve
+                    </span>
+                    <h4 className="text-base font-bold text-white">{nextMeeting.title}</h4>
+                    <p className="text-xs text-blue-200/80 mt-0.5">
+                      {nextMeeting.startTime} – {nextMeeting.endTime} · {nextMeeting.location}
+                    </p>
 
-                  {/* Participantes */}
-                  <div className="flex items-center gap-1.5 mt-3">
-                    <div className="flex -space-x-2">
-                      {members.slice(0, 4).map((m) => (
-                        <img
-                          key={m.id}
-                          src={m.avatar}
-                          alt={m.name}
-                          className="w-6 h-6 rounded-full object-cover ring-2 ring-[#141622]"
-                        />
-                      ))}
+                    {/* Participantes */}
+                    <div className="flex items-center gap-1.5 mt-3">
+                      <div className="flex -space-x-2">
+                        {nextMeeting.attendeeIds.slice(0, 4).map((attId) => {
+                          const att = members.find((m) => m.id === attId);
+                          if (!att) return null;
+                          return (
+                            <img
+                              key={att.id}
+                              src={att.avatar}
+                              alt={att.name}
+                              className="w-6 h-6 rounded-full object-cover ring-2 ring-[#141622]"
+                              title={att.name}
+                            />
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <button
-                  onClick={() => setActiveTab('calendar')}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 shadow-md shadow-blue-500/30 transition-all flex items-center gap-1.5 shrink-0"
-                >
-                  <Video size={14} />
-                  Entrar
-                </button>
+                  <button
+                    onClick={() => setActiveTab('calendar')}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 shadow-md shadow-blue-500/30 transition-all flex items-center gap-1.5 shrink-0"
+                  >
+                    <Video size={14} />
+                    Entrar
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 text-center text-xs text-white/50">
+                Nenhuma reunião agendada para hoje.
+              </div>
+            )}
 
             {/* Demais itens da agenda do dia */}
             <div className="space-y-2 pt-2">
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-xs">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1 h-4 rounded-full bg-pink-500" />
-                  <span className="text-white/90 font-medium">Almoço e aprendizado: materiais de vidro</span>
-                </div>
-                <span className="text-white/50 text-[11px]">12:30</span>
-              </div>
-
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-xs">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1 h-4 rounded-full bg-purple-500" />
-                  <span className="text-white/90 font-medium">Trabalho focado (Deep work)</span>
-                </div>
-                <span className="text-white/50 text-[11px]">14:00</span>
-              </div>
-
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-xs">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1 h-4 rounded-full bg-purple-500" />
-                  <span className="text-white/90 font-medium">Corte do vídeo de lançamento Orbit</span>
-                </div>
-                <span className="text-white/50 text-[11px]">16:00</span>
-              </div>
+              {otherTodayEvents.length > 0 ? (
+                otherTodayEvents.map((ev) => (
+                  <div
+                    key={ev.id}
+                    onClick={() => setActiveTab('calendar')}
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-xs cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-1 h-4 rounded-full bg-blue-400" />
+                      <span className="text-white/90 font-medium">{ev.title}</span>
+                    </div>
+                    <span className="text-white/50 text-[11px]">{ev.startTime}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-[11px] text-white/30 text-center py-1">
+                  Não há outros eventos na agenda de hoje
+                </p>
+              )}
             </div>
           </div>
 

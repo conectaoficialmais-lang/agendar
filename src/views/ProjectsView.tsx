@@ -10,14 +10,26 @@ import {
   Flame,
   Compass,
   Folder,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ACCENTS } from '../themeUtils';
+import { Project } from '../types';
 
 export const ProjectsView: React.FC = () => {
-  const { projects, members, tasks, toggleProjectStar, openQuickAdd, preferences, getProjectStats } =
-    useApp();
+  const {
+    projects,
+    members,
+    tasks,
+    toggleProjectStar,
+    openQuickAdd,
+    preferences,
+    getProjectStats,
+    deleteProject,
+  } = useApp();
   const [statusFilter, setStatusFilter] = useState<'Todos' | 'Ativos' | 'Planejamento' | 'Entregues'>('Todos');
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
   const currentAccent = ACCENTS[preferences.accent] || ACCENTS.blue;
 
@@ -146,12 +158,16 @@ export const ProjectsView: React.FC = () => {
 
         <div className="p-4 rounded-3xl bg-[#141622]/60 backdrop-blur-xl border border-white/10 shadow-lg glass-card-hover">
           <span className="text-xs text-white/50 block font-medium">No prazo</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">50%</div>
+          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">
+            {projects.length > 0 ? Math.round(((activeCount + shippedCount) / projects.length) * 100) : 100}%
+          </div>
         </div>
 
         <div className="p-4 rounded-3xl bg-[#141622]/60 backdrop-blur-xl border border-white/10 shadow-lg glass-card-hover">
           <span className="text-xs text-white/50 block font-medium">Entrega este mês</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">2</div>
+          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">
+            {projects.filter((p) => p.dueDate.startsWith('2026-10') || p.dueDisplay.includes('Out') || p.dueDisplay.includes('Oct')).length}
+          </div>
         </div>
       </div>
 
@@ -160,7 +176,7 @@ export const ProjectsView: React.FC = () => {
         {filteredProjects.map((proj) => {
           const Icon = getProjectIcon(proj.icon);
           const stats = getProjectStats(proj.id);
-          const progress = Math.max(stats.progress, proj.nextMilestone.progress);
+          const progress = stats.total > 0 ? stats.progress : proj.nextMilestone.progress;
 
           const strokeRadius = 20;
           const circumference = 2 * Math.PI * strokeRadius;
@@ -172,7 +188,7 @@ export const ProjectsView: React.FC = () => {
               className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl glass-card-hover space-y-5 flex flex-col justify-between"
             >
               <div>
-                {/* Linha Superior: Ícone, Título & Status, Estrela */}
+                {/* Linha Superior: Ícone, Título & Status, Ações (Estrela + Excluir) */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3.5">
                     <div
@@ -204,16 +220,25 @@ export const ProjectsView: React.FC = () => {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => toggleProjectStar(proj.id)}
-                    className="p-2 rounded-xl text-white/40 hover:text-amber-400 hover:bg-white/5 transition-colors"
-                    title={proj.starred ? 'Desmarcar favorito' : 'Favoritar projeto'}
-                  >
-                    <Star
-                      size={18}
-                      className={proj.starred ? 'fill-amber-400 text-amber-400' : ''}
-                    />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => toggleProjectStar(proj.id)}
+                      className="p-2 rounded-xl text-white/40 hover:text-amber-400 hover:bg-white/5 transition-colors"
+                      title={proj.starred ? 'Desmarcar favorito' : 'Favoritar projeto'}
+                    >
+                      <Star
+                        size={17}
+                        className={proj.starred ? 'fill-amber-400 text-amber-400' : ''}
+                      />
+                    </button>
+                    <button
+                      onClick={() => setProjectToDelete(proj)}
+                      className="p-2 rounded-xl text-white/40 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                      title="Excluir projeto"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Descrição */}
@@ -302,6 +327,52 @@ export const ProjectsView: React.FC = () => {
           );
         })}
       </div>
+
+      {/* Modal de Confirmação de Exclusão do Projeto */}
+      {projectToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
+          <div
+            className="w-full max-w-md rounded-3xl bg-[#151722]/95 backdrop-blur-2xl border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.7)] text-white p-6 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center">
+              <AlertTriangle size={24} />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-white">Excluir projeto</h3>
+              <p className="text-xs text-white/60 mt-1.5 leading-relaxed">
+                Tem certeza de que deseja excluir o projeto <strong className="text-white">"{projectToDelete.name}"</strong>?
+              </p>
+              <p className="text-xs text-rose-300/80 mt-2 bg-rose-500/10 p-2.5 rounded-xl border border-rose-500/20">
+                Atenção: Todas as tarefas e dados vinculados a este projeto serão removidos permanentemente.
+              </p>
+            </div>
+
+            <div className="pt-2 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setProjectToDelete(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-white/70 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteProject(projectToDelete.id);
+                  setProjectToDelete(null);
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-600/30 transition-all flex items-center gap-1.5"
+              >
+                <Trash2 size={13} />
+                Excluir Projeto
+              </button>
+            </div>
+          </div>
+          <div className="fixed inset-0 -z-10" onClick={() => setProjectToDelete(null)} />
+        </div>
+      )}
     </div>
   );
 };

@@ -12,7 +12,7 @@ import { TeamDepartment } from '../types';
 import { ACCENTS } from '../themeUtils';
 
 export const TeamView: React.FC = () => {
-  const { members, openMemberModal, preferences, getMemberOpenCount } = useApp();
+  const { members, openMemberModal, preferences, getMemberOpenCount, addTeamMember } = useApp();
   const [selectedDept, setSelectedDept] = useState<'Todos' | 'Produto' | 'Design' | 'Engenharia' | 'Marketing'>('Todos');
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -31,6 +31,13 @@ export const TeamView: React.FC = () => {
 
   const onlineCount = members.filter((m) => m.status === 'online').length;
   const inFocusCount = members.filter((m) => m.status === 'focus').length;
+  const deptCount = new Set(members.map((m) => m.team)).size;
+  const avgLoad = members.length > 0
+    ? Math.round(
+        members.reduce((acc, m) => acc + (m.workloadHours / (m.maxWorkloadHours || 40)) * 100, 0) /
+          members.length
+      )
+    : 0;
 
   const statusColors = {
     online: 'bg-emerald-400',
@@ -51,12 +58,30 @@ export const TeamView: React.FC = () => {
   const handleSendInvite = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteEmail.trim()) return;
+    const namePart = inviteEmail.split('@')[0];
+    const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    addTeamMember({
+      name: formattedName,
+      role: 'Colaborador',
+      team: selectedDept !== 'Todos' ? (selectedDept as any) : 'Engenharia',
+      avatar: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80`,
+      status: 'online',
+      statusText: 'Disponível no workspace',
+      city: 'São Paulo',
+      timezoneOffset: -3,
+      timezoneNote: 'BRT',
+      localTimeStr: '11:00',
+      workloadHours: 12,
+      maxWorkloadHours: 40,
+      openTasksCount: 0,
+      email: inviteEmail.trim(),
+    });
     setInviteSent(true);
     setTimeout(() => {
       setInviteSent(false);
       setInviteModalOpen(false);
       setInviteEmail('');
-    }, 1800);
+    }, 1200);
   };
 
   return (
@@ -65,7 +90,9 @@ export const TeamView: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">Equipe</h1>
-          <p className="text-white/60 text-sm mt-1">12 pessoas · 4 departamentos</p>
+          <p className="text-white/60 text-sm mt-1">
+            {members.length} {members.length === 1 ? 'pessoa' : 'pessoas'} · {deptCount} departamentos
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -97,21 +124,23 @@ export const TeamView: React.FC = () => {
         </div>
       </div>
 
-      {/* 3 Stat Cards */}
+      {/* 3 Stat Cards Sincronizados */}
       <div className="grid grid-cols-3 gap-3 md:gap-4">
         <div className="p-4 rounded-3xl bg-[#141622]/60 backdrop-blur-xl border border-white/10 shadow-lg glass-card-hover">
           <span className="text-xs text-white/50 block font-medium">Online agora</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">9/12</div>
+          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">
+            {onlineCount}/{members.length}
+          </div>
         </div>
 
         <div className="p-4 rounded-3xl bg-[#141622]/60 backdrop-blur-xl border border-white/10 shadow-lg glass-card-hover">
           <span className="text-xs text-white/50 block font-medium">Em foco</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">2</div>
+          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">{inFocusCount}</div>
         </div>
 
         <div className="p-4 rounded-3xl bg-[#141622]/60 backdrop-blur-xl border border-white/10 shadow-lg glass-card-hover">
           <span className="text-xs text-white/50 block font-medium">Carga média</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">32%</div>
+          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">{avgLoad}%</div>
         </div>
       </div>
 
