@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pane - Projects Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            bgDark: '#0a0a0b',
+            sidebarDark: '#121316',
+            cardDark: '#131316',
+            textMuted: '#8b8b90',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0a0a0b;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .custom-glow-orbit {
+      background: radial-gradient(circle at 10% 10%, rgba(168, 85, 247, 0.16) 0%, rgba(19, 19, 22, 0) 55%), #131316;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .custom-glow-tide {
+      background: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.16) 0%, rgba(19, 19, 22, 0) 55%), #131316;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .custom-glow-facet {
+      background: radial-gradient(circle at 10% 10%, rgba(236, 72, 153, 0.16) 0%, rgba(19, 19, 22, 0) 55%), #131316;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .custom-glow-sprout {
+      background: radial-gradient(circle at 10% 10%, rgba(34, 197, 94, 0.16) 0%, rgba(19, 19, 22, 0) 55%), #131316;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .custom-glow-q4brand {
+      background: radial-gradient(circle at 10% 10%, rgba(249, 115, 22, 0.16) 0%, rgba(19, 19, 22, 0) 55%), #131316;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .custom-glow-northstar {
+      background: radial-gradient(circle at 10% 10%, rgba(6, 182, 212, 0.16) 0%, rgba(19, 19, 22, 0) 55%), #131316;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0a0a0b] text-white">
+
+  <!-- ============================================== -->
+  <!-- SIDEBAR ESQUERDA (fixa, ~220px)                -->
+  <!-- ============================================== -->
+  <aside class="fixed left-4 top-4 bottom-4 w-[220px] hidden md:flex flex-col justify-between p-3.5 rounded-[20px] bg-[#121316] border border-white/[0.06] shadow-2xl z-40">
+    <div class="space-y-4">
+      <!-- Topo: Logo circular com ícone abstrato + texto "Pane" em negrito branco -->
+      <div class="flex items-center gap-2.5 px-2 py-1.5 rounded-xl cursor-pointer">
+        <div class="w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white shadow-sm">
+          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9" stroke-opacity="0.4" />
+            <path d="M8 8h8v8H8z" rx="2" />
+            <path d="M12 8v8M8 12h8" />
+          </svg>
+        </div>
+        <span class="font-bold text-base text-white tracking-tight">Pane</span>
+      </div>
+
+      <!-- Menu de navegação (ícone + label) -->
+      <nav class="space-y-1 w-full text-xs">
+        <a href="#/home" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Home</span>
+        </a>
+
+        <!-- Tasks (badge circular "7" à direita) -->
+        <a href="#/tasks" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all">
+          <div class="flex items-center gap-2.5">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+            <span>Tasks</span>
+          </div>
+          <span class="w-4 h-4 rounded-full bg-white/10 text-white/80 text-[10px] font-bold flex items-center justify-center">7</span>
+        </a>
+
+        <!-- Calendar -->
+        <a href="#/calendar" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Calendar</span>
+        </a>
+
+        <!-- Projects (ITEM ATIVO: fundo destacado, levemente mais claro) -->
+        <a href="#/projects" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.1] text-white font-semibold border border-white/[0.08] shadow-sm transition-all">
+          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+          <span>Projects</span>
+        </a>
+
+        <!-- Insights -->
+        <a href="#/insights" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+          <span>Insights</span>
+        </a>
+
+        <!-- Team -->
+        <a href="#/team" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Team</span>
+        </a>
+
+        <!-- Settings -->
+        <a href="#/settings" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- Separador -->
+      <div class="pt-2 border-t border-white/[0.06]">
+        <!-- Seção PINNED -->
+        <span class="text-[10px] font-semibold text-[#8b8b90] uppercase tracking-wider px-3 mb-2 block">PINNED</span>
+        <div class="space-y-1 text-xs">
+          <!-- Tide mobile app (bullet azul) -->
+          <a href="#/projects" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all truncate">
+            <span class="w-2 h-2 rounded-full bg-[#3b82f6] shrink-0"></span>
+            <span class="truncate">Tide mobile app</span>
+          </a>
+          <!-- Orbit 2.0 launch (bullet roxo) -->
+          <a href="#/projects" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all truncate">
+            <span class="w-2 h-2 rounded-full bg-[#a855f7] shrink-0"></span>
+            <span class="truncate">Orbit 2.0 launch</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Usuário Rodapé -->
+    <div class="flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer border-t border-white/[0.06] pt-3">
+      <div class="relative shrink-0">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Lin Zhao" class="w-7 h-7 rounded-full object-cover ring-1 ring-white/10">
+        <span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 ring-1 ring-[#121316]"></span>
+      </div>
+      <div class="truncate">
+        <p class="text-xs font-semibold text-white leading-tight truncate">Lin Zhao</p>
+        <p class="text-[10px] text-[#8b8b90] leading-tight truncate mt-0.5">Product Lead</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============================================== -->
+  <!-- TOP BAR (Canto superior direito)               -->
+  <!-- ============================================== -->
+  <header class="fixed top-4 right-4 md:right-8 z-40">
+    <div class="flex items-center gap-1.5 p-1.5 pl-2.5 rounded-full bg-[#131417]/90 backdrop-blur-xl border border-white/[0.06] shadow-xl">
+      <!-- Barra de busca arredondada com lupa, Search e ⌘K -->
+      <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] text-[#8b8b90] text-xs">
+        <svg class="w-3.5 h-3.5 text-[#8b8b90]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <span class="text-[#8b8b90] text-xs">Search</span>
+        <kbd class="ml-2 px-1.5 py-0.5 text-[10px] font-mono bg-white/[0.08] rounded text-[#8b8b90]">⌘K</kbd>
+      </div>
+
+      <!-- Ícone "+" -->
+      <button class="p-1.5 rounded-full text-[#8b8b90] hover:text-white hover:bg-white/[0.06] transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></svg>
+      </button>
+
+      <!-- Ícone de Sol (tema) -->
+      <button class="p-1.5 rounded-full text-[#8b8b90] hover:text-white hover:bg-white/[0.06] transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+
+      <!-- Ícone de Sino com ponto de notificação vermelho -->
+      <button class="p-1.5 rounded-full text-[#8b8b90] hover:text-white hover:bg-white/[0.06] transition-colors relative">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#ef4444] ring-2 ring-[#131417]"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================== -->
+  <!-- CONTEÚDO PRINCIPAL (HEADER + 4 STATS + CARDS)  -->
+  <!-- ============================================== -->
+  <main class="min-h-screen pl-4 md:pl-[244px] pr-4 md:pr-8 pt-4 md:pt-6 pb-20 max-w-[1720px] mx-auto">
+    <div class="space-y-6">
+
+      <!-- HEADER / TOPO DA ÁREA PRINCIPAL -->
+      <div class="space-y-4">
+        <!-- Título grande "Projects" (~42px bold branco) + Subtítulo em cinza (#8b8b90) -->
+        <div>
+          <h1 class="text-[38px] md:text-[42px] font-bold tracking-tight text-white leading-none">Projects</h1>
+          <p class="text-[#8b8b90] text-sm mt-1.5 font-normal">5 in flight · 1 shipped</p>
+        </div>
+
+        <!-- Linha abaixo do título: 4 mini-cards à esquerda + Filtros e "+ New project" à direita -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
+          <!-- 4 mini-cards de métricas (stat tiles) -->
+          <div class="flex items-center gap-3 overflow-x-auto pb-1">
+            <!-- Active — 4 -->
+            <div class="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+              <span class="text-[11px] font-medium text-[#8b8b90] block">Active</span>
+              <div class="text-[26px] font-bold text-white mt-0.5 leading-none">4</div>
+            </div>
+
+            <!-- Shipped — 1 -->
+            <div class="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+              <span class="text-[11px] font-medium text-[#8b8b90] block">Shipped</span>
+              <div class="text-[26px] font-bold text-white mt-0.5 leading-none">1</div>
+            </div>
+
+            <!-- On track — 50% -->
+            <div class="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+              <span class="text-[11px] font-medium text-[#8b8b90] block">On track</span>
+              <div class="text-[26px] font-bold text-white mt-0.5 leading-none">50%</div>
+            </div>
+
+            <!-- Due this month — 1 -->
+            <div class="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+              <span class="text-[11px] font-medium text-[#8b8b90] block">Due this month</span>
+              <div class="text-[26px] font-bold text-white mt-0.5 leading-none">1</div>
+            </div>
+          </div>
+
+          <!-- À direita: grupo de filtros em pílula + botão "+ New project" -->
+          <div class="flex items-center gap-3 shrink-0">
+            <!-- Grupo de filtros em pílula -->
+            <div class="flex items-center p-1 rounded-full bg-[#131417] border border-white/[0.06]">
+              <button class="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/[0.12] text-white shadow-sm">All</button>
+              <button class="px-3.5 py-1.5 rounded-full text-xs font-medium text-[#8b8b90] hover:text-white transition-colors">Active</button>
+              <button class="px-3.5 py-1.5 rounded-full text-xs font-medium text-[#8b8b90] hover:text-white transition-colors">Planning</button>
+              <button class="px-3.5 py-1.5 rounded-full text-xs font-medium text-[#8b8b90] hover:text-white transition-colors">Shipped</button>
+            </div>
+
+            <!-- Botão "+ New project" (pílula destacada) -->
+            <button class="px-4 py-2 rounded-full text-xs font-semibold text-white bg-white/[0.1] hover:bg-white/[0.16] border border-white/[0.1] shadow-sm transition-all flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
+              <span>New project</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- GRID DE CARDS DE PROJETO (2 LINHAS)            -->
+      <!-- ============================================== -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <!-- CARD 1: Orbit 2.0 launch -->
+        <div class="p-5 rounded-[16px] custom-glow-orbit flex flex-col justify-between shadow-md transition-all hover:border-white/[0.12] hover:-translate-y-0.5">
+          <div>
+            <!-- Topo: Ícone roxo (foguete) + Nome + Estrela dourada -->
+            <div class="flex items-start justify-between gap-2.5">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-[12px] bg-gradient-to-br from-[#a855f7] to-[#7c3aed] flex items-center justify-center text-white shadow-md shrink-0">
+                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-[14px] font-bold text-white leading-tight truncate">Orbit 2.0 launch</h3>
+                  <!-- Badge "In progress" com bullet azul -->
+                  <div class="mt-1">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#3b82f6]/10 text-[#60a5fa] border border-[#3b82f6]/20">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#3b82f6]"></span>
+                      <span>In progress</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <!-- Estrela dourada -->
+              <svg class="w-4 h-4 text-[#eab308] fill-[#eab308] shrink-0" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+
+            <!-- Descrição (2 linhas) -->
+            <p class="text-xs text-[#8b8b90] leading-relaxed mt-3.5 mb-4 line-clamp-2">
+              Everything the public sees on launch day: site, film, press kit and the waitlist email.
+            </p>
+
+            <!-- Bloco "Next milestone" -->
+            <div class="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] flex items-center gap-3.5 mb-4">
+              <!-- Anel 45% (roxo) -->
+              <div class="relative w-11 h-11 flex items-center justify-center shrink-0">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+                  <circle cx="22" cy="22" r="17" stroke="rgba(255,255,255,0.08)" stroke-width="3.5" fill="none"/>
+                  <circle cx="22" cy="22" r="17" stroke="#a855f7" stroke-width="3.5" stroke-dasharray="106.81" stroke-dashoffset="58.74" stroke-linecap="round" fill="none"/>
+                </svg>
+                <span class="absolute text-[10px] font-bold text-white font-mono">45%</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-medium text-[#8b8b90] block leading-tight">Next milestone</span>
+                <h4 class="text-xs font-bold text-white truncate leading-tight mt-0.5">Launch film final cut</h4>
+                <span class="text-[11px] text-[#8b8b90] block leading-tight mt-0.5">Oct 24 · in 4 days</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rodapé: Avatares +1 · 5/11 tasks · Nov 1 -->
+          <div class="flex items-center justify-between text-xs text-[#8b8b90] pt-1">
+            <div class="flex -space-x-1.5 shrink-0">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Lin">
+              <img src="https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Ines">
+              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Peter">
+              <span class="w-5 h-5 rounded-full bg-white/10 ring-2 ring-[#131316] text-[9px] font-bold text-white/80 flex items-center justify-center">+1</span>
+            </div>
+            <span class="text-[11px] text-[#8b8b90] font-medium">5/11 tasks</span>
+            <div class="flex items-center gap-1.5 text-[#8b8b90] text-[11px] font-medium">
+              <svg class="w-3 h-3 text-[#8b8b90]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Nov 1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: Tide mobile app -->
+        <div class="p-5 rounded-[16px] custom-glow-tide flex flex-col justify-between shadow-md transition-all hover:border-white/[0.12] hover:-translate-y-0.5">
+          <div>
+            <!-- Topo: Ícone azul (celular) + Nome + Estrela dourada -->
+            <div class="flex items-start justify-between gap-2.5">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-[12px] bg-gradient-to-br from-[#3b82f6] to-[#2563eb] flex items-center justify-center text-white shadow-md shrink-0">
+                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-[14px] font-bold text-white leading-tight truncate">Tide mobile app</h3>
+                  <!-- Badge "In progress" -->
+                  <div class="mt-1">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#3b82f6]/10 text-[#60a5fa] border border-[#3b82f6]/20">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#3b82f6]"></span>
+                      <span>In progress</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <!-- Estrela dourada -->
+              <svg class="w-4 h-4 text-[#eab308] fill-[#eab308] shrink-0" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+
+            <!-- Descrição (2 linhas) -->
+            <p class="text-xs text-[#8b8b90] leading-relaxed mt-3.5 mb-4 line-clamp-2">
+              The 3.0 rebuild of the Tide app: new home, offline sync and a calmer onboarding.
+            </p>
+
+            <!-- Bloco "Next milestone" -->
+            <div class="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] flex items-center gap-3.5 mb-4">
+              <!-- Anel 47% (azul) -->
+              <div class="relative w-11 h-11 flex items-center justify-center shrink-0">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+                  <circle cx="22" cy="22" r="17" stroke="rgba(255,255,255,0.08)" stroke-width="3.5" fill="none"/>
+                  <circle cx="22" cy="22" r="17" stroke="#3b82f6" stroke-width="3.5" stroke-dasharray="106.81" stroke-dashoffset="56.61" stroke-linecap="round" fill="none"/>
+                </svg>
+                <span class="absolute text-[10px] font-bold text-white font-mono">47%</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-medium text-[#8b8b90] block leading-tight">Next milestone</span>
+                <h4 class="text-xs font-bold text-white truncate leading-tight mt-0.5">Offline sync in beta</h4>
+                <span class="text-[11px] text-[#8b8b90] block leading-tight mt-0.5">Oct 26 · in 6 days</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rodapé: Avatares +2 · 8/17 tasks · Nov 29 -->
+          <div class="flex items-center justify-between text-xs text-[#8b8b90] pt-1">
+            <div class="flex -space-x-1.5 shrink-0">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Kwame">
+              <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Elise">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Omar">
+              <span class="w-5 h-5 rounded-full bg-white/10 ring-2 ring-[#131316] text-[9px] font-bold text-white/80 flex items-center justify-center">+2</span>
+            </div>
+            <span class="text-[11px] text-[#8b8b90] font-medium">8/17 tasks</span>
+            <div class="flex items-center gap-1.5 text-[#8b8b90] text-[11px] font-medium">
+              <svg class="w-3 h-3 text-[#8b8b90]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Nov 29</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 3: Facet design system -->
+        <div class="p-5 rounded-[16px] custom-glow-facet flex flex-col justify-between shadow-md transition-all hover:border-white/[0.12] hover:-translate-y-0.5">
+          <div>
+            <!-- Topo: Ícone rosa/magenta (grid) + Nome + Estrela vazia -->
+            <div class="flex items-start justify-between gap-2.5">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-[12px] bg-gradient-to-br from-[#ec4899] to-[#db2777] flex items-center justify-center text-white shadow-md shrink-0">
+                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-[14px] font-bold text-white leading-tight truncate">Facet design system</h3>
+                  <!-- Badge "In progress" -->
+                  <div class="mt-1">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#3b82f6]/10 text-[#60a5fa] border border-[#3b82f6]/20">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#3b82f6]"></span>
+                      <span>In progress</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <!-- Estrela vazia -->
+              <svg class="w-4 h-4 text-white/20 hover:text-white/40 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+
+            <!-- Descrição (2 linhas) -->
+            <p class="text-xs text-[#8b8b90] leading-relaxed mt-3.5 mb-4 line-clamp-2">
+              One set of tokens, components and docs for every Pane surface, light and dark.
+            </p>
+
+            <!-- Bloco "Next milestone" -->
+            <div class="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] flex items-center gap-3.5 mb-4">
+              <!-- Anel 50% (rosa) -->
+              <div class="relative w-11 h-11 flex items-center justify-center shrink-0">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+                  <circle cx="22" cy="22" r="17" stroke="rgba(255,255,255,0.08)" stroke-width="3.5" fill="none"/>
+                  <circle cx="22" cy="22" r="17" stroke="#ec4899" stroke-width="3.5" stroke-dasharray="106.81" stroke-dashoffset="53.4" stroke-linecap="round" fill="none"/>
+                </svg>
+                <span class="absolute text-[10px] font-bold text-white font-mono">50%</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-medium text-[#8b8b90] block leading-tight">Next milestone</span>
+                <h4 class="text-xs font-bold text-white truncate leading-tight mt-0.5">Docs site live</h4>
+                <span class="text-[11px] text-[#8b8b90] block leading-tight mt-0.5">Nov 7 · in 18 days</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rodapé: Avatares · 7/14 tasks · Dec 19 -->
+          <div class="flex items-center justify-between text-xs text-[#8b8b90] pt-1">
+            <div class="flex -space-x-1.5 shrink-0">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Nia">
+              <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Haruto">
+              <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Elise">
+            </div>
+            <span class="text-[11px] text-[#8b8b90] font-medium">7/14 tasks</span>
+            <div class="flex items-center gap-1.5 text-[#8b8b90] text-[11px] font-medium">
+              <svg class="w-3 h-3 text-[#8b8b90]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Dec 19</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 4: Sprout onboarding -->
+        <div class="p-5 rounded-[16px] custom-glow-sprout flex flex-col justify-between shadow-md transition-all hover:border-white/[0.12] hover:-translate-y-0.5">
+          <div>
+            <!-- Topo: Ícone verde (folha) + Nome + Estrela vazia -->
+            <div class="flex items-start justify-between gap-2.5">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-[12px] bg-gradient-to-br from-[#22c55e] to-[#16a34a] flex items-center justify-center text-white shadow-md shrink-0">
+                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></svg>
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-[14px] font-bold text-white leading-tight truncate">Sprout onboarding</h3>
+                  <!-- Badge "In review" (laranja) -->
+                  <div class="mt-1">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#f97316]/10 text-[#fb923c] border border-[#f97316]/20">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#f97316]"></span>
+                      <span>In review</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <!-- Estrela vazia -->
+              <svg class="w-4 h-4 text-white/20 hover:text-white/40 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+
+            <!-- Descrição (2 linhas) -->
+            <p class="text-xs text-[#8b8b90] leading-relaxed mt-3.5 mb-4 line-clamp-2">
+              A first-week path that gets new teams to their first finished project.
+            </p>
+
+            <!-- Bloco "Next milestone" -->
+            <div class="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] flex items-center gap-3.5 mb-4">
+              <!-- Anel 50% (verde) -->
+              <div class="relative w-11 h-11 flex items-center justify-center shrink-0">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+                  <circle cx="22" cy="22" r="17" stroke="rgba(255,255,255,0.08)" stroke-width="3.5" fill="none"/>
+                  <circle cx="22" cy="22" r="17" stroke="#22c55e" stroke-width="3.5" stroke-dasharray="106.81" stroke-dashoffset="53.4" stroke-linecap="round" fill="none"/>
+                </svg>
+                <span class="absolute text-[10px] font-bold text-white font-mono">50%</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-medium text-[#8b8b90] block leading-tight">Next milestone</span>
+                <h4 class="text-xs font-bold text-white truncate leading-tight mt-0.5">Read-out to leadership</h4>
+                <span class="text-[11px] text-[#8b8b90] block leading-tight mt-0.5">Oct 25 · in 5 days</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rodapé: Avatares · 4/8 tasks · Oct 25 -->
+          <div class="flex items-center justify-between text-xs text-[#8b8b90] pt-1">
+            <div class="flex -space-x-1.5 shrink-0">
+              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Maya">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Lin">
+              <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Elise">
+            </div>
+            <span class="text-[11px] text-[#8b8b90] font-medium">4/8 tasks</span>
+            <div class="flex items-center gap-1.5 text-[#8b8b90] text-[11px] font-medium">
+              <svg class="w-3 h-3 text-[#8b8b90]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Oct 25</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 5: Q4 brand campaign (Linha 2) -->
+        <div class="p-5 rounded-[16px] custom-glow-q4brand flex flex-col justify-between shadow-md transition-all hover:border-white/[0.12] hover:-translate-y-0.5">
+          <div>
+            <!-- Topo: Ícone laranja (chama) + Nome + Estrela vazia -->
+            <div class="flex items-start justify-between gap-2.5">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-[12px] bg-gradient-to-br from-[#f97316] to-[#ea580c] flex items-center justify-center text-white shadow-md shrink-0">
+                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-[14px] font-bold text-white leading-tight truncate">Q4 brand campaign</h3>
+                  <!-- Badge "Planning" (roxo) -->
+                  <div class="mt-1">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#a855f7]/10 text-[#c084fc] border border-[#a855f7]/20">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#a855f7]"></span>
+                      <span>Planning</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <!-- Estrela vazia -->
+              <svg class="w-4 h-4 text-white/20 hover:text-white/40 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+
+            <!-- Descrição (2 linhas) -->
+            <p class="text-xs text-[#8b8b90] leading-relaxed mt-3.5 mb-4 line-clamp-2">
+              Out-of-home and social for the winter season, built around “work you can see through”.
+            </p>
+
+            <!-- Bloco "Next milestone" -->
+            <div class="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] flex items-center gap-3.5 mb-4">
+              <!-- Anel 0% -->
+              <div class="relative w-11 h-11 flex items-center justify-center shrink-0">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+                  <circle cx="22" cy="22" r="17" stroke="rgba(255,255,255,0.08)" stroke-width="3.5" fill="none"/>
+                  <circle cx="22" cy="22" r="17" stroke="#f97316" stroke-width="3.5" stroke-dasharray="106.81" stroke-dashoffset="106.81" stroke-linecap="round" fill="none"/>
+                </svg>
+                <span class="absolute text-[10px] font-bold text-white font-mono">0%</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-medium text-[#8b8b90] block leading-tight">Next milestone</span>
+                <h4 class="text-xs font-bold text-white truncate leading-tight mt-0.5">Creative brief</h4>
+                <span class="text-[11px] text-[#8b8b90] block leading-tight mt-0.5">Oct 30 · in 10 days</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rodapé: Avatares · 0/6 tasks · Dec 27 -->
+          <div class="flex items-center justify-between text-xs text-[#8b8b90] pt-1">
+            <div class="flex -space-x-1.5 shrink-0">
+              <img src="https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Ines">
+              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Chloe">
+              <img src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Alex">
+            </div>
+            <span class="text-[11px] text-[#8b8b90] font-medium">0/6 tasks</span>
+            <div class="flex items-center gap-1.5 text-[#8b8b90] text-[11px] font-medium">
+              <svg class="w-3 h-3 text-[#8b8b90]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Dec 27</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 6: Northstar analytics (Linha 2) -->
+        <div class="p-5 rounded-[16px] custom-glow-northstar flex flex-col justify-between shadow-md transition-all hover:border-white/[0.12] hover:-translate-y-0.5">
+          <div>
+            <!-- Topo: Ícone teal/ciano (gráfico de barras) + Nome + Estrela vazia -->
+            <div class="flex items-start justify-between gap-2.5">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-[12px] bg-gradient-to-br from-[#06b6d4] to-[#0891b2] flex items-center justify-center text-white shadow-md shrink-0">
+                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-[14px] font-bold text-white leading-tight truncate">Northstar analytics</h3>
+                  <!-- Badge "Shipped" (verde com check ✓) -->
+                  <div class="mt-1">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#10b981]/10 text-[#34d399] border border-[#10b981]/20">
+                      <svg class="w-3 h-3 text-[#34d399]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <span>Shipped</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <!-- Estrela vazia -->
+              <svg class="w-4 h-4 text-white/20 hover:text-white/40 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+
+            <!-- Descrição (2 linhas) -->
+            <p class="text-xs text-[#8b8b90] leading-relaxed mt-3.5 mb-4 line-clamp-2">
+              One trusted metric per team and a weekly digest everyone actually opens.
+            </p>
+
+            <!-- Bloco "Next milestone" com anel 100% -->
+            <div class="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] flex items-center gap-3.5 mb-4">
+              <!-- Anel 100% (teal completo) -->
+              <div class="relative w-11 h-11 flex items-center justify-center shrink-0">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+                  <circle cx="22" cy="22" r="17" stroke="rgba(255,255,255,0.08)" stroke-width="3.5" fill="none"/>
+                  <circle cx="22" cy="22" r="17" stroke="#06b6d4" stroke-width="3.5" stroke-dasharray="106.81" stroke-dashoffset="0" stroke-linecap="round" fill="none"/>
+                </svg>
+                <span class="absolute text-[10px] font-bold text-white font-mono">100%</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-medium text-[#8b8b90] block leading-tight">Shipped</span>
+                <h4 class="text-xs font-bold text-white truncate leading-tight mt-0.5">Every milestone met</h4>
+                <span class="text-[11px] text-[#8b8b90] block leading-tight mt-0.5">Oct 8</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rodapé: Avatares · 6/6 tasks · Oct 8 -->
+          <div class="flex items-center justify-between text-xs text-[#8b8b90] pt-1">
+            <div class="flex -space-x-1.5 shrink-0">
+              <img src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Alex">
+              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80" class="w-5 h-5 rounded-full object-cover ring-2 ring-[#131316]" alt="Peter">
+            </div>
+            <span class="text-[11px] text-[#8b8b90] font-medium">6/6 tasks</span>
+            <div class="flex items-center gap-1.5 text-[#8b8b90] text-[11px] font-medium">
+              <svg class="w-3 h-3 text-[#8b8b90]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Oct 8</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

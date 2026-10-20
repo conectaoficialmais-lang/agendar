@@ -69,76 +69,91 @@ export const HomeView: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6 pb-20">
-      {/* Cabeçalho de Saudação */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 pb-20 animate-in fade-in duration-300">
+      {/* ════════════════════════════════════
+          HEADER / TOPO
+          ════════════════════════════════════ */}
+      <div className="space-y-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          <h1 className="text-[38px] md:text-[42px] font-bold tracking-tight text-white leading-none">
             Bom dia, {currentUser.name.split(' ')[0]}
           </h1>
-          <p className="text-white/60 text-sm mt-1">
+          <p className="text-[#8b8b90] text-sm mt-1.5 font-normal">
             Segunda-feira, 19 de outubro · {todayEvents.length} reuniões e {openTasksCount} tarefas restantes hoje
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => openQuickAdd('task')}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-semibold text-white bg-gradient-to-r ${currentAccent.gradient} shadow-lg ${currentAccent.activeNavGlow} hover:brightness-110 active:scale-95 transition-all flex items-center gap-2`}
-          >
-            <Plus size={15} />
-            <span>Nova tarefa</span>
-          </button>
+        {/* Linha com 4 Mini Stat Tiles e Botões de Ação */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
+          {/* 4 Mini Stat Tiles */}
+          <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none">
+            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+              <span className="text-[11px] font-medium text-[#8b8b90] block">Concluídas</span>
+              <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
+                {doneTodayCount}/8
+              </div>
+            </div>
 
-          <button
-            onClick={() => setActiveTab('calendar')}
-            className="px-4 py-2.5 rounded-2xl text-xs font-semibold text-white/90 bg-white/10 hover:bg-white/15 border border-white/10 backdrop-blur-xl transition-all flex items-center gap-2"
-          >
-            <Clock size={15} className="text-blue-400" />
-            <span>Próximo: 11:00</span>
-          </button>
+            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+              <span className="text-[11px] font-medium text-[#8b8b90] block">Foco hoje</span>
+              <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
+                {(focusedMinutesToday / 60).toFixed(1)}h
+              </div>
+            </div>
+
+            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+              <span className="text-[11px] font-medium text-[#8b8b90] block">Em aberto</span>
+              <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
+                {openTasksCount}
+              </div>
+            </div>
+
+            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+              <span className="text-[11px] font-medium text-[#8b8b90] block">Reuniões</span>
+              <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
+                {todayEvents.length}
+              </div>
+            </div>
+          </div>
+
+          {/* Botões de Ação na Direita */}
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => setActiveTab('calendar')}
+              className="px-4 py-2 rounded-full text-xs font-medium text-[#8b8b90] hover:text-white bg-[#131417] hover:bg-white/[0.08] border border-white/[0.06] transition-all flex items-center gap-2"
+            >
+              <Clock size={13} className="text-blue-400" />
+              <span>Próximo: 11:00</span>
+            </button>
+
+            <button
+              onClick={() => openQuickAdd('task')}
+              className="px-4 py-2 rounded-full text-xs font-semibold text-white bg-white/[0.1] hover:bg-white/[0.16] border border-white/[0.1] shadow-sm transition-all flex items-center gap-1.5 active:scale-95"
+            >
+              <Plus size={14} />
+              <span>Nova tarefa</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Mini Stat Cards */}
-      <div className="grid grid-cols-3 gap-3 md:gap-4">
-        <div className="p-4 rounded-3xl bg-[#141622]/60 backdrop-blur-xl border border-white/10 shadow-lg glass-card-hover">
-          <span className="text-xs text-white/50 block font-medium">Concluídas hoje</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">
-            {doneTodayCount}/8
-          </div>
-        </div>
-
-        <div className="p-4 rounded-3xl bg-[#141622]/60 backdrop-blur-xl border border-white/10 shadow-lg glass-card-hover">
-          <span className="text-xs text-white/50 block font-medium">Foco hoje</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">
-            {(focusedMinutesToday / 60).toFixed(1)}h
-          </div>
-        </div>
-
-        <div className="p-4 rounded-3xl bg-[#141622]/60 backdrop-blur-xl border border-white/10 shadow-lg glass-card-hover">
-          <span className="text-xs text-white/50 block font-medium">Atrasadas</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">{overdueCount}</div>
-        </div>
-      </div>
-
-      {/* Grid de 2 Colunas */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* Grid Principal de 2 Colunas */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Coluna Esquerda (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
+        <div className="lg:col-span-7 space-y-5">
           {/* Card dos Anéis de Atividade */}
-          <div className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl">
+          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-sm font-bold text-white">Hoje</h3>
-                <p className="text-xs text-white/50">Complete seus anéis de meta</p>
+                <p className="text-xs text-[#8b8b90]">Complete seus anéis de meta diária</p>
               </div>
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
+              <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
                 {Math.round(((doneTodayCount / 8) * 0.4 + Math.min(1, focusedMinutesToday / 120) * 0.4 + 0.25 * 0.2) * 100)}% geral
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-[12px] bg-[#0d0e11] border border-white/[0.04]">
               {/* SVG dos Anéis Concêntricos */}
               <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
@@ -215,7 +230,7 @@ export const HomeView: React.FC = () => {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <Sparkles size={18} className="text-white/60 mb-0.5" />
+                  <Sparkles size={18} className="text-[#8b8b90] mb-0.5" />
                 </div>
               </div>
 
@@ -224,7 +239,7 @@ export const HomeView: React.FC = () => {
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]" />
-                    <span className="text-white/80 font-medium">Tarefas</span>
+                    <span className="text-white font-medium">Tarefas</span>
                   </div>
                   <span className="font-bold text-white">{doneTodayCount}/8 concluídas</span>
                 </div>
@@ -232,7 +247,7 @@ export const HomeView: React.FC = () => {
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_#f97316]" />
-                    <span className="text-white/80 font-medium">Foco</span>
+                    <span className="text-white font-medium">Foco</span>
                   </div>
                   <span className="font-bold text-white">
                     {(focusedMinutesToday / 60).toFixed(1)}h / 2.0h
@@ -242,7 +257,7 @@ export const HomeView: React.FC = () => {
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
-                    <span className="text-white/80 font-medium">Reuniões</span>
+                    <span className="text-white font-medium">Reuniões</span>
                   </div>
                   <span className="font-bold text-white">1/{todayEvents.length || 1} realizadas</span>
                 </div>
@@ -251,23 +266,23 @@ export const HomeView: React.FC = () => {
           </div>
 
           {/* Foco — Cronômetro Pomodoro */}
-          <div className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl relative overflow-hidden">
+          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-sm font-bold text-white">Foco</h3>
-                <p className="text-xs text-white/50">A ilha mantém o tempo</p>
+                <p className="text-xs text-[#8b8b90]">Trabalho focado com cronômetro integrado</p>
               </div>
 
-              {/* Seletor de Duração */}
-              <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white/5 border border-white/10">
+              {/* Seletor de Duração em pílula */}
+              <div className="flex items-center p-1 rounded-full bg-[#0d0e11] border border-white/[0.04]">
                 {[15, 25, 50].map((mins) => (
                   <button
                     key={mins}
                     onClick={() => setFocusDurationMinutes(mins)}
-                    className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
                       Math.round(focusDuration / 60) === mins
-                        ? 'bg-white/20 text-white shadow-sm ring-1 ring-white/20'
-                        : 'text-white/50 hover:text-white'
+                        ? 'bg-white/[0.12] text-white shadow-sm font-bold'
+                        : 'text-[#8b8b90] hover:text-white'
                     }`}
                   >
                     {mins}m
@@ -277,23 +292,23 @@ export const HomeView: React.FC = () => {
             </div>
 
             {/* Display do Timer & Controles */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
+            <div className="p-4 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <div className="text-4xl md:text-5xl font-extrabold tracking-tight text-white font-mono">
+                <div className="text-4xl md:text-5xl font-extrabold tracking-tight text-white font-mono leading-none">
                   {formatTime(focusRemaining)}
                 </div>
-                <span className="text-xs font-medium text-white/40 uppercase tracking-widest mt-1 block">
-                  {isFocusRunning ? 'Em Foco · Trabalho Profundo' : 'Pronto'}
+                <span className="text-[11px] font-medium text-[#8b8b90] uppercase tracking-wider mt-2 block">
+                  {isFocusRunning ? 'Em Foco · Trabalho Profundo' : 'Pronto para começar'}
                 </span>
               </div>
 
               {/* Focar em */}
               <div className="flex-1 max-w-xs">
-                <label className="text-[11px] text-white/40 block mb-1">Focar em</label>
+                <label className="text-[11px] text-[#8b8b90] block mb-1">Focar na tarefa</label>
                 <select
                   value={focusTaskId || ''}
                   onChange={(e) => setFocusTaskId(e.target.value || null)}
-                  className="w-full text-xs px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white/90 focus:outline-none focus:border-white/20"
+                  className="w-full text-xs px-3 py-2 rounded-xl bg-[#131417] border border-white/[0.06] text-white focus:outline-none cursor-pointer"
                 >
                   <option value="">Nenhuma tarefa — apenas focar</option>
                   {tasks
@@ -306,142 +321,44 @@ export const HomeView: React.FC = () => {
                 </select>
               </div>
 
-              {/* Botões Iniciar / Pausar */}
-              <div className="flex items-center gap-2">
-                {isFocusRunning ? (
+              {/* Botões Play/Pause/Reset */}
+              <div className="flex items-center gap-2 shrink-0">
+                {!isFocusRunning ? (
                   <button
-                    onClick={pauseFocus}
-                    className="px-5 py-2.5 rounded-2xl text-xs font-semibold text-white bg-amber-500/80 hover:bg-amber-500 shadow-lg shadow-amber-500/20 active:scale-95 transition-all flex items-center gap-1.5"
+                    onClick={() => startFocus()}
+                    className="p-3 rounded-full bg-white text-black hover:bg-gray-100 transition-all shadow-md flex items-center justify-center font-bold active:scale-95"
+                    title="Iniciar foco"
                   >
-                    <Pause size={14} fill="currentColor" />
-                    Pausar
+                    <Play size={16} className="fill-current ml-0.5" />
                   </button>
                 ) : (
                   <button
-                    onClick={() => startFocus()}
-                    className={`px-6 py-2.5 rounded-2xl text-xs font-semibold text-white bg-gradient-to-r ${currentAccent.gradient} shadow-lg ${currentAccent.activeNavGlow} hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5`}
+                    onClick={pauseFocus}
+                    className="p-3 rounded-full bg-amber-500 text-black hover:bg-amber-400 transition-all shadow-md flex items-center justify-center font-bold active:scale-95"
+                    title="Pausar foco"
                   >
-                    <Play size={14} fill="currentColor" />
-                    Iniciar foco
+                    <Pause size={16} className="fill-current" />
                   </button>
                 )}
 
                 <button
                   onClick={resetFocus}
-                  className="p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-colors"
-                  title="Reiniciar tempo"
+                  className="p-3 rounded-full bg-white/[0.06] text-[#8b8b90] hover:text-white hover:bg-white/[0.1] border border-white/[0.06] transition-all"
+                  title="Reiniciar cronômetro"
                 >
-                  <RotateCcw size={14} />
+                  <RotateCcw size={16} />
                 </button>
               </div>
-            </div>
-
-            {/* Barra de Focado Hoje */}
-            <div className="mt-4 pt-4 border-t border-white/10">
-              <div className="flex items-center justify-between text-xs mb-1.5">
-                <span className="text-white/60">Focado hoje</span>
-                <span className="font-bold text-white">
-                  {(focusedMinutesToday / 60).toFixed(1)}h · {focusSessionsToday} sessões
-                </span>
-              </div>
-              <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all duration-500"
-                  style={{ width: `${Math.min(100, (focusedMinutesToday / 120) * 100)}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Próximo Compromisso (Up next) */}
-          <div className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white">Próximo compromisso</h3>
-              <button
-                onClick={() => setActiveTab('calendar')}
-                className="text-xs text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 transition-colors"
-              >
-                Calendário
-                <ChevronRight size={14} />
-              </button>
-            </div>
-
-            {/* Card Destacado da Próxima Reunião */}
-            {nextMeeting ? (
-              <div className="p-4 rounded-2xl bg-blue-600/15 border border-blue-500/30 text-white shadow-lg relative overflow-hidden">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/30 text-blue-200 mb-1.5">
-                      em breve
-                    </span>
-                    <h4 className="text-base font-bold text-white">{nextMeeting.title}</h4>
-                    <p className="text-xs text-blue-200/80 mt-0.5">
-                      {nextMeeting.startTime} – {nextMeeting.endTime} · {nextMeeting.location}
-                    </p>
-
-                    {/* Participantes */}
-                    <div className="flex items-center gap-1.5 mt-3">
-                      <div className="flex -space-x-2">
-                        {nextMeeting.attendeeIds.slice(0, 4).map((attId) => {
-                          const att = members.find((m) => m.id === attId);
-                          if (!att) return null;
-                          return (
-                            <img
-                              key={att.id}
-                              src={att.avatar}
-                              alt={att.name}
-                              className="w-6 h-6 rounded-full object-cover ring-2 ring-[#141622]"
-                              title={att.name}
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setActiveTab('calendar')}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 shadow-md shadow-blue-500/30 transition-all flex items-center gap-1.5 shrink-0"
-                  >
-                    <Video size={14} />
-                    Entrar
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 text-center text-xs text-white/50">
-                Nenhuma reunião agendada para hoje.
-              </div>
-            )}
-
-            {/* Demais itens da agenda do dia */}
-            <div className="space-y-2 pt-2">
-              {otherTodayEvents.length > 0 ? (
-                otherTodayEvents.map((ev) => (
-                  <div
-                    key={ev.id}
-                    onClick={() => setActiveTab('calendar')}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-xs cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-1 h-4 rounded-full bg-blue-400" />
-                      <span className="text-white/90 font-medium">{ev.title}</span>
-                    </div>
-                    <span className="text-white/50 text-[11px]">{ev.startTime}</span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-[11px] text-white/30 text-center py-1">
-                  Não há outros eventos na agenda de hoje
-                </p>
-              )}
             </div>
           </div>
 
           {/* Visão Geral dos Projetos */}
-          <div className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl space-y-4">
+          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white">Projetos</h3>
+              <div>
+                <h3 className="text-sm font-bold text-white">Projetos em andamento</h3>
+                <p className="text-xs text-[#8b8b90]">Clique em qualquer card para ver especificações completas</p>
+              </div>
               <button
                 onClick={() => setActiveTab('projects')}
                 className="text-xs text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 transition-colors"
@@ -451,9 +368,10 @@ export const HomeView: React.FC = () => {
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {projects.slice(0, 5).map((proj) => {
                 const stats = getProjectStats(proj.id);
+                const progress = Math.max(stats.progress, proj.nextMilestone.progress);
 
                 return (
                   <div
@@ -462,36 +380,38 @@ export const HomeView: React.FC = () => {
                       openProjectDetail(proj.id);
                       setActiveTab('projects');
                     }}
-                    className="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+                    className="p-3.5 rounded-[12px] bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04] hover:border-white/[0.1] transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
                       <div
-                        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-md"
-                        style={{ backgroundColor: `${proj.color}25`, color: proj.color }}
+                        className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 shadow-sm font-bold text-xs"
+                        style={{ backgroundColor: `${proj.color}20`, color: proj.color, border: `1px solid ${proj.color}35` }}
                       >
-                        <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: proj.color }} />
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: proj.color }} />
                       </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-white">{proj.name}</h4>
-                        <p className="text-[11px] text-white/50">
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors truncate">
+                          {proj.name}
+                        </h4>
+                        <p className="text-[11px] text-[#8b8b90] truncate mt-0.5">
                           {proj.status} · {proj.dueDisplay}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                      {/* Barra de Progresso Dinâmica */}
-                      <div className="w-24 sm:w-32 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                    <div className="flex items-center gap-4 shrink-0">
+                      {/* Barra de Progresso */}
+                      <div className="w-24 sm:w-28 h-1.5 rounded-full bg-white/10 overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
-                            width: `${Math.max(stats.progress, proj.nextMilestone.progress)}%`,
+                            width: `${progress}%`,
                             backgroundColor: proj.color,
                           }}
                         />
                       </div>
-                      <span className="text-xs font-bold text-white w-8 text-right">
-                        {Math.max(stats.progress, proj.nextMilestone.progress)}%
+                      <span className="text-xs font-bold text-white w-8 text-right font-mono">
+                        {progress}%
                       </span>
 
                       {/* Avatares */}
@@ -501,10 +421,10 @@ export const HomeView: React.FC = () => {
                             key={m.id}
                             src={m.avatar}
                             alt={m.name}
-                            className="w-5 h-5 rounded-full object-cover ring-1 ring-[#141622]"
+                            className="w-5 h-5 rounded-full object-cover ring-2 ring-[#0d0e11]"
                           />
                         ))}
-                        <span className="w-5 h-5 rounded-full bg-white/10 ring-1 ring-[#141622] text-[9px] font-bold text-white/70 flex items-center justify-center">
+                        <span className="w-5 h-5 rounded-full bg-white/10 ring-2 ring-[#0d0e11] text-[9px] font-bold text-white/80 flex items-center justify-center">
                           +2
                         </span>
                       </div>
@@ -517,19 +437,19 @@ export const HomeView: React.FC = () => {
         </div>
 
         {/* Coluna Direita (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="lg:col-span-5 space-y-5">
           {/* Minhas Tarefas — Para hoje e atrasadas */}
-          <div className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl space-y-4">
+          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-white">Minhas tarefas</h3>
-                <p className="text-xs text-white/50">Para hoje e atrasadas</p>
+                <p className="text-xs text-[#8b8b90]">Para hoje e prioridades</p>
               </div>
               <button
                 onClick={() => setActiveTab('tasks')}
                 className="text-xs text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 transition-colors"
               >
-                Todas as tarefas
+                Todas
                 <ChevronRight size={14} />
               </button>
             </div>
@@ -542,35 +462,35 @@ export const HomeView: React.FC = () => {
                 return (
                   <div
                     key={task.id}
-                    className="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 transition-all flex items-start gap-3 group"
+                    className="p-3 rounded-[12px] bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04] hover:border-white/[0.1] transition-all flex items-start gap-3 group"
                   >
                     <button
                       onClick={() => toggleTaskComplete(task.id)}
-                      className={`w-5 h-5 rounded-full mt-0.5 flex items-center justify-center transition-all shrink-0 ${
+                      className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center transition-all shrink-0 ${
                         isDone
                           ? 'bg-blue-500 text-white'
                           : 'border border-white/30 group-hover:border-white/60 text-transparent'
                       }`}
                       title={isDone ? 'Concluída' : 'Marcar como concluída'}
                     >
-                      <Check size={12} strokeWidth={3} />
+                      <Check size={11} strokeWidth={3} />
                     </button>
 
                     <div
-                      className="flex-1 cursor-pointer"
+                      className="flex-1 cursor-pointer min-w-0"
                       onClick={() => openTaskModal(task.id)}
                     >
                       <h4
-                        className={`text-xs font-semibold ${
-                          isDone ? 'line-through text-white/40' : 'text-white/90'
+                        className={`text-xs font-semibold truncate ${
+                          isDone ? 'line-through text-[#8b8b90]' : 'text-white'
                         }`}
                       >
                         {task.title}
                       </h4>
 
-                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
                         {proj && (
-                          <span className="flex items-center gap-1 text-[10px] text-white/50">
+                          <span className="flex items-center gap-1 text-[10px] text-[#8b8b90]">
                             <span
                               className="w-1.5 h-1.5 rounded-full"
                               style={{ backgroundColor: proj.color }}
@@ -578,14 +498,14 @@ export const HomeView: React.FC = () => {
                             {proj.name}
                           </span>
                         )}
-                        <span className="text-[10px] text-white/40">{task.dueDisplay}</span>
+                        <span className="text-[10px] text-[#8b8b90]">{task.dueDisplay}</span>
                         {task.priority === 'Urgent' && (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
                             P Urgente
                           </span>
                         )}
                         {task.priority === 'High' && (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
                             Alta
                           </span>
                         )}
@@ -597,161 +517,81 @@ export const HomeView: React.FC = () => {
             </div>
           </div>
 
-          {/* Esta semana — Tarefas que a equipe concluiu */}
-          <div className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl space-y-4">
+          {/* Agenda de Reuniões */}
+          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold text-white">Esta semana</h3>
-                <p className="text-xs text-white/50">Tarefas que a equipe concluiu</p>
+                <h3 className="text-sm font-bold text-white">Reuniões de hoje</h3>
+                <p className="text-xs text-[#8b8b90]">{todayEvents.length} compromissos agendados</p>
               </div>
-              <ArrowUpRight size={16} className="text-white/40" />
+              <button
+                onClick={() => setActiveTab('calendar')}
+                className="text-xs text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 transition-colors"
+              >
+                Calendário
+                <ChevronRight size={14} />
+              </button>
             </div>
 
-            <div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-white">{doneThisWeekCount}</span>
-                <span className="text-xs text-white/60 font-medium">concluídas até agora</span>
-                <span className="text-xs font-bold text-emerald-400 ml-auto">+0% vs semana passada</span>
-              </div>
-            </div>
+            {nextMeeting ? (
+              <div className="p-3.5 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20">
+                    A seguir · {nextMeeting.startTime}
+                  </span>
+                  <span className="text-[11px] text-[#8b8b90]">{nextMeeting.durationMinutes} min</span>
+                </div>
 
-            {/* Mini Gráfico de Barras Seg–Dom */}
-            <div className="pt-2">
-              <div className="grid grid-cols-7 gap-2 items-end h-32 px-1">
-                {[
-                  { day: 'Seg', count: Math.max(2, doneTodayCount), isToday: true },
-                  { day: 'Ter', count: 0, isToday: false },
-                  { day: 'Qua', count: 0, isToday: false },
-                  { day: 'Qui', count: 0, isToday: false },
-                  { day: 'Sex', count: 0, isToday: false },
-                  { day: 'Sáb', count: 0, isToday: false },
-                  { day: 'Dom', count: 0, isToday: false },
-                ].map((item) => (
-                  <div key={item.day} className="flex flex-col items-center gap-2 h-full justify-end">
-                    <div
-                      className={`w-full rounded-2xl transition-all duration-500 ${
-                        item.isToday
-                          ? 'bg-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)]'
-                          : 'bg-white/10'
-                      }`}
-                      style={{
-                        height: item.count > 0 ? `${Math.min(100, (item.count / 6) * 100)}%` : '12%',
-                        minHeight: '12px',
-                      }}
-                    />
-                    <span
-                      className={`text-[10px] font-medium ${
-                        item.isToday ? 'text-white font-bold' : 'text-white/40'
-                      }`}
-                    >
-                      {item.day}
-                    </span>
+                <div>
+                  <h4 className="text-xs font-bold text-white">{nextMeeting.title}</h4>
+                  <p className="text-[11px] text-[#8b8b90] mt-0.5">
+                    com {members.filter((m) => nextMeeting.attendeeIds.includes(m.id)).map((m) => m.name).join(', ') || 'Equipe'}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex -space-x-1.5">
+                    {members.slice(0, 3).map((m) => (
+                      <img
+                        key={m.id}
+                        src={m.avatar}
+                        alt={m.name}
+                        className="w-5 h-5 rounded-full object-cover ring-2 ring-[#0d0e11]"
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
 
-          {/* Agora mesmo: Equipe / Atividade */}
-          <div className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white">Agora mesmo</h3>
-
-              {/* Alternador Equipe / Atividade */}
-              <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10">
-                <button
-                  onClick={() => setRightNowTab('team')}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-                    rightNowTab === 'team'
-                      ? 'bg-white/20 text-white shadow-sm'
-                      : 'text-white/50 hover:text-white'
-                  }`}
-                >
-                  Equipe
-                </button>
-                <button
-                  onClick={() => setRightNowTab('activity')}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-                    rightNowTab === 'activity'
-                      ? 'bg-white/20 text-white shadow-sm'
-                      : 'text-white/50 hover:text-white'
-                  }`}
-                >
-                  Atividade
-                </button>
-              </div>
-            </div>
-
-            {/* Conteúdo */}
-            {rightNowTab === 'team' ? (
-              <div className="space-y-3">
-                {members.slice(1, 6).map((m) => {
-                  const statusDots = {
-                    online: 'bg-emerald-400',
-                    focus: 'bg-purple-400',
-                    meeting: 'bg-amber-400',
-                    offline: 'bg-neutral-500',
-                  };
-
-                  return (
-                    <div
-                      key={m.id}
-                      onClick={() => openMemberModal(m.id)}
-                      className="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <div className="relative">
-                          <img
-                            src={m.avatar}
-                            alt={m.name}
-                            className="w-8 h-8 rounded-full object-cover ring-1 ring-white/10"
-                          />
-                          <span
-                            className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ${
-                              statusDots[m.status]
-                            } ring-1 ring-[#141622]`}
-                          />
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-bold text-white">{m.name}</h4>
-                          <p className="text-[11px] text-white/40">{m.statusText}</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                  <a
+                    href="#join"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      alert('Entrando na chamada de vídeo...');
+                    }}
+                    className="px-3 py-1 rounded-full text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-colors flex items-center gap-1.5"
+                  >
+                    <Video size={12} />
+                    <span>Entrar</span>
+                  </a>
+                </div>
               </div>
             ) : (
-              <div className="space-y-3">
-                <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-xs space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-white/90">Kwame Asante</span>
-                    <span className="text-[10px] text-white/40">15m atrás</span>
-                  </div>
-                  <p className="text-white/60 text-[11px]">
-                    Concluiu a tarefa <span className="text-blue-300 font-medium">Construir fila inicial offline do Tide</span>
-                  </p>
-                </div>
+              <p className="text-xs text-[#8b8b90] py-4 text-center">Nenhuma reunião restante hoje.</p>
+            )}
 
-                <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-xs space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-white/90">Nia Okoro</span>
-                    <span className="text-[10px] text-white/40">45m atrás</span>
+            {otherTodayEvents.length > 0 && (
+              <div className="space-y-2 pt-1">
+                {otherTodayEvents.map((evt) => (
+                  <div
+                    key={evt.id}
+                    className="p-2.5 rounded-[10px] bg-[#0d0e11] border border-white/[0.04] flex items-center justify-between text-xs"
+                  >
+                    <div>
+                      <span className="font-bold text-white block">{evt.title}</span>
+                      <span className="text-[11px] text-[#8b8b90]">{evt.startTime}</span>
+                    </div>
+                    <span className="text-[10px] text-[#8b8b90]">{evt.durationMinutes} min</span>
                   </div>
-                  <p className="text-white/60 text-[11px]">
-                    Atualizou as especificações no <span className="text-pink-300 font-medium">Sistema de design Facet</span>
-                  </p>
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-xs space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-white/90">Lin Zhao</span>
-                    <span className="text-[10px] text-white/40">1h atrás</span>
-                  </div>
-                  <p className="text-white/60 text-[11px]">
-                    Acumulou 2 sessões de foco (1.1h no total)
-                  </p>
-                </div>
+                ))}
               </div>
             )}
           </div>

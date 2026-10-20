@@ -103,8 +103,6 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
     members[0];
 
   // Membros do projeto
-  const projectMembers = members.filter((m) => project.memberIds.includes(m.id));
-  // Se for Tide e a lista estiver curta, garantir os 6 membros da foto
   const tideMembers = [
     members.find((m) => m.name.includes('Kwame')) || {
       id: 'user-kwame',
@@ -138,77 +136,57 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
       id: 'user-malik',
       name: 'Malik Johnson',
       role: 'Away',
-      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
       status: 'offline',
     },
-    members.find((m) => m.id === currentUser.id) || {
-      id: 'user-lin',
-      name: 'Lin Zhao',
+    members.find((m) => m.name.includes('Nia')) || {
+      id: 'user-nia',
+      name: 'Nia Adebayo',
       role: 'Online',
-      avatar: currentUser.avatar,
+      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
       status: 'online',
     },
   ];
 
-  const displayedMembers = isTide ? tideMembers : projectMembers;
+  const displayedMembers = isTide ? tideMembers : members.slice(0, 6);
 
-  // Marcos
-  const defaultMilestones = isTide
-    ? [
-        {
-          id: 'ms-1',
-          title: 'Navigation prototype signed off',
-          date: 'Sep 29 · Done',
-          status: 'done' as const,
-        },
-        {
-          id: 'ms-2',
-          title: 'Offline sync in beta',
-          date: 'Oct 25',
-          status: 'next' as const,
-        },
-        {
-          id: 'ms-3',
-          title: 'App Store submission',
-          date: 'Nov 15',
-          status: 'pending' as const,
-        },
-        {
-          id: 'ms-4',
-          title: 'Public launch 3.0',
-          date: 'Nov 28',
-          status: 'pending' as const,
-        },
-      ]
-    : project.milestones || [
-        {
-          id: 'ms-gen-1',
-          title: 'Escopo inicial e kickoff',
-          date: '10 Out · Concluído',
-          status: 'done' as const,
-        },
-        {
-          id: 'ms-gen-2',
-          title: project.nextMilestone.title,
-          date: project.nextMilestone.dueDisplay,
-          status: 'next' as const,
-        },
-        {
-          id: 'ms-gen-3',
-          title: 'Deploy e entrega final',
-          date: project.dueDisplay,
-          status: 'pending' as const,
-        },
-      ];
+  // Milestones padrão
+  const defaultMilestones = [
+    {
+      id: 'ms-1',
+      title: 'Design freeze & token pass',
+      date: 'Oct 8',
+      status: 'done',
+    },
+    {
+      id: 'ms-2',
+      title: 'Offline sync in beta',
+      date: 'Oct 26 · in 6 days',
+      status: 'next',
+    },
+    {
+      id: 'ms-3',
+      title: 'RC1 on TestFlight',
+      date: 'Nov 12',
+      status: 'upcoming',
+    },
+    {
+      id: 'ms-4',
+      title: 'Store submission',
+      date: 'Nov 28',
+      status: 'upcoming',
+    },
+  ];
 
-  const getProjectIcon = (iconName: string) => {
-    switch (iconName) {
+  const getProjectIcon = () => {
+    switch (project.icon) {
       case 'smartphone':
         return Smartphone;
       case 'rocket':
         return Rocket;
-      case 'layout-grid':
+      case 'grid':
         return LayoutGrid;
+      case 'leaf':
       case 'sprout':
         return Sprout;
       case 'flame':
@@ -220,124 +198,125 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
     }
   };
 
-  const Icon = getProjectIcon(project.icon);
+  const Icon = getProjectIcon();
 
-  // Member status dot color
   const getStatusDot = (status: string) => {
     switch (status) {
       case 'online':
         return 'bg-emerald-400';
-      case 'focus':
-        return 'bg-purple-400';
       case 'meeting':
         return 'bg-amber-400';
+      case 'focus':
+        return 'bg-purple-400';
       default:
         return 'bg-neutral-500';
     }
   };
 
   return (
-    <div className="space-y-6 pb-24 animate-in fade-in duration-200">
-      {/* Top Header Row com Botão Voltar e Ações */}
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-        <div className="flex items-start gap-3.5">
-          {/* Circular Back Button */}
-          <button
-            onClick={closeProjectDetail}
-            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-white transition-all shrink-0 mt-1"
-            title="Voltar para todos os projetos"
-          >
-            <ChevronLeft size={18} />
-          </button>
+    <div className="space-y-6 pb-20 animate-in fade-in duration-300">
+      {/* ════════════════════════════════════
+          HEADER / TOPO
+          ════════════════════════════════════ */}
+      <div className="space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            {/* Back button */}
+            <button
+              onClick={closeProjectDetail}
+              className="p-2.5 rounded-full bg-[#131417] hover:bg-white/[0.08] text-[#8b8b90] hover:text-white border border-white/[0.06] transition-all shrink-0 mt-0.5"
+              title="Voltar para a lista de projetos"
+            >
+              <ChevronLeft size={16} />
+            </button>
 
-          {/* Project Icon */}
-          <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shrink-0 mt-0.5"
-            style={{
-              backgroundColor: `${project.color}30`,
-              color: project.color,
-              boxShadow: `0 0 20px ${project.color}25`,
-            }}
-          >
-            <Icon size={24} />
+            {/* Project Icon */}
+            <div
+              className="w-11 h-11 rounded-[12px] flex items-center justify-center shadow-md shrink-0 mt-0.5"
+              style={{
+                backgroundColor: `${project.color}25`,
+                color: project.color,
+                border: `1px solid ${project.color}40`,
+              }}
+            >
+              <Icon size={20} />
+            </div>
+
+            {/* Title & Description */}
+            <div>
+              <h1 className="text-[34px] md:text-[38px] font-bold tracking-tight text-white leading-none">
+                {project.name}
+              </h1>
+              <p className="text-[#8b8b90] text-sm mt-1.5 font-normal max-w-2xl leading-relaxed">
+                {project.description}
+              </p>
+            </div>
           </div>
 
-          {/* Title & Description */}
-          <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
-              {project.name}
-            </h1>
-            <p className="text-white/60 text-xs md:text-sm mt-1 max-w-2xl leading-relaxed">
-              {project.description}
-            </p>
+          {/* Pinned / New Event Buttons */}
+          <div className="flex items-center gap-2.5 shrink-0 self-start md:self-auto">
+            <button
+              onClick={() => toggleProjectStar(project.id)}
+              className="px-4 py-2 rounded-full text-xs font-semibold bg-[#131417] hover:bg-white/[0.08] border border-white/[0.06] text-white shadow-sm transition-all flex items-center gap-1.5"
+            >
+              <Star size={13} className="fill-amber-400 text-amber-400" />
+              <span>Pinned</span>
+            </button>
+
+            <button
+              onClick={() => openQuickAdd('event')}
+              className="px-4 py-2 rounded-full text-xs font-semibold bg-[#131417] hover:bg-white/[0.08] border border-white/[0.06] text-white shadow-sm transition-all flex items-center gap-1.5"
+            >
+              <Calendar size={13} className="text-[#8b8b90]" />
+              <span>New event</span>
+            </button>
           </div>
         </div>
 
-        {/* Pinned / New Event Buttons */}
-        <div className="flex items-center gap-2.5 shrink-0 self-start md:self-auto">
-          {/* Pinned Button */}
-          <button
-            onClick={() => toggleProjectStar(project.id)}
-            className="px-4 py-2 rounded-2xl text-xs font-semibold bg-[#161824]/90 hover:bg-white/15 border border-white/10 text-white/90 shadow-md backdrop-blur-xl transition-all flex items-center gap-1.5"
-          >
-            <Star size={13} className="fill-amber-400 text-amber-400" />
-            <span>Pinned</span>
-          </button>
+        {/* 4 Stat Tiles */}
+        <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none pt-1">
+          <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <span className="text-[11px] font-medium text-[#8b8b90] block">Progress</span>
+            <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
+              {progressPercent}%
+            </div>
+          </div>
 
-          {/* New Event Button */}
-          <button
-            onClick={() => openQuickAdd('event')}
-            className="px-4 py-2 rounded-2xl text-xs font-semibold bg-[#161824]/90 hover:bg-white/15 border border-white/10 text-white/90 shadow-md backdrop-blur-xl transition-all flex items-center gap-1.5"
-          >
-            <Calendar size={13} className="text-white/70" />
-            <span>New event</span>
-          </button>
+          <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <span className="text-[11px] font-medium text-[#8b8b90] block">Open tasks</span>
+            <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
+              {openCount}
+            </div>
+          </div>
+
+          <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <span className="text-[11px] font-medium text-[#8b8b90] block">Done</span>
+            <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
+              {doneCount}
+            </div>
+          </div>
+
+          <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <span className="text-[11px] font-medium text-[#8b8b90] block">Days left</span>
+            <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
+              {project.daysLeft || 41}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 4 Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
-        <div className="p-4 rounded-3xl bg-[#141622]/70 backdrop-blur-xl border border-white/10 shadow-lg">
-          <span className="text-[11px] font-medium text-white/50 block">Progress</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">
-            {progressPercent}%
-          </div>
-        </div>
-
-        <div className="p-4 rounded-3xl bg-[#141622]/70 backdrop-blur-xl border border-white/10 shadow-lg">
-          <span className="text-[11px] font-medium text-white/50 block">Open tasks</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">
-            {openCount}
-          </div>
-        </div>
-
-        <div className="p-4 rounded-3xl bg-[#141622]/70 backdrop-blur-xl border border-white/10 shadow-lg">
-          <span className="text-[11px] font-medium text-white/50 block">Done</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">
-            {doneCount}
-          </div>
-        </div>
-
-        <div className="p-4 rounded-3xl bg-[#141622]/70 backdrop-blur-xl border border-white/10 shadow-lg">
-          <span className="text-[11px] font-medium text-white/50 block">Days left</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">
-            {project.daysLeft || 41}
-          </div>
-        </div>
-      </div>
-
-      {/* Two Column Layout exactly matching the screenshot */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* Two Column Layout matching screenshot */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Left Column: Overview and Milestones */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6 space-y-5">
           {/* Card: Overview */}
-          <div className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl space-y-6">
-            <h3 className="text-base font-bold text-white">Overview</h3>
+          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-5">
+            <h3 className="text-sm font-bold text-white">Overview</h3>
 
             {/* Lead & Status sub-boxes */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5">
-                <span className="text-[10px] font-medium text-white/40 block mb-1.5">Lead</span>
+              <div className="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04]">
+                <span className="text-[10px] font-medium text-[#8b8b90] block mb-1">Lead</span>
                 <div
                   onClick={() => openMemberModal(leadMember.id)}
                   className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
@@ -345,30 +324,30 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                   <img
                     src={leadMember.avatar}
                     alt={leadMember.name}
-                    className="w-6 h-6 rounded-full object-cover ring-1 ring-white/20"
+                    className="w-5 h-5 rounded-full object-cover ring-1 ring-white/10"
                   />
                   <span className="text-xs font-bold text-blue-400 truncate">{leadMember.name}</span>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5">
-                <span className="text-[10px] font-medium text-white/40 block mb-1.5">Status</span>
+              <div className="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04]">
+                <span className="text-[10px] font-medium text-[#8b8b90] block mb-1">Status</span>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-                  <span className="text-xs font-semibold text-white/90">In progress</span>
+                  <span className="text-xs font-semibold text-white">In progress</span>
                 </div>
               </div>
             </div>
 
             {/* Timeline Slider with floating "Today" pill */}
             <div className="pt-2">
-              <div className="flex items-center justify-between text-xs text-white/70 mb-3">
+              <div className="flex items-center justify-between text-xs text-[#8b8b90] mb-2.5">
                 <div>
-                  <span className="text-[10px] text-white/40 block">Started</span>
+                  <span className="text-[10px] text-[#8b8b90]/70 block">Started</span>
                   <span className="font-bold text-white">{project.startDisplay || 'Sep 19'}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] text-white/40 block">Due</span>
+                  <span className="text-[10px] text-[#8b8b90]/70 block">Due</span>
                   <span className="font-bold text-white">{project.dueDisplay || 'Nov 28'}</span>
                 </div>
               </div>
@@ -380,7 +359,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                   className="absolute -top-1 z-10 flex flex-col items-center pointer-events-none transform -translate-x-1/2"
                   style={{ left: '46%' }}
                 >
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-white text-neutral-900 shadow-lg">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-white text-neutral-900 shadow-md">
                     Today
                   </span>
                   <span className="w-0.5 h-3 bg-white" />
@@ -388,7 +367,6 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
 
                 {/* Background track */}
                 <div className="w-full h-1.5 rounded-full bg-white/10 relative overflow-visible">
-                  {/* Active progress track */}
                   <div
                     className="h-full rounded-full bg-blue-500 shadow-[0_0_12px_#3b82f6]"
                     style={{ width: '46%' }}
@@ -396,46 +374,46 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
 
                   {/* Dot at start */}
                   <div
-                    className="absolute top-1/2 left-0 w-3 h-3 rounded-full bg-blue-500 ring-4 ring-[#141622] transform -translate-y-1/2"
+                    className="absolute top-1/2 left-0 w-2.5 h-2.5 rounded-full bg-blue-500 ring-2 ring-[#131417] transform -translate-y-1/2"
                   />
 
                   {/* Milestone dot 1 */}
                   <div
-                    className="absolute top-1/2 w-2.5 h-2.5 rounded-full bg-blue-400 ring-2 ring-[#141622] transform -translate-y-1/2"
+                    className="absolute top-1/2 w-2 h-2 rounded-full bg-blue-400 ring-2 ring-[#131417] transform -translate-y-1/2"
                     style={{ left: '16%' }}
                   />
 
                   {/* Milestone dot 2 */}
                   <div
-                    className="absolute top-1/2 w-2.5 h-2.5 rounded-full bg-blue-400 ring-2 ring-[#141622] transform -translate-y-1/2"
+                    className="absolute top-1/2 w-2 h-2 rounded-full bg-blue-400 ring-2 ring-[#131417] transform -translate-y-1/2"
                     style={{ left: '58%' }}
                   />
 
                   {/* Milestone dot 3 */}
                   <div
-                    className="absolute top-1/2 w-2.5 h-2.5 rounded-full bg-white/40 ring-2 ring-[#141622] transform -translate-y-1/2"
+                    className="absolute top-1/2 w-2 h-2 rounded-full bg-white/30 ring-2 ring-[#131417] transform -translate-y-1/2"
                     style={{ left: '72%' }}
                   />
 
                   {/* Dot at end */}
                   <div
-                    className="absolute top-1/2 right-0 w-3 h-3 rounded-full bg-blue-500 ring-4 ring-[#141622] transform -translate-y-1/2"
+                    className="absolute top-1/2 right-0 w-2.5 h-2.5 rounded-full bg-blue-500 ring-2 ring-[#131417] transform -translate-y-1/2"
                   />
                 </div>
               </div>
             </div>
 
             {/* People Section */}
-            <div className="pt-2 border-t border-white/5 space-y-3">
+            <div className="pt-2 border-t border-white/[0.04] space-y-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-white">People</span>
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-white/10 text-white/60">
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-white/[0.08] text-[#8b8b90]">
                   {displayedMembers.length}
                 </span>
               </div>
 
-              {/* 2-Column Grid of Members exactly as in the photo */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* 2-Column Grid of Members */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {displayedMembers.map((member: any) => {
                   const statusDot = getStatusDot(member.status);
                   const displayRole = member.role || (member.status === 'online' ? 'Online' : 'Team');
@@ -444,23 +422,23 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                     <div
                       key={member.id}
                       onClick={() => openMemberModal(member.id)}
-                      className="flex items-center gap-3 p-2 rounded-2xl hover:bg-white/5 transition-colors cursor-pointer"
+                      className="flex items-center gap-2.5 p-2 rounded-[10px] hover:bg-white/[0.04] transition-colors cursor-pointer"
                     >
                       <div className="relative shrink-0">
                         <img
                           src={member.avatar}
                           alt={member.name}
-                          className="w-8 h-8 rounded-full object-cover ring-1 ring-white/15"
+                          className="w-7 h-7 rounded-full object-cover ring-1 ring-white/10"
                         />
                         <span
-                          className={`absolute bottom-0 right-0 w-2 h-2 rounded-full ${statusDot} ring-1 ring-[#141622]`}
+                          className={`absolute bottom-0 right-0 w-2 h-2 rounded-full ${statusDot} ring-1 ring-[#131417]`}
                         />
                       </div>
                       <div className="truncate">
                         <h5 className="text-xs font-bold text-white truncate leading-tight">
                           {member.name}
                         </h5>
-                        <p className="text-[11px] text-white/50 truncate leading-tight mt-0.5">
+                        <p className="text-[11px] text-[#8b8b90] truncate leading-tight mt-0.5">
                           {displayRole}
                         </p>
                       </div>
@@ -472,52 +450,50 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
           </div>
 
           {/* Card: Milestones */}
-          <div className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl space-y-4">
+          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
             <div>
-              <h3 className="text-base font-bold text-white">Milestones</h3>
-              <p className="text-xs text-white/50 mt-0.5">1 of 4 reached</p>
+              <h3 className="text-sm font-bold text-white">Milestones</h3>
+              <p className="text-xs text-[#8b8b90] mt-0.5">1 of 4 reached</p>
             </div>
 
             {/* Vertical Stepper List */}
-            <div className="space-y-4 pt-2">
-              {defaultMilestones.map((ms, index) => {
+            <div className="space-y-3 pt-1">
+              {defaultMilestones.map((ms) => {
                 const isDone = ms.status === 'done';
                 const isNext = ms.status === 'next';
 
                 return (
-                  <div key={ms.id} className="flex items-start gap-3.5 relative group">
-                    {/* Stepper icon */}
+                  <div key={ms.id} className="flex items-start gap-3 relative group">
                     <div className="shrink-0 mt-0.5">
                       {isDone ? (
-                        <div className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-md shadow-blue-500/30">
-                          <Check size={12} strokeWidth={3} />
+                        <div className="w-4 h-4 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-sm">
+                          <Check size={10} strokeWidth={3} />
                         </div>
                       ) : isNext ? (
-                        <div className="w-5 h-5 rounded-full border-2 border-blue-400 bg-blue-500/20 flex items-center justify-center">
+                        <div className="w-4 h-4 rounded-full border-2 border-blue-400 bg-blue-500/20 flex items-center justify-center">
                           <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                         </div>
                       ) : (
-                        <div className="w-5 h-5 rounded-full border border-white/20 bg-white/5" />
+                        <div className="w-4 h-4 rounded-full border border-white/20 bg-white/5" />
                       )}
                     </div>
 
-                    {/* Content */}
                     <div className="flex-1 flex items-center justify-between gap-2 min-w-0">
                       <div>
                         <h4
                           className={`text-xs font-bold truncate leading-tight ${
-                            isDone ? 'text-white' : isNext ? 'text-white' : 'text-white/60'
+                            isDone ? 'text-white' : isNext ? 'text-white' : 'text-[#8b8b90]'
                           }`}
                         >
                           {ms.title}
                         </h4>
-                        <p className="text-[11px] text-white/40 mt-0.5 leading-tight">
+                        <p className="text-[11px] text-[#8b8b90]/70 mt-0.5 leading-tight">
                           {ms.date}
                         </p>
                       </div>
 
                       {isNext && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 shrink-0">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
                           Next
                         </span>
                       )}
@@ -530,80 +506,72 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
         </div>
 
         {/* Right Column: Burn-up Chart and Tasks */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6 space-y-5">
           {/* Card: Burn-up */}
-          <div className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl space-y-4">
+          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="text-base font-bold text-white">Burn-up</h3>
-                  <ArrowUpRight size={15} className="text-white/40" />
+                  <h3 className="text-sm font-bold text-white">Burn-up</h3>
+                  <ArrowUpRight size={14} className="text-[#8b8b90]" />
                 </div>
-                <p className="text-xs text-white/50 mt-0.5">
+                <p className="text-xs text-[#8b8b90] mt-0.5">
                   Tasks done against the total, over the project's life
                 </p>
               </div>
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-4 text-xs text-white/70 pt-1">
+            <div className="flex items-center gap-4 text-xs text-[#8b8b90] pt-1">
               <div className="flex items-center gap-2">
-                <span className="w-4 h-0.5 bg-blue-400 rounded-full" />
-                <span className="text-[11px] font-medium">Done</span>
+                <span className="w-3.5 h-0.5 bg-blue-400 rounded-full" />
+                <span className="text-[11px] font-medium text-white">Done</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-4 h-0.5 border-t border-dashed border-white/40" />
-                <span className="text-[11px] font-medium text-white/50">Total</span>
+                <span className="w-3.5 h-0.5 border-t border-dashed border-white/40" />
+                <span className="text-[11px] font-medium text-[#8b8b90]">Total</span>
               </div>
             </div>
 
-            {/* SVG Burn-up Chart matching screenshot exactly */}
-            <div className="pt-2 w-full">
-              <div className="relative w-full h-52">
+            {/* SVG Burn-up Chart */}
+            <div className="pt-2 w-full p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04]">
+              <div className="relative w-full h-44">
                 <svg className="w-full h-full overflow-visible" viewBox="0 0 520 180">
                   <defs>
                     <linearGradient id="tideBurnupGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.35" />
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
                       <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
                     </linearGradient>
                   </defs>
 
-                  {/* Horizontal dotted grid lines */}
-                  {/* 5 tasks (top) */}
                   <line x1="50" y1="25" x2="510" y2="25" stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
-                  <text x="42" y="29" fill="rgba(255,255,255,0.35)" fontSize="9" textAnchor="end" fontFamily="monospace">
+                  <text x="42" y="29" fill="rgba(255,255,255,0.3)" fontSize="9" textAnchor="end" fontFamily="monospace">
                     5 tasks
                   </text>
 
-                  {/* 3 tasks (middle) */}
                   <line x1="50" y1="75" x2="510" y2="75" stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
-                  <text x="42" y="79" fill="rgba(255,255,255,0.35)" fontSize="9" textAnchor="end" fontFamily="monospace">
+                  <text x="42" y="79" fill="rgba(255,255,255,0.3)" fontSize="9" textAnchor="end" fontFamily="monospace">
                     3 tasks
                   </text>
 
-                  {/* 0 tasks (bottom) */}
-                  <line x1="50" y1="150" x2="510" y2="150" stroke="rgba(255,255,255,0.1)" />
-                  <text x="42" y="154" fill="rgba(255,255,255,0.35)" fontSize="9" textAnchor="end" fontFamily="monospace">
+                  <line x1="50" y1="150" x2="510" y2="150" stroke="rgba(255,255,255,0.08)" />
+                  <text x="42" y="154" fill="rgba(255,255,255,0.3)" fontSize="9" textAnchor="end" fontFamily="monospace">
                     0 tasks
                   </text>
 
-                  {/* Dashed line: Total tasks */}
-                  {/* Sep 19 (0) -> Sep 21 (0 to 1) -> Sep 24 (1 to 2) -> Sep 26 (2) -> Oct 1 (3) -> Oct 19 (3) */}
                   <path
                     d="M 60 150 L 95 150 L 130 125 L 165 125 L 200 100 L 235 100 L 270 75 L 500 75"
                     fill="none"
-                    stroke="rgba(255,255,255,0.4)"
+                    stroke="rgba(255,255,255,0.3)"
                     strokeWidth="1.5"
                     strokeDasharray="4 3"
                   />
 
-                  {/* Filled Area for Done */}
                   <path
                     d="M 60 150 L 200 150 L 235 125 L 270 100 L 305 75 L 500 75 L 500 150 Z"
                     fill="url(#tideBurnupGrad)"
                   />
 
-                  {/* Solid Blue line: Done tasks */}
                   <path
                     d="M 60 150 L 200 150 L 235 125 L 270 100 L 305 75 L 500 75"
                     fill="none"
@@ -613,7 +581,6 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                     strokeLinejoin="round"
                   />
 
-                  {/* X-axis labels */}
                   {[
                     { label: 'Sep 19', x: 60 },
                     { label: 'Sep 21', x: 95 },
@@ -633,7 +600,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                       key={tick.label}
                       x={tick.x}
                       y="168"
-                      fill="rgba(255,255,255,0.35)"
+                      fill="rgba(255,255,255,0.3)"
                       fontSize="8.5"
                       textAnchor="middle"
                     >
@@ -646,19 +613,18 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
           </div>
 
           {/* Card: Tasks */}
-          <div className="p-6 rounded-3xl bg-[#141622]/70 backdrop-blur-2xl border border-white/10 shadow-xl space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.04]">
               <div>
-                <h3 className="text-base font-bold text-white">Tasks</h3>
-                <p className="text-xs text-white/50 mt-0.5">
+                <h3 className="text-sm font-bold text-white">Tasks</h3>
+                <p className="text-xs text-[#8b8b90] mt-0.5">
                   {openCount} open · {doneCount} done
                 </p>
               </div>
 
-              {/* + Add task button */}
               <button
                 onClick={() => openQuickAdd('task')}
-                className="px-4 py-2 rounded-2xl text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 shadow-md shadow-blue-500/30 transition-all flex items-center gap-1.5"
+                className="px-4 py-2 rounded-full text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-sm transition-all flex items-center gap-1.5"
               >
                 <Plus size={14} />
                 <span>Add task</span>
@@ -667,23 +633,23 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
 
             {/* To do Section */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-white/70">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#8b8b90]">
                 <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                 <span>To do</span>
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/10 text-white/60">
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/[0.08] text-[#8b8b90]">
                   {displayedTodoTasks.length}
                 </span>
               </div>
 
               {displayedTodoTasks.length === 0 ? (
-                <p className="text-xs text-white/40 py-2 pl-3">Nothing waiting.</p>
+                <p className="text-xs text-[#8b8b90]/60 py-1.5 pl-3">Nothing waiting.</p>
               ) : (
                 <div className="space-y-2">
                   {displayedTodoTasks.map((t) => (
                     <div
                       key={t.id}
                       onClick={() => openTaskModal(t.id)}
-                      className="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 flex items-center justify-between gap-3 cursor-pointer transition-all"
+                      className="p-3 rounded-[10px] bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04] flex items-center justify-between gap-3 cursor-pointer transition-all"
                     >
                       <div className="flex items-center gap-2.5 truncate">
                         <button
@@ -692,11 +658,11 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                             e.stopPropagation();
                             toggleTaskComplete(t.id);
                           }}
-                          className="w-4 h-4 rounded-md border border-white/30 flex items-center justify-center shrink-0 hover:border-white"
+                          className="w-4 h-4 rounded border border-white/30 flex items-center justify-center shrink-0 hover:border-white"
                         />
                         <span className="text-xs text-white truncate font-medium">{t.title}</span>
                       </div>
-                      <span className="text-[10px] text-white/40 shrink-0">{t.dueDisplay}</span>
+                      <span className="text-[10px] text-[#8b8b90] shrink-0">{t.dueDisplay}</span>
                     </div>
                   ))}
                 </div>
@@ -704,24 +670,24 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             </div>
 
             {/* In progress Section */}
-            <div className="space-y-2 pt-2 border-t border-white/5">
-              <div className="flex items-center gap-2 text-xs font-bold text-white/70">
+            <div className="space-y-2 pt-2 border-t border-white/[0.04]">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#8b8b90]">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                 <span>In progress</span>
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/10 text-white/60">
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/[0.08] text-[#8b8b90]">
                   {displayedInProgressTasks.length}
                 </span>
               </div>
 
               {displayedInProgressTasks.length === 0 ? (
-                <p className="text-xs text-white/40 py-2 pl-3">Nothing here.</p>
+                <p className="text-xs text-[#8b8b90]/60 py-1.5 pl-3">Nothing here.</p>
               ) : (
                 <div className="space-y-2">
                   {displayedInProgressTasks.map((t) => (
                     <div
                       key={t.id}
                       onClick={() => openTaskModal(t.id)}
-                      className="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 flex items-center justify-between gap-3 cursor-pointer transition-all"
+                      className="p-3 rounded-[10px] bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04] flex items-center justify-between gap-3 cursor-pointer transition-all"
                     >
                       <div className="flex items-center gap-2.5 truncate">
                         <button
@@ -730,11 +696,11 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                             e.stopPropagation();
                             toggleTaskComplete(t.id);
                           }}
-                          className="w-4 h-4 rounded-md border border-white/30 flex items-center justify-center shrink-0 hover:border-white"
+                          className="w-4 h-4 rounded border border-white/30 flex items-center justify-center shrink-0 hover:border-white"
                         />
                         <span className="text-xs text-white truncate font-medium">{t.title}</span>
                       </div>
-                      <span className="text-[10px] text-white/40 shrink-0">{t.dueDisplay}</span>
+                      <span className="text-[10px] text-[#8b8b90] shrink-0">{t.dueDisplay}</span>
                     </div>
                   ))}
                 </div>
@@ -742,11 +708,11 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             </div>
 
             {/* Done Section */}
-            <div className="space-y-2 pt-2 border-t border-white/5">
-              <div className="flex items-center gap-2 text-xs font-bold text-white/70">
+            <div className="space-y-2 pt-2 border-t border-white/[0.04]">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#8b8b90]">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 <span>Done</span>
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/10 text-white/60">
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/[0.08] text-[#8b8b90]">
                   {displayedDoneTasks.length}
                 </span>
               </div>
@@ -762,46 +728,44 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                     <div
                       key={task.id}
                       onClick={() => openTaskModal(task.id)}
-                      className="p-3 rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 flex items-center justify-between gap-3 cursor-pointer transition-all group"
+                      className="p-3 rounded-[10px] bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04] flex items-center justify-between gap-3 cursor-pointer transition-all group"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        {/* Checkbox */}
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleTaskComplete(task.id);
                           }}
-                          className="w-5 h-5 rounded-lg bg-blue-500 border border-blue-500 text-white flex items-center justify-center shrink-0 shadow-sm shadow-blue-500/40"
+                          className="w-4 h-4 rounded bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-sm"
                         >
-                          <Check size={12} strokeWidth={3} />
+                          <Check size={11} strokeWidth={3} />
                         </button>
 
                         <div className="truncate">
-                          <h5 className="text-xs font-semibold text-white/90 truncate line-through group-hover:text-white transition-colors">
+                          <h5 className="text-xs font-medium text-[#8b8b90] truncate line-through group-hover:text-white transition-colors">
                             {task.title}
                           </h5>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <span className="flex items-center gap-1 text-[10px] text-white/50">
+                            <span className="flex items-center gap-1 text-[10px] text-[#8b8b90]/70">
                               <span
                                 className="w-1.5 h-1.5 rounded-full"
                                 style={{ backgroundColor: project.color }}
                               />
                               {project.name}
                             </span>
-                            <span className="text-[10px] text-white/40">
+                            <span className="text-[10px] text-[#8b8b90]/70">
                               {task.priority === 'High' ? 'Alta' : task.priority === 'Low' ? 'Baixa' : 'Média'}
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Assignee Avatar */}
                       <img
                         src={assignee.avatar}
                         alt={assignee.name}
                         title={assignee.name}
-                        className="w-6 h-6 rounded-full object-cover ring-1 ring-white/15 shrink-0"
+                        className="w-5 h-5 rounded-full object-cover ring-1 ring-white/10 shrink-0"
                       />
                     </div>
                   );

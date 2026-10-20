@@ -9,115 +9,154 @@ import {
   Settings,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { ACCENTS } from '../themeUtils';
 
 interface NavItem {
   id: string;
   label: string;
   icon: React.ComponentType<{ className?: string; size?: number }>;
+  badge?: number | string;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { id: 'home', label: 'Início', icon: Home },
-  { id: 'tasks', label: 'Tarefas', icon: CheckSquare },
-  { id: 'calendar', label: 'Calendário', icon: Calendar },
-  { id: 'projects', label: 'Projetos', icon: Folder },
-  { id: 'insights', label: 'Métricas', icon: BarChart2 },
-  { id: 'team', label: 'Equipe', icon: Users },
-  { id: 'settings', label: 'Configurações', icon: Settings },
-];
-
 export const Sidebar: React.FC = () => {
-  const { activeTab, setActiveTab, currentUser, preferences } = useApp();
-  const currentAccent = ACCENTS[preferences.accent] || ACCENTS.blue;
+  const {
+    activeTab,
+    setActiveTab,
+    currentUser,
+    projects,
+    openProjectDetail,
+  } = useApp();
+
+  const NAV_ITEMS: NavItem[] = [
+    { id: 'home', label: 'Home', icon: Home },
+    { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: '7' },
+    { id: 'calendar', label: 'Calendar', icon: Calendar },
+    { id: 'projects', label: 'Projects', icon: Folder },
+    { id: 'insights', label: 'Insights', icon: BarChart2 },
+    { id: 'team', label: 'Team', icon: Users },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ];
+
+  const tideProject = projects.find((p) => p.slug === 'tide' || p.id === 'proj-tide');
+  const orbitProject = projects.find((p) => p.slug === 'orbit' || p.id === 'proj-orbit');
 
   return (
     <>
-      {/* Desktop Fixed Left Rail */}
-      <aside className="fixed left-4 top-4 bottom-4 w-16 z-40 hidden md:flex flex-col items-center justify-between py-4 rounded-3xl bg-[#14161f]/75 dark:bg-[#12141c]/80 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-        {/* Top: App Logo */}
-        <button
-          onClick={() => setActiveTab('home')}
-          className="relative group p-2.5 rounded-2xl transition-all duration-300 transform active:scale-95"
-          title="Pane Início"
-        >
-          <div
-            className={`w-10 h-10 rounded-2xl bg-gradient-to-tr ${currentAccent.gradient} flex items-center justify-center shadow-lg ${currentAccent.activeNavGlow} text-white`}
+      {/* Desktop Fixed Left Sidebar (~220px) */}
+      <aside className="fixed left-4 top-4 bottom-4 w-[220px] z-40 hidden md:flex flex-col justify-between p-3.5 rounded-[20px] bg-[#121316] border border-white/[0.06] shadow-2xl backdrop-blur-xl">
+        <div className="space-y-4">
+          {/* Top: Logo circular com ícone abstrato + texto "Pane" em negrito branco */}
+          <button
+            onClick={() => setActiveTab('home')}
+            className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-white/[0.04] transition-all text-left w-full group"
           >
-            {/* Minimalist Pane Window Icon */}
-            <svg
-              className="w-5 h-5 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="4" />
-              <line x1="12" y1="3" x2="12" y2="21" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-            </svg>
-          </div>
-          {/* Tooltip */}
-          <div className="absolute left-16 ml-2 px-2.5 py-1 bg-neutral-900/95 text-white text-xs font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity backdrop-blur-md border border-white/10 shadow-xl whitespace-nowrap z-50">
-            Pane Início
-          </div>
-        </button>
+            <div className="w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
+              {/* Ícone abstrato de janelas / painéis */}
+              <svg
+                className="w-4 h-4 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="9" strokeOpacity="0.4" />
+                <path d="M8 8h8v8H8z" rx="2" />
+                <path d="M12 8v8M8 12h8" />
+              </svg>
+            </div>
+            <span className="font-bold text-base text-white tracking-tight">Pane</span>
+          </button>
 
-        {/* Center: Navigation Icons */}
-        <nav className="flex flex-col items-center gap-3 w-full px-2">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
+          {/* Menu de navegação */}
+          <nav className="space-y-1 w-full">
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
 
-            return (
-              <div key={item.id} className="relative group w-full flex justify-center">
+              return (
                 <button
+                  key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`relative p-3 rounded-2xl transition-all duration-200 flex items-center justify-center ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                     isActive
-                      ? 'bg-white/15 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/15'
-                      : 'text-white/50 hover:text-white hover:bg-white/5'
+                      ? 'bg-white/[0.1] text-white font-semibold border border-white/[0.08] shadow-sm'
+                      : 'text-[#8b8b90] hover:text-white hover:bg-white/[0.04]'
                   }`}
-                  aria-label={item.label}
                 >
-                  <Icon size={20} />
+                  <div className="flex items-center gap-2.5">
+                    <Icon size={16} className={isActive ? 'text-white' : 'text-[#8b8b90]'} />
+                    <span>{item.label}</span>
+                  </div>
+
+                  {/* Badge circular "7" à direita */}
+                  {item.badge !== undefined && (
+                    <span className="w-4 h-4 rounded-full bg-white/10 text-white/80 text-[10px] font-bold flex items-center justify-center">
+                      {item.badge}
+                    </span>
+                  )}
                 </button>
+              );
+            })}
+          </nav>
 
-                {/* Tooltip */}
-                <div className="absolute left-16 ml-2 px-2.5 py-1 bg-neutral-900/95 text-white text-xs font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity backdrop-blur-md border border-white/10 shadow-xl whitespace-nowrap z-50">
-                  {item.label}
-                </div>
-              </div>
-            );
-          })}
-        </nav>
+          {/* Separador */}
+          <div className="pt-2 border-t border-white/[0.06]">
+            {/* Seção PINNED */}
+            <span className="text-[10px] font-semibold text-[#8b8b90] uppercase tracking-wider px-3 mb-2 block">
+              PINNED
+            </span>
+            <div className="space-y-1">
+              {/* Tide mobile app (bullet azul) */}
+              <button
+                onClick={() => {
+                  if (tideProject) openProjectDetail(tideProject.id);
+                  setActiveTab('projects');
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all text-left truncate group"
+              >
+                <span className="w-2 h-2 rounded-full bg-[#3b82f6] shrink-0 group-hover:scale-125 transition-transform" />
+                <span className="truncate">Tide mobile app</span>
+              </button>
 
-        {/* Bottom: Current User Avatar */}
-        <button
+              {/* Orbit 2.0 launch (bullet roxo) */}
+              <button
+                onClick={() => {
+                  if (orbitProject) openProjectDetail(orbitProject.id);
+                  setActiveTab('projects');
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all text-left truncate group"
+              >
+                <span className="w-2 h-2 rounded-full bg-[#a855f7] shrink-0 group-hover:scale-125 transition-transform" />
+                <span className="truncate">Orbit 2.0 launch</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Rodapé: Usuário */}
+        <div
           onClick={() => setActiveTab('settings')}
-          className="relative group p-1 rounded-full transition-transform active:scale-95"
-          title={`${currentUser.name} (${currentUser.role})`}
+          className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer pt-3 border-t border-white/[0.06]"
+          title={`${currentUser.name} · ${currentUser.role}`}
         >
-          <div className="relative">
+          <div className="relative shrink-0">
             <img
               src={currentUser.avatar}
               alt={currentUser.name}
-              className="w-10 h-10 rounded-full object-cover ring-2 ring-white/20 hover:ring-white/50 transition-all"
+              className="w-7 h-7 rounded-full object-cover ring-1 ring-white/10"
             />
-            <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-neutral-900" />
+            <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 ring-1 ring-[#121316]" />
           </div>
-
-          <div className="absolute left-16 ml-2 bottom-0 px-2.5 py-1.5 bg-neutral-900/95 text-white text-xs rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity backdrop-blur-md border border-white/10 shadow-xl whitespace-nowrap z-50">
-            <p className="font-semibold">{currentUser.name}</p>
-            <p className="text-white/60 text-[10px]">{currentUser.role}</p>
+          <div className="truncate">
+            <p className="text-xs font-semibold text-white truncate leading-tight">{currentUser.name}</p>
+            <p className="text-[10px] text-[#8b8b90] truncate leading-tight mt-0.5">{currentUser.role}</p>
           </div>
-        </button>
+        </div>
       </aside>
 
       {/* Mobile Floating Bottom Bar */}
-      <nav className="fixed bottom-3 left-4 right-4 z-40 md:hidden flex items-center justify-around py-2.5 px-3 rounded-2xl bg-[#14161f]/85 backdrop-blur-2xl border border-white/10 shadow-2xl">
+      <nav className="fixed bottom-3 left-4 right-4 z-40 md:hidden flex items-center justify-around py-2.5 px-3 rounded-2xl bg-[#121316]/95 backdrop-blur-2xl border border-white/[0.08] shadow-2xl">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -127,8 +166,8 @@ export const Sidebar: React.FC = () => {
               onClick={() => setActiveTab(item.id)}
               className={`p-2.5 rounded-xl transition-all ${
                 isActive
-                  ? 'bg-white/20 text-white shadow-sm ring-1 ring-white/20'
-                  : 'text-white/50 hover:text-white'
+                  ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/20'
+                  : 'text-[#8b8b90] hover:text-white'
               }`}
             >
               <Icon size={18} />

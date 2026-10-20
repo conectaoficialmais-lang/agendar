@@ -30,21 +30,17 @@ const MainShell: React.FC = () => {
 
   return (
     <div
-      className={`min-h-screen text-white relative transition-colors duration-500 ${
-        isLight ? 'light-mode' : 'dark'
-      }`}
+      className="min-h-screen text-white relative font-sans selection:bg-white/20 selection:text-white"
       style={{
-        background: backgroundStyle,
-        backgroundColor: isLight ? '#f8fafc' : '#0e1017',
+        background: '#0a0a0b',
+        backgroundColor: '#0a0a0b',
       }}
     >
       {/* Dynamic Ambient Blur Glow Layer */}
       <div
-        className="fixed inset-0 pointer-events-none opacity-60 mix-blend-screen transition-opacity duration-700"
+        className="fixed inset-0 pointer-events-none opacity-20 mix-blend-screen transition-opacity duration-700"
         style={{
-          background: `radial-gradient(ellipse 60% 40% at 50% 0%, ${
-            ACCENTS[preferences.accent]?.glow || 'rgba(59, 130, 246, 0.25)'
-          } 0%, transparent 70%)`,
+          background: `radial-gradient(ellipse 60% 40% at 50% 0%, rgba(120, 119, 198, 0.08) 0%, transparent 70%)`,
         }}
       />
 
@@ -55,7 +51,7 @@ const MainShell: React.FC = () => {
       <TopBar />
 
       {/* Main Content Area */}
-      <main className="min-h-screen px-4 md:px-8 pl-4 md:pl-28 pt-20 md:pt-16 pb-24 md:pb-12 max-w-7xl mx-auto relative z-10">
+      <main className="min-h-screen px-4 md:px-8 pl-4 md:pl-[244px] pt-4 md:pt-6 pb-24 md:pb-12 max-w-[1720px] mx-auto relative z-10">
         {activeTab === 'home' && <HomeView />}
         {activeTab === 'tasks' && <TasksView />}
         {activeTab === 'calendar' && <CalendarView />}

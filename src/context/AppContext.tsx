@@ -214,7 +214,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [projects, setProjects] = useState<Project[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.PROJECTS);
-      return saved ? JSON.parse(saved) : SEED_PROJECTS;
+      if (saved) {
+        const parsed: Project[] = JSON.parse(saved);
+        if (parsed.some((p) => p.name === 'Aplicativo móvel Tide' || p.name === 'Lançamento Orbit 2.0')) {
+          localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(SEED_PROJECTS));
+          return SEED_PROJECTS;
+        }
+        return parsed;
+      }
+      return SEED_PROJECTS;
     } catch {
       return SEED_PROJECTS;
     }
