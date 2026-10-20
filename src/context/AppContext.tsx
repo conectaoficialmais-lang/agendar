@@ -321,8 +321,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   ).length;
 
   const overdueCount = 0; // High performance team with zero overdue tasks
-  const totalCompletedCount = 139 + (tasks.filter((t) => t.status === 'done').length - 30);
-  const onTimeRate = 97;
+  const doneTasksAll = tasks.filter((t) => t.status === 'done');
+  const totalCompletedCount = 109 + doneTasksAll.length;
+  const baseLateCount = 4;
+  const onTimeRate = Math.min(
+    100,
+    Math.max(70, Math.round(((totalCompletedCount - baseLateCount) / Math.max(1, totalCompletedCount)) * 100))
+  );
 
   const getProjectStats = (projectId: string) => {
     const projTasks = tasks.filter((t) => t.projectId === projectId);
