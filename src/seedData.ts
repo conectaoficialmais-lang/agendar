@@ -7,6 +7,20 @@ import {
   AppNotification,
 } from './types';
 
+export const getRelativeDateStr = (daysAgo: number): string => {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+export const getRelativeIsoStr = (daysAgo: number, timeStr: string = '12:00:00Z'): string => {
+  const dateStr = getRelativeDateStr(daysAgo);
+  return `${dateStr}T${timeStr}`;
+};
+
 export const SEED_PROJECTS: Project[] = [
   {
     id: 'proj-orbit',
@@ -346,7 +360,7 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-orbit',
     status: 'todo',
     priority: 'Urgent',
-    dueDate: '2026-10-19',
+    dueDate: getRelativeDateStr(0),
     dueDisplay: 'Hoje',
     assigneeId: 'user-lin',
     subtasks: [
@@ -371,7 +385,7 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-facet',
     status: 'todo',
     priority: 'Medium',
-    dueDate: '2026-10-19',
+    dueDate: getRelativeDateStr(0),
     dueDisplay: 'Hoje',
     assigneeId: 'user-lin',
     subtasks: [],
@@ -384,7 +398,7 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-tide',
     status: 'todo',
     priority: 'Medium',
-    dueDate: '2026-10-19',
+    dueDate: getRelativeDateStr(0),
     dueDisplay: 'Hoje',
     assigneeId: 'user-lin',
     subtasks: [
@@ -400,7 +414,7 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-tide',
     status: 'todo',
     priority: 'High',
-    dueDate: '2026-10-19',
+    dueDate: getRelativeDateStr(0),
     dueDisplay: 'Hoje',
     assigneeId: 'user-kwame',
     subtasks: [],
@@ -413,7 +427,7 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-tide',
     status: 'todo',
     priority: 'High',
-    dueDate: '2026-10-19',
+    dueDate: getRelativeDateStr(0),
     dueDisplay: 'Hoje',
     assigneeId: 'user-kwame',
     subtasks: [],
@@ -822,18 +836,20 @@ export const SEED_TASKS: Task[] = [
   },
 
   // --- CONCLUÍDAS (30 tarefas no quadro) ---
+  // 8 tarefas nos últimos 7 dias (dias 0 a 6): 7D = 8 tarefas
   {
     id: 'task-33',
     title: 'Responder Kwame sobre caso limite de sincronização',
     projectId: 'proj-tide',
     status: 'done',
     priority: 'High',
-    dueDate: '2026-10-19',
-    dueDisplay: '19 Out',
+    dueDate: getRelativeDateStr(0),
+    dueDisplay: 'Hoje',
     assigneeId: 'user-lin',
     subtasks: [],
     comments: [],
-    completedAt: '2026-10-19T09:15:00Z',
+    completedAt: getRelativeIsoStr(0, '09:15:00Z'),
+    daysOpen: 2,
   },
   {
     id: 'task-34',
@@ -841,12 +857,13 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-orbit',
     status: 'done',
     priority: 'Medium',
-    dueDate: '2026-10-19',
-    dueDisplay: '19 Out',
+    dueDate: getRelativeDateStr(0),
+    dueDisplay: 'Hoje',
     assigneeId: 'user-lin',
     subtasks: [],
     comments: [],
-    completedAt: '2026-10-19T08:45:00Z',
+    completedAt: getRelativeIsoStr(0, '08:45:00Z'),
+    daysOpen: 3,
   },
   {
     id: 'task-35',
@@ -854,12 +871,13 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-facet',
     status: 'done',
     priority: 'Medium',
-    dueDate: '2026-10-18',
-    dueDisplay: '18 Out',
+    dueDate: getRelativeDateStr(1),
+    dueDisplay: 'Ontem',
     assigneeId: 'user-nia',
     subtasks: [],
     comments: [],
-    completedAt: '2026-10-18T16:20:00Z',
+    completedAt: getRelativeIsoStr(1, '16:20:00Z'),
+    daysOpen: 4,
   },
   {
     id: 'task-36',
@@ -867,12 +885,13 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-tide',
     status: 'done',
     priority: 'Urgent',
-    dueDate: '2026-10-17',
-    dueDisplay: '17 Out',
+    dueDate: getRelativeDateStr(2),
+    dueDisplay: '2d atrás',
     assigneeId: 'user-kwame',
     subtasks: [],
     comments: [],
-    completedAt: '2026-10-17T14:10:00Z',
+    completedAt: getRelativeIsoStr(2, '14:10:00Z'),
+    daysOpen: 5,
   },
   {
     id: 'task-37',
@@ -880,12 +899,13 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-facet',
     status: 'done',
     priority: 'Low',
-    dueDate: '2026-10-16',
-    dueDisplay: '16 Out',
+    dueDate: getRelativeDateStr(3),
+    dueDisplay: '3d atrás',
     assigneeId: 'user-elise',
     subtasks: [],
     comments: [],
-    completedAt: '2026-10-16T17:00:00Z',
+    completedAt: getRelativeIsoStr(3, '17:00:00Z'),
+    daysOpen: 2,
   },
   {
     id: 'task-38',
@@ -893,12 +913,13 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-northstar',
     status: 'done',
     priority: 'High',
-    dueDate: '2026-10-15',
-    dueDisplay: '15 Out',
+    dueDate: getRelativeDateStr(4),
+    dueDisplay: '4d atrás',
     assigneeId: 'user-alex',
     subtasks: [],
     comments: [],
-    completedAt: '2026-10-15T11:00:00Z',
+    completedAt: getRelativeIsoStr(4, '11:00:00Z'),
+    daysOpen: 6,
   },
   {
     id: 'task-39',
@@ -906,12 +927,13 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-tide',
     status: 'done',
     priority: 'Medium',
-    dueDate: '2026-10-14',
-    dueDisplay: '14 Out',
+    dueDate: getRelativeDateStr(5),
+    dueDisplay: '5d atrás',
     assigneeId: 'user-lucas',
     subtasks: [],
     comments: [],
-    completedAt: '2026-10-14T15:30:00Z',
+    completedAt: getRelativeIsoStr(5, '15:30:00Z'),
+    daysOpen: 3,
   },
   {
     id: 'task-40',
@@ -919,25 +941,28 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-sprout',
     status: 'done',
     priority: 'Medium',
-    dueDate: '2026-10-13',
-    dueDisplay: '13 Out',
+    dueDate: getRelativeDateStr(6),
+    dueDisplay: '6d atrás',
     assigneeId: 'user-maya',
     subtasks: [],
     comments: [],
-    completedAt: '2026-10-13T10:00:00Z',
+    completedAt: getRelativeIsoStr(6, '10:00:00Z'),
+    daysOpen: 4,
   },
+  // 2 tarefas no período de 30 dias (fora de 7D)
   {
     id: 'task-41',
     title: 'Preparar slides para a reunião geral (all-hands)',
     projectId: 'proj-orbit',
     status: 'done',
     priority: 'High',
-    dueDate: '2026-10-12',
-    dueDisplay: '12 Out',
+    dueDate: getRelativeDateStr(7),
+    dueDisplay: '7d atrás',
     assigneeId: 'user-lin',
     subtasks: [],
     comments: [],
-    completedAt: '2026-10-12T18:00:00Z',
+    completedAt: getRelativeIsoStr(7, '18:00:00Z'),
+    daysOpen: 5,
   },
   {
     id: 'task-42',
@@ -945,35 +970,37 @@ export const SEED_TASKS: Task[] = [
     projectId: 'proj-tide',
     status: 'done',
     priority: 'Urgent',
-    dueDate: '2026-10-11',
-    dueDisplay: '11 Out',
+    dueDate: getRelativeDateStr(8),
+    dueDisplay: '8d atrás',
     assigneeId: 'user-peter',
     subtasks: [],
     comments: [],
-    completedAt: '2026-10-11T12:00:00Z',
+    completedAt: getRelativeIsoStr(8, '12:00:00Z'),
+    daysOpen: 7,
   },
-  // Tarefas históricas complementares
+  // 20 tarefas históricas complementares (concluídas entre 10 e 26 dias atrás, todas dentro de 30D e 90D)
   ...Array.from({ length: 20 }).map((_, idx) => ({
     id: `task-hist-${idx + 43}`,
     title: `Entregável de sprint concluído #${idx + 1}`,
     projectId: ['proj-tide', 'proj-orbit', 'proj-facet', 'proj-sprout', 'proj-northstar'][idx % 5],
     status: 'done' as const,
     priority: (['Medium', 'High', 'Low', 'Urgent'][idx % 4]) as any,
-    dueDate: `2026-09-${20 + (idx % 10)}`,
-    dueDisplay: `${20 + (idx % 10)} Set`,
+    dueDate: getRelativeDateStr(35 + (idx % 10)), // concluídas após o prazo original -> atrasadas
+    dueDisplay: `${35 + (idx % 10)}d atrás`,
     assigneeId: ['user-lin', 'user-nia', 'user-kwame', 'user-omar', 'user-elise', 'user-alex'][idx % 6],
     subtasks: [],
     comments: [],
-    completedAt: `2026-10-0${(idx % 9) + 1}T10:00:00Z`,
+    completedAt: getRelativeIsoStr(10 + (idx % 16), '10:00:00Z'),
+    daysOpen: 4 + (idx % 5),
   })),
 ];
 
 export const SEED_CALENDAR_EVENTS: CalendarEvent[] = [
-  // Segunda-feira 19 de Outubro de 2026
+  // Hoje
   {
     id: 'ev-1',
     title: 'Stand-up matinal',
-    date: '2026-10-19',
+    date: getRelativeDateStr(0),
     startTime: '09:30',
     endTime: '09:45',
     startHour: 9.5,
@@ -987,7 +1014,7 @@ export const SEED_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'ev-2',
     title: 'Revisão e alinhamento Tide',
-    date: '2026-10-19',
+    date: getRelativeDateStr(0),
     startTime: '11:00',
     endTime: '11:45',
     startHour: 11.0,
@@ -1001,7 +1028,7 @@ export const SEED_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'ev-3',
     title: 'Almoço e aprendizado: materiais de vidro',
-    date: '2026-10-19',
+    date: getRelativeDateStr(0),
     startTime: '12:30',
     endTime: '13:30',
     startHour: 12.5,
@@ -1015,7 +1042,7 @@ export const SEED_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'ev-4',
     title: 'Trabalho focado (Deep work)',
-    date: '2026-10-19',
+    date: getRelativeDateStr(0),
     startTime: '14:00',
     endTime: '15:30',
     startHour: 14.0,
@@ -1028,7 +1055,7 @@ export const SEED_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'ev-5',
     title: 'Corte do vídeo de lançamento Orbit',
-    date: '2026-10-19',
+    date: getRelativeDateStr(0),
     startTime: '16:00',
     endTime: '16:30',
     startHour: 16.0,
@@ -1040,11 +1067,11 @@ export const SEED_CALENDAR_EVENTS: CalendarEvent[] = [
     attendeeIds: ['user-lin', 'user-ines', 'user-elise'],
   },
 
-  // Terça-feira 20 de Outubro de 2026
+  // Amanhã
   {
     id: 'ev-6',
     title: 'Stand-up matinal',
-    date: '2026-10-20',
+    date: getRelativeDateStr(-1),
     startTime: '09:30',
     endTime: '09:45',
     startHour: 9.5,
@@ -1057,7 +1084,7 @@ export const SEED_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'ev-7',
     title: 'Crítica de Design: inputs do Facet',
-    date: '2026-10-20',
+    date: getRelativeDateStr(-1),
     startTime: '11:00',
     endTime: '12:00',
     startHour: 11.0,
@@ -1071,7 +1098,7 @@ export const SEED_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'ev-8',
     title: '1:1 Peter e Lin',
-    date: '2026-10-20',
+    date: getRelativeDateStr(-1),
     startTime: '15:00',
     endTime: '15:45',
     startHour: 15.0,
@@ -1082,11 +1109,11 @@ export const SEED_CALENDAR_EVENTS: CalendarEvent[] = [
     attendeeIds: ['user-lin', 'user-peter'],
   },
 
-  // Quarta-feira 21 de Outubro de 2026
+  // Depois de amanhã
   {
     id: 'ev-9',
     title: 'Stand-up matinal',
-    date: '2026-10-21',
+    date: getRelativeDateStr(-2),
     startTime: '09:30',
     endTime: '09:45',
     startHour: 9.5,
@@ -1099,7 +1126,7 @@ export const SEED_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'ev-10',
     title: 'Apresentação da arquitetura offline',
-    date: '2026-10-21',
+    date: getRelativeDateStr(-2),
     startTime: '10:30',
     endTime: '11:30',
     startHour: 10.5,

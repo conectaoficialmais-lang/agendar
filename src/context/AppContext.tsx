@@ -19,13 +19,13 @@ import {
 } from '../seedData';
 
 const STORAGE_KEYS = {
-  TASKS: 'pane_tasks_pt_v2',
-  PROJECTS: 'pane_projects_pt_v2',
-  EVENTS: 'pane_events_pt_v2',
-  MEMBERS: 'pane_members_pt_v2',
-  PREFERENCES: 'pane_prefs_pt_v2',
-  NOTIFICATIONS: 'pane_notifications_pt_v2',
-  FOCUS: 'pane_focus_pt_v2',
+  TASKS: 'pane_tasks_pt_v3',
+  PROJECTS: 'pane_projects_pt_v3',
+  EVENTS: 'pane_events_pt_v3',
+  MEMBERS: 'pane_members_pt_v3',
+  PREFERENCES: 'pane_prefs_pt_v3',
+  NOTIFICATIONS: 'pane_notifications_pt_v3',
+  FOCUS: 'pane_focus_pt_v3',
 };
 
 interface AppContextType {
@@ -76,6 +76,7 @@ interface AppContextType {
   completeAllOverdue: () => void;
   totalCompletedCount: number;
   onTimeRate: number;
+  todayIso: string;
   getProjectStats: (projectId: string) => { total: number; done: number; progress: number };
   getMemberOpenCount: (memberId: string) => number;
 
@@ -312,14 +313,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [notifications]);
 
   // Dynamic Metrics & Stats Synchronized with Tasks State
+  const today = new Date();
+  const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
   const openTasks = tasks.filter((t) => t.status !== 'done');
   const openTasksCount = openTasks.length;
 
   const doneTodayTasks = tasks.filter(
     (t) =>
       t.status === 'done' &&
-      ((t.completedAt && t.completedAt.startsWith('2026-10-19')) ||
-        t.dueDate === '2026-10-19' ||
+      ((t.completedAt && t.completedAt.startsWith(todayIso)) ||
+        t.dueDate === todayIso ||
         t.dueDisplay === 'Hoje')
   );
   const doneTodayCount = doneTodayTasks.length;
@@ -330,12 +334,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const dueThisWeekCount = tasks.filter(
     (t) =>
       t.status !== 'done' &&
-      (t.dueDate.startsWith('2026-10-1') ||
-        t.dueDate.startsWith('2026-10-2') ||
+      (t.dueDate.startsWith(todayIso.slice(0, 7)) ||
         ['Hoje', 'Amanhã', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom', 'Today'].includes(t.dueDisplay))
   ).length;
 
-  const CURRENT_DATE_STR = '2026-10-22';
+  const CURRENT_DATE_STR = todayIso;
   const overdueTasks = tasks.filter(
     (t) => t.status !== 'done' && t.dueDate && t.dueDate < CURRENT_DATE_STR
   );
@@ -387,12 +390,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const doneTasksAll = tasks.filter((t) => t.status === 'done');
-  const totalCompletedCount = 109 + doneTasksAll.length;
-  const baseLateCount = Math.max(4, overdueCount);
-  const onTimeRate = Math.min(
-    100,
-    Math.max(60, Math.round(((totalCompletedCount - baseLateCount) / Math.max(1, totalCompletedCount)) * 100))
-  );
+  const totalCompletedCount = doneTasksAll.length;
+  
+  const onTimeTasksAll = doneTasksAll.filter((t) => {
+    if (!t.completedAt || !t.dueDate) return true;
+    return t.completedAt.slice(0, 10) <= t.dueDate;
+  });
+  const onTimeRate = doneTasksAll.length > 0
+    ? Math.round((onTimeTasksAll.length / doneTasksAll.length) * 100)
+    : 100;
 
   const getProjectStats = (projectId: string) => {
     const projTasks = tasks.filter((t) => t.projectId === projectId);
@@ -845,6 +851,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         completeAllOverdue,
         totalCompletedCount,
         onTimeRate,
+        todayIso,
         getProjectStats,
         getMemberOpenCount,
 
