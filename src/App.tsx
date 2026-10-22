@@ -6,6 +6,7 @@ import { CommandPalette } from './components/CommandPalette';
 import { QuickAddModal } from './components/QuickAddModal';
 import { TaskModal } from './components/TaskModal';
 import { MemberModal } from './components/MemberModal';
+import { OverdueAlertBanner } from './components/OverdueAlertBanner';
 
 import { HomeView } from './views/HomeView';
 import { TasksView } from './views/TasksView';
@@ -24,23 +25,23 @@ const MainShell: React.FC = () => {
     WALLPAPERS.find((w) => w.id === preferences.wallpaper) || WALLPAPERS[0];
   const isLight = preferences.theme === 'light';
 
-  const backgroundStyle = isLight
-    ? currentWallpaper.lightBackground
-    : currentWallpaper.darkBackground;
-
   return (
     <div
-      className="min-h-screen text-white relative font-sans selection:bg-white/20 selection:text-white"
+      className="min-h-screen text-white relative font-sans selection:bg-blue-500/30 selection:text-white"
       style={{
-        background: '#0a0a0b',
-        backgroundColor: '#0a0a0b',
+        background: '#0d0e12',
+        backgroundColor: '#0d0e12',
       }}
     >
-      {/* Dynamic Ambient Blur Glow Layer */}
+      {/* Pane subtle ambient depth */}
       <div
-        className="fixed inset-0 pointer-events-none opacity-20 mix-blend-screen transition-opacity duration-700"
+        className="fixed inset-0 pointer-events-none transition-opacity duration-700 opacity-60"
         style={{
-          background: `radial-gradient(ellipse 60% 40% at 50% 0%, rgba(120, 119, 198, 0.08) 0%, transparent 70%)`,
+          background: `
+            radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 255, 255, 0.03) 0%, transparent 60%),
+            radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.02) 0%, transparent 40%),
+            radial-gradient(circle at 90% 60%, rgba(59, 130, 246, 0.02) 0%, transparent 40%)
+          `,
         }}
       />
 
@@ -52,6 +53,9 @@ const MainShell: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="min-h-screen px-4 md:px-8 pl-4 md:pl-[244px] pt-4 md:pt-6 pb-24 md:pb-12 max-w-[1720px] mx-auto relative z-10">
+        {/* Overdue Task Alert Banner */}
+        <OverdueAlertBanner />
+
         {activeTab === 'home' && <HomeView />}
         {activeTab === 'tasks' && <TasksView />}
         {activeTab === 'calendar' && <CalendarView />}

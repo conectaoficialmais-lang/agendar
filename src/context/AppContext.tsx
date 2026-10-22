@@ -67,6 +67,13 @@ interface AppContextType {
   doneThisWeekCount: number;
   dueThisWeekCount: number;
   overdueCount: number;
+  overdueTasks: Task[];
+  isOverdueAlertDismissed: boolean;
+  dismissOverdueAlert: () => void;
+  showOverdueAlert: () => void;
+  rescheduleTask: (taskId: string, newDueDate?: string, newDueDisplay?: string) => void;
+  rescheduleAllOverdue: () => void;
+  completeAllOverdue: () => void;
   totalCompletedCount: number;
   onTimeRate: number;
   getProjectStats: (projectId: string) => { total: number; done: number; progress: number };
@@ -328,13 +335,63 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         ['Hoje', 'Amanhã', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom', 'Today'].includes(t.dueDisplay))
   ).length;
 
-  const overdueCount = 0; // High performance team with zero overdue tasks
+  const CURRENT_DATE_STR = '2026-10-22';
+  const overdueTasks = tasks.filter(
+    (t) => t.status !== 'done' && t.dueDate && t.dueDate < CURRENT_DATE_STR
+  );
+  const overdueCount = overdueTasks.length;
+
+  const [isOverdueAlertDismissed, setIsOverdueAlertDismissed] = useState(false);
+  const dismissOverdueAlert = () => setIsOverdueAlertDismissed(true);
+  const showOverdueAlert = () => setIsOverdueAlertDismissed(false);
+
+  const rescheduleTask = (taskId: string, newDueDate: string = CURRENT_DATE_STR, newDueDisplay: string = 'Hoje') => {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, dueDate: newDueDate, dueDisplay: newDueDisplay } : t))
+    );
+    try {
+      confetti({ particleCount: 35, spread: 60, origin: { y: 0.7 } });
+    } catch {
+      // ignore
+    }
+  };
+
+  const rescheduleAllOverdue = () => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.status !== 'done' && t.dueDate && t.dueDate < CURRENT_DATE_STR
+          ? { ...t, dueDate: CURRENT_DATE_STR, dueDisplay: 'Hoje' }
+          : t
+      )
+    );
+    try {
+      confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+    } catch {
+      // ignore
+    }
+  };
+
+  const completeAllOverdue = () => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.status !== 'done' && t.dueDate && t.dueDate < CURRENT_DATE_STR
+          ? { ...t, status: 'done', completedAt: new Date().toISOString() }
+          : t
+      )
+    );
+    try {
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+    } catch {
+      // ignore
+    }
+  };
+
   const doneTasksAll = tasks.filter((t) => t.status === 'done');
   const totalCompletedCount = 109 + doneTasksAll.length;
-  const baseLateCount = 4;
+  const baseLateCount = Math.max(4, overdueCount);
   const onTimeRate = Math.min(
     100,
-    Math.max(70, Math.round(((totalCompletedCount - baseLateCount) / Math.max(1, totalCompletedCount)) * 100))
+    Math.max(60, Math.round(((totalCompletedCount - baseLateCount) / Math.max(1, totalCompletedCount)) * 100))
   );
 
   const getProjectStats = (projectId: string) => {
@@ -779,6 +836,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         doneThisWeekCount,
         dueThisWeekCount,
         overdueCount,
+        overdueTasks,
+        isOverdueAlertDismissed,
+        dismissOverdueAlert,
+        showOverdueAlert,
+        rescheduleTask,
+        rescheduleAllOverdue,
+        completeAllOverdue,
         totalCompletedCount,
         onTimeRate,
         getProjectStats,

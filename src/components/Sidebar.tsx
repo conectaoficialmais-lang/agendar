@@ -42,15 +42,15 @@ export const Sidebar: React.FC = () => {
   return (
     <>
       {/* Desktop Fixed Left Sidebar (~220px) */}
-      <aside className="fixed left-4 top-4 bottom-4 w-[220px] z-40 hidden md:flex flex-col justify-between p-3.5 rounded-[20px] bg-[#121316] border border-white/[0.06] shadow-2xl backdrop-blur-xl">
+      <aside className="fixed left-4 top-4 bottom-4 w-[220px] z-40 hidden md:flex flex-col justify-between p-3.5 rounded-[22px] bg-[#16171d] border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
         <div className="space-y-4">
-          {/* Top: Logo circular com ícone abstrato + texto "Pane" em negrito branco */}
+          {/* Top: Logo circular/squircle com ícone abstrato e texto Pane */}
           <button
             onClick={() => setActiveTab('home')}
             className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-white/[0.04] transition-all text-left w-full group"
           >
-            <div className="w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
-              {/* Ícone abstrato de janelas / painéis */}
+            <div className="w-8 h-8 rounded-xl bg-white/[0.08] border border-white/10 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
+              {/* Ícone abstrato Pane idêntico à imagem */}
               <svg
                 className="w-4 h-4 text-white"
                 viewBox="0 0 24 24"
@@ -60,12 +60,12 @@ export const Sidebar: React.FC = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <circle cx="12" cy="12" r="9" strokeOpacity="0.4" />
-                <path d="M8 8h8v8H8z" rx="2" />
-                <path d="M12 8v8M8 12h8" />
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 3a9 9 0 0 1 9 9" />
+                <line x1="12" y1="3" x2="12" y2="12" />
               </svg>
             </div>
-            <span className="font-bold text-base text-white tracking-tight">Pane</span>
+            <span className="font-bold text-[17px] text-white tracking-tight">Pane</span>
           </button>
 
           {/* Menu de navegação */}
@@ -78,10 +78,10 @@ export const Sidebar: React.FC = () => {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all ${
                     isActive
-                      ? 'bg-white/[0.1] text-white font-semibold border border-white/[0.08] shadow-sm'
-                      : 'text-[#8b8b90] hover:text-white hover:bg-white/[0.04]'
+                      ? 'bg-white/[0.10] text-white font-semibold shadow-sm'
+                      : 'text-[#8b8b90] hover:text-white hover:bg-white/[0.04] font-medium'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
@@ -91,7 +91,7 @@ export const Sidebar: React.FC = () => {
 
                   {/* Badge circular "7" à direita */}
                   {item.badge !== undefined && (
-                    <span className="w-4 h-4 rounded-full bg-white/10 text-white/80 text-[10px] font-bold flex items-center justify-center">
+                    <span className="w-5 h-5 rounded-full bg-[#262730] text-[#8b8b90] text-[10px] font-bold flex items-center justify-center">
                       {item.badge}
                     </span>
                   )}

@@ -9,6 +9,7 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
+  AlertTriangle,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Priority, TaskStatus } from '../types';
@@ -27,6 +28,8 @@ export const TasksView: React.FC = () => {
     dueThisWeekCount,
     overdueCount,
     doneThisWeekCount,
+    isTaskOverdue,
+    getTaskDaysOverdue,
   } = useApp();
 
   const [viewMode, setViewMode] = useState<'board' | 'list'>('board');

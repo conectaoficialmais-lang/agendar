@@ -11,51 +11,69 @@
   body {
     min-height: 100vh;
     overflow-x: hidden;
-    background-color: #0a0a0b;
+    background-color: #0d0e12;
     color: #ffffff;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* Design System Utilities from the Reference Design */
-.pane-card {
-  background: #131417;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
+/* Vaulta / Pane Luxury Dark Theme Design System */
+.vaulta-bg {
+  background-color: #070a13;
+  background-image: 
+    radial-gradient(ellipse 90% 60% at 50% -15%, rgba(37, 99, 235, 0.28) 0%, rgba(56, 189, 248, 0.08) 45%, transparent 75%),
+    radial-gradient(circle at 10% 25%, rgba(30, 58, 138, 0.15) 0%, transparent 45%);
 }
 
-.pane-card-glow {
-  background: radial-gradient(circle at 12% 12%, rgba(255, 255, 255, 0.04) 0%, transparent 60%), #131417;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
+.pane-card, .vaulta-card {
+  background: #0c1222;
+  border: 1px solid rgba(59, 130, 246, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
-.pane-subcard {
-  background: #0d0e11;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
+.pane-card-glow, .vaulta-card-glow {
+  background: radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.12) 0%, transparent 60%), #0c1222;
+  border: 1px solid rgba(59, 130, 246, 0.14);
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
-.pane-stat-tile {
-  background: #131417;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+.pane-subcard, .vaulta-subcard {
+  background: #080d1a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 14px;
 }
 
-.glass-pill {
-  background: #131417;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+.pane-stat-tile, .vaulta-stat-tile {
+  background: #0c1222;
+  border: 1px solid rgba(59, 130, 246, 0.14);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.glass-pill, .vaulta-pill {
+  background: #0c1222;
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.vaulta-glow-blue {
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.45);
+}
+
+.vaulta-glow-cyan {
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
 }
 
 .glass-card-hover {
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease;
 }
 
 .glass-card-hover:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(37, 99, 235, 0.15);
 }
 
 /* Custom sleek scrollbar */
@@ -69,10 +87,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(59, 130, 246, 0.2);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(59, 130, 246, 0.4);
 }

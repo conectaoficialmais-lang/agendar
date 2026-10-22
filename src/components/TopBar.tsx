@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Plus, Sun, Bell } from 'lucide-react';
+import { Search, Plus, Sun, Bell, AlertTriangle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { NotificationsPopover } from './NotificationsPopover';
 
 export const TopBar: React.FC = () => {
-  const { preferences, toggleTheme, openCommandPalette, openQuickAdd, notifications } = useApp();
+  const { preferences, toggleTheme, openCommandPalette, openQuickAdd, notifications, overdueCount, showOverdueAlert } = useApp();
   const [showNotifications, setShowNotifications] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -21,9 +21,21 @@ export const TopBar: React.FC = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="fixed top-4 right-4 md:right-8 z-40">
-      {/* Floating Glass Pill */}
-      <div className="flex items-center gap-1.5 p-1.5 pl-2.5 rounded-full bg-[#131417]/90 backdrop-blur-xl border border-white/[0.06] shadow-xl">
+    <div ref={containerRef} className="fixed top-4 right-4 md:right-8 z-40 flex items-center gap-2">
+      {/* Overdue Task Pill Badge */}
+      {overdueCount > 0 && (
+        <button
+          onClick={showOverdueAlert}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-bold transition-all shadow-[0_0_15px_rgba(244,63,94,0.3)] animate-pulse"
+          title={`${overdueCount} tarefas atrasadas detectadas! Clique para abrir o alerta.`}
+        >
+          <AlertTriangle size={13} className="text-rose-400" />
+          <span>{overdueCount} atrasada{overdueCount > 1 ? 's' : ''}</span>
+        </button>
+      )}
+
+      {/* Floating Glass Pill with Pane / image styling */}
+      <div className="flex items-center gap-1.5 p-1.5 pl-2.5 rounded-full bg-[#16171d]/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
         {/* Barra de busca arredondada com lupa, Search e ⌘K */}
         <button
           onClick={openCommandPalette}
@@ -64,8 +76,7 @@ export const TopBar: React.FC = () => {
           title="Notifications"
         >
           <Bell size={16} />
-          {/* Ponto vermelho sempre visível como na especificação */}
-          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#ef4444] ring-2 ring-[#131417]" />
+          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)] ring-2 ring-[#16171d]" />
           <span className="sr-only">Notifications</span>
         </button>
       </div>
