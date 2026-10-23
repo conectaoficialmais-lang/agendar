@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import { Priority, TaskStatus } from '../types';
 import { ACCENTS } from '../themeUtils';
 import { todayIso, addDays, formatDueLabel, timeRangeToHourAndDuration } from '../dateUtils';
+import { useEscape } from '../a11y';
 
 export const QuickAddModal: React.FC = () => {
   const {
@@ -19,6 +20,8 @@ export const QuickAddModal: React.FC = () => {
     preferences,
     openTaskModal,
   } = useApp();
+
+  useEscape(closeQuickAdd);
 
   const [activeTab, setActiveTab] = useState<'task' | 'event' | 'project'>(quickAddType);
 

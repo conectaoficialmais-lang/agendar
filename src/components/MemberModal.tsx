@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { X, Clock, Briefcase, CheckSquare, Send, Sparkles, Trash2, AlertTriangle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { formatDueLabel } from '../dateUtils';
+import { useEscape } from '../a11y';
 
 export const MemberModal: React.FC = () => {
   const { selectedMemberId, closeMemberModal, members, tasks, openTaskModal, deleteTeamMember } = useApp();
   const [message, setMessage] = useState('');
   const [sentToast, setSentToast] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  useEscape(closeMemberModal);
 
   if (!selectedMemberId) return null;
 

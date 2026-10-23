@@ -15,6 +15,7 @@ import { useApp } from '../context/AppContext';
 import { ACCENTS } from '../themeUtils';
 import { greeting, longDateLabel, todayIso, formatDueLabel } from '../dateUtils';
 import { statusLabel } from '../labels';
+import { clickable } from '../a11y';
 
 export const HomeView: React.FC = () => {
   const {
@@ -390,10 +391,10 @@ export const HomeView: React.FC = () => {
                 return (
                   <div
                     key={proj.id}
-                    onClick={() => {
+                    {...clickable(() => {
                       openProjectDetail(proj.id);
                       setActiveTab('projects');
-                    }}
+                    })}
                     className="p-3.5 rounded-[12px] panel-inset panel-hover transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -497,8 +498,8 @@ export const HomeView: React.FC = () => {
                     </button>
 
                     <div
+                      {...clickable(() => openTaskModal(task.id))}
                       className="flex-1 cursor-pointer min-w-0"
-                      onClick={() => openTaskModal(task.id)}
                     >
                       <h4
                         className={`text-xs font-semibold truncate ${

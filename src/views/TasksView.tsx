@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Kanban,
   List,
@@ -10,10 +11,12 @@ import {
   ChevronDown,
   ChevronRight,
   AlertTriangle,
+  GripVertical,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { Priority, TaskStatus } from '../types';
+import { Priority, TaskStatus, Task } from '../types';
 import { formatDueLabel } from '../dateUtils';
+import { clickable } from '../a11y';
 
 export const TasksView: React.FC = () => {
   const {
@@ -42,7 +45,22 @@ export const TasksView: React.FC = () => {
     done: false,
   });
 
-  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
+  // Drag-and-drop por ponteiro (mouse, toque e caneta) + mover por teclado.
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dropCol, setDropCol] = useState<TaskStatus | null>(null);
+  const [announce, setAnnounce] = useState('');
+  const ghostRef = useRef<HTMLDivElement | null>(null);
+  const dragMeta = useRef<{
+    id: string;
+    startX: number;
+    startY: number;
+    dragging: boolean;
+    title: string;
+    color: string;
+  } | null>(null);
+  const dropColRef = useRef<TaskStatus | null>(null);
+  const pointerPos = useRef({ x: 0, y: 0 });
+  const scrollRaf = useRef<number | null>(null);
 
   // Filtrar tarefas
   const filteredTasks = tasks.filter((task) => {
@@ -69,22 +87,111 @@ export const TasksView: React.FC = () => {
     { id: 'done', label: 'Concluídas', dotColor: 'bg-emerald-400' },
   ];
 
-  const handleDragStart = (e: React.DragEvent, id: string) => {
-    e.dataTransfer.setData('text/plain', id);
-    setDraggedTaskId(id);
+  const columnAt = (x: number, y: number): TaskStatus | null => {
+    const el = (document.elementFromPoint(x, y) as HTMLElement | null)?.closest(
+      '[data-status]'
+    ) as HTMLElement | null;
+    return (el?.dataset.status as TaskStatus) || null;
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
+  // Auto-scroll perto das bordas: no celular as colunas ficam empilhadas e
+  // touch-action:none bloqueia o scroll do dedo durante o arraste.
+  const runAutoScroll = () => {
+    const y = pointerPos.current.y;
+    const margin = 90;
+    if (y < margin) window.scrollBy(0, -14);
+    else if (y > window.innerHeight - margin) window.scrollBy(0, 14);
+    scrollRaf.current = requestAnimationFrame(runAutoScroll);
   };
 
-  const handleDrop = (e: React.DragEvent, status: TaskStatus) => {
-    e.preventDefault();
-    const taskId = e.dataTransfer.getData('text/plain') || draggedTaskId;
-    if (taskId) {
-      moveTaskStatus(taskId, status);
+  const endDrag = (commit: boolean) => {
+    if (scrollRaf.current) {
+      cancelAnimationFrame(scrollRaf.current);
+      scrollRaf.current = null;
     }
-    setDraggedTaskId(null);
+    const meta = dragMeta.current;
+    const target = dropColRef.current;
+    if (commit && meta?.dragging && target) {
+      const current = tasks.find((t) => t.id === meta.id)?.status;
+      if (target !== current) moveTaskStatus(meta.id, target);
+    }
+    dragMeta.current = null;
+    dropColRef.current = null;
+    setDragId(null);
+    setDropCol(null);
+  };
+
+  const onHandlePointerDown = (e: React.PointerEvent, task: Task) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+    const proj = projects.find((p) => p.id === task.projectId);
+    dragMeta.current = {
+      id: task.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      dragging: false,
+      title: task.title,
+      color: proj?.color || '#64748b',
+    };
+    pointerPos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const onHandlePointerMove = (e: React.PointerEvent) => {
+    const meta = dragMeta.current;
+    if (!meta) return;
+    pointerPos.current = { x: e.clientX, y: e.clientY };
+    if (!meta.dragging) {
+      if (Math.abs(e.clientX - meta.startX) < 6 && Math.abs(e.clientY - meta.startY) < 6) return;
+      meta.dragging = true;
+      setDragId(meta.id);
+      scrollRaf.current = requestAnimationFrame(runAutoScroll);
+    }
+    if (ghostRef.current) {
+      ghostRef.current.style.transform = `translate(${e.clientX + 12}px, ${e.clientY + 12}px)`;
+    }
+    const col = columnAt(e.clientX, e.clientY);
+    if (col !== dropColRef.current) {
+      dropColRef.current = col;
+      setDropCol(col); // só re-renderiza quando a coluna-alvo muda
+    }
+  };
+
+  const onHandlePointerUp = (e: React.PointerEvent) => {
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+    endDrag(true);
+  };
+
+  const onHandlePointerCancel = () => endDrag(false);
+
+  const moveByKeyboard = (task: Task, dir: 1 | -1) => {
+    const idx = columns.findIndex((c) => c.id === task.status);
+    const next = columns[idx + dir];
+    if (!next) return;
+    moveTaskStatus(task.id, next.id);
+    setAnnounce(`${task.title} movida para ${next.label}`);
+    // O card remonta em outra coluna; devolve o foco ao mesmo handle.
+    // setTimeout(0) roda após o commit do React (e mesmo com a aba em 2º plano).
+    setTimeout(() => {
+      (document.querySelector(`[data-handle="${task.id}"]`) as HTMLElement | null)?.focus();
+    }, 0);
+  };
+
+  const onHandleKeyDown = (e: React.KeyboardEvent, task: Task) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      moveByKeyboard(task, 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      moveByKeyboard(task, -1);
+    }
   };
 
   const toggleSection = (section: string) => {
@@ -291,9 +398,10 @@ export const TasksView: React.FC = () => {
             return (
               <div
                 key={col.id}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, col.id)}
-                className="rounded-[16px] panel shadow-sm p-4 flex flex-col min-h-[500px]"
+                data-status={col.id}
+                className={`rounded-[16px] panel shadow-sm p-4 flex flex-col min-h-[500px] transition-shadow ${
+                  dropCol === col.id ? 'drop-active' : ''
+                }`}
               >
                 {/* Cabeçalho da Coluna */}
                 <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/[0.04]">
@@ -324,24 +432,41 @@ export const TasksView: React.FC = () => {
                     return (
                       <div
                         key={task.id}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, task.id)}
-                        onClick={() => openTaskModal(task.id)}
-                        className="p-3.5 rounded-[12px] panel-inset panel-hover shadow-sm cursor-pointer transition-all space-y-2.5 group"
+                        {...clickable(() => openTaskModal(task.id))}
+                        className={`p-3.5 rounded-[12px] panel-inset panel-hover shadow-sm cursor-pointer transition-all space-y-2.5 group ${
+                          dragId === task.id ? 'opacity-40' : ''
+                        }`}
                       >
                         {/* Topo: Chip do Projeto & Prioridade */}
                         <div className="flex items-center justify-between gap-2 flex-wrap">
-                          {proj && (
-                            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/[0.04]">
-                              <span
-                                className="w-1.5 h-1.5 rounded-full"
-                                style={{ backgroundColor: proj.color }}
-                              />
-                              <span className="text-[#8b8b90] truncate max-w-[120px]">
-                                {proj.name}
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <button
+                              type="button"
+                              data-handle={task.id}
+                              aria-label={`Mover tarefa: ${task.title}`}
+                              title="Arraste para mover, ou use as setas do teclado"
+                              onClick={(e) => e.stopPropagation()}
+                              onPointerDown={(e) => onHandlePointerDown(e, task)}
+                              onPointerMove={onHandlePointerMove}
+                              onPointerUp={onHandlePointerUp}
+                              onPointerCancel={onHandlePointerCancel}
+                              onKeyDown={(e) => onHandleKeyDown(e, task)}
+                              className="shrink-0 p-2 -m-1 rounded-lg text-[#8b8b90] hover:text-white hover:bg-white/[0.06] cursor-grab active:cursor-grabbing touch-none select-none"
+                            >
+                              <GripVertical size={14} />
+                            </button>
+                            {proj && (
+                              <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/[0.04] min-w-0">
+                                <span
+                                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                                  style={{ backgroundColor: proj.color }}
+                                />
+                                <span className="text-[#8b8b90] truncate max-w-[110px]">
+                                  {proj.name}
+                                </span>
                               </span>
-                            </span>
-                          )}
+                            )}
+                          </div>
 
                           {task.priority !== 'Medium' && priorityBadge(task.priority)}
                         </div>
@@ -476,8 +601,8 @@ export const TasksView: React.FC = () => {
                           return (
                             <div
                               key={task.id}
+                              {...clickable(() => openTaskModal(task.id))}
                               className="p-3 rounded-[10px] panel-inset panel-hover transition-colors flex items-center justify-between gap-4 group cursor-pointer"
-                              onClick={() => openTaskModal(task.id)}
                             >
                               <div className="flex items-center gap-3 min-w-0">
                                 <button
@@ -543,6 +668,33 @@ export const TasksView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Ghost do arraste — via portal p/ não ser cortado pelo overflow/backdrop-filter */}
+      {dragId &&
+        createPortal(
+          <div
+            ref={(el) => {
+              ghostRef.current = el;
+              // Posiciona já na montagem p/ não piscar no canto superior esquerdo.
+              if (el) {
+                el.style.transform = `translate(${pointerPos.current.x + 12}px, ${pointerPos.current.y + 12}px)`;
+              }
+            }}
+            className="fixed top-0 left-0 z-[100] pointer-events-none px-3 py-2 rounded-[10px] bg-[#151722]/95 border border-white/20 shadow-2xl text-xs font-bold text-white flex items-center gap-2 max-w-[240px]"
+          >
+            <span
+              className="w-1.5 h-1.5 rounded-full shrink-0"
+              style={{ backgroundColor: dragMeta.current?.color }}
+            />
+            <span className="truncate">{dragMeta.current?.title}</span>
+          </div>,
+          document.body
+        )}
+
+      {/* Anúncio para leitores de tela ao mover por teclado */}
+      <div aria-live="polite" className="sr-only">
+        {announce}
+      </div>
     </div>
   );
 };

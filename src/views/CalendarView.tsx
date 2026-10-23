@@ -16,6 +16,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { CalendarEvent } from '../types';
 import { todayIso, timeRangeToHourAndDuration } from '../dateUtils';
+import { useEscape } from '../a11y';
 
 const EVENT_TYPES: CalendarEvent['type'][] = ['Reunião', 'Revisão', 'Equipe', 'Bloco de foco'];
 
@@ -32,6 +33,8 @@ const EventEditModal: React.FC<{ event: CalendarEvent; onClose: () => void }> = 
   const [location, setLocation] = useState(event.location);
   const [type, setType] = useState<CalendarEvent['type']>(event.type);
   const [error, setError] = useState('');
+
+  useEscape(onClose);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();

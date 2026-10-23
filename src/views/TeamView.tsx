@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { TeamDepartment } from '../types';
+import { useEscape } from '../a11y';
 
 export const TeamView: React.FC = () => {
   const { members, openMemberModal, preferences, getMemberOpenCount, addTeamMember } = useApp();
@@ -16,6 +17,10 @@ export const TeamView: React.FC = () => {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteSent, setInviteSent] = useState(false);
+
+  useEscape(() => {
+    if (inviteModalOpen) setInviteModalOpen(false);
+  });
 
   const filteredMembers = members.filter((m) => {
     if (selectedDept === 'Todos') return true;

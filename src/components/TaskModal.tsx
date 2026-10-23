@@ -13,6 +13,7 @@ import { useApp } from '../context/AppContext';
 import { Priority, TaskStatus } from '../types';
 import { ACCENTS } from '../themeUtils';
 import { formatDueLabel } from '../dateUtils';
+import { useEscape } from '../a11y';
 
 export const TaskModal: React.FC = () => {
   const {
@@ -34,6 +35,8 @@ export const TaskModal: React.FC = () => {
 
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [commentText, setCommentText] = useState('');
+
+  useEscape(closeTaskModal);
 
   if (!selectedTaskId) return null;
 

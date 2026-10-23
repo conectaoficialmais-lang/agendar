@@ -127,9 +127,10 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Rodapé: Usuário */}
-        <div
+        <button
+          type="button"
           onClick={() => setActiveTab('settings')}
-          className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer pt-3 border-t border-white/[0.06]"
+          className="w-full text-left flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/[0.04] transition-colors pt-3 border-t border-white/[0.06]"
           title={`${currentUser.name} · ${currentUser.role}`}
         >
           <div className="relative shrink-0">
@@ -144,11 +145,11 @@ export const Sidebar: React.FC = () => {
             <p className="text-xs font-semibold text-white truncate leading-tight">{currentUser.name}</p>
             <p className="text-[10px] text-[#8b8b90] truncate leading-tight mt-0.5">{currentUser.role}</p>
           </div>
-        </div>
+        </button>
       </aside>
 
       {/* Mobile Floating Bottom Bar */}
-      <nav className="fixed bottom-3 left-4 right-4 z-40 md:hidden flex items-center justify-around py-2.5 px-3 rounded-2xl bg-white/[0.06] backdrop-blur-2xl border border-white/[0.1] shadow-2xl">
+      <nav className="fixed bottom-3 left-4 right-4 z-40 md:hidden flex items-stretch justify-around gap-1 py-2 px-2 rounded-2xl bg-white/[0.06] backdrop-blur-2xl border border-white/[0.1] shadow-2xl">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -156,13 +157,18 @@ export const Sidebar: React.FC = () => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`p-2.5 rounded-xl transition-all ${
+              aria-label={item.label}
+              aria-current={isActive ? 'page' : undefined}
+              className={`flex-1 min-w-0 flex flex-col items-center gap-0.5 py-1.5 rounded-xl transition-all ${
                 isActive
                   ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/20'
                   : 'text-[#8b8b90] hover:text-white'
               }`}
             >
-              <Icon size={18} />
+              <Icon size={17} className="shrink-0" />
+              <span className="text-[9px] font-medium leading-none truncate max-w-full">
+                {item.label}
+              </span>
             </button>
           );
         })}

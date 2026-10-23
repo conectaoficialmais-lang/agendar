@@ -23,6 +23,7 @@ import { ProjectDetailView } from './ProjectDetailView';
 import { Project } from '../types';
 import { todayIso, addDays, formatDueLabel } from '../dateUtils';
 import { statusLabel } from '../labels';
+import { clickable, useEscape } from '../a11y';
 
 export const ProjectsView: React.FC = () => {
   const {
@@ -41,6 +42,11 @@ export const ProjectsView: React.FC = () => {
   const [filter, setFilter] = useState<'All' | 'Active' | 'Planning' | 'Shipped'>('All');
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  useEscape(() => {
+    if (projectToDelete) setProjectToDelete(null);
+    else if (isCreateModalOpen) setIsCreateModalOpen(false);
+  });
 
   // New Project Form State
   const [newProjectName, setNewProjectName] = useState('');
@@ -308,8 +314,8 @@ export const ProjectsView: React.FC = () => {
           return (
             <div
               key={proj.id}
-              onClick={() => openProjectDetail(proj.id)}
-              className="p-5 rounded-[20px] bg-[#181920] border border-white/[0.08] hover:border-white/[0.16] shadow-[0_12px_32px_rgba(0,0,0,0.4)] transition-all duration-200 cursor-pointer flex flex-col justify-between group hover:-translate-y-1 relative overflow-hidden"
+              {...clickable(() => openProjectDetail(proj.id))}
+              className="p-5 rounded-[20px] panel transition-all duration-200 cursor-pointer flex flex-col justify-between group hover:-translate-y-1 relative overflow-hidden"
               style={{
                 background: `radial-gradient(circle at 14% 14%, ${glowColor} 0%, rgba(24, 25, 32, 0) 65%), #181920`,
               }}

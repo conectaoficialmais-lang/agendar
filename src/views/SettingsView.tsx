@@ -19,6 +19,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { WALLPAPERS, ACCENTS } from '../themeUtils';
 import { AccentId } from '../types';
+import { useEscape } from '../a11y';
 
 export const SettingsView: React.FC = () => {
   const {
@@ -91,6 +92,10 @@ export const SettingsView: React.FC = () => {
   };
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  useEscape(() => {
+    if (showResetConfirm) setShowResetConfirm(false);
+  });
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -373,6 +378,9 @@ export const SettingsView: React.FC = () => {
 
                     <button
                       type="button"
+                      role="switch"
+                      aria-checked={isEnabled}
+                      aria-label={item.title}
                       onClick={() =>
                         updatePreferences({
                           notifications: {
