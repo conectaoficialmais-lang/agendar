@@ -545,8 +545,8 @@ export const CalendarView: React.FC = () => {
                           : isSelected
                           ? 'bg-white/[0.12] border border-white/[0.2] shadow-sm'
                           : isCurrentMonthCell
-                          ? 'bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04]'
-                          : 'opacity-30 bg-[#0d0e11]/50 border border-transparent hover:opacity-50'
+                          ? 'panel-inset panel-hover'
+                          : 'opacity-30 panel-inset border-transparent hover:opacity-50'
                       }`}
                     >
                       <div className="flex items-center justify-between">
