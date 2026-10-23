@@ -10,9 +10,149 @@ import {
   Calendar as CalendarIcon,
   Trash2,
   Check,
+  X,
+  Pencil,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { todayIso } from '../dateUtils';
+import { CalendarEvent } from '../types';
+import { todayIso, timeRangeToHourAndDuration } from '../dateUtils';
+
+const EVENT_TYPES: CalendarEvent['type'][] = ['Reunião', 'Revisão', 'Equipe', 'Bloco de foco'];
+
+// Modal de edição de evento. Estado local — não precisa entrar no AppContext.
+const EventEditModal: React.FC<{ event: CalendarEvent; onClose: () => void }> = ({
+  event,
+  onClose,
+}) => {
+  const { updateCalendarEvent, deleteCalendarEvent } = useApp();
+  const [title, setTitle] = useState(event.title);
+  const [date, setDate] = useState(event.date);
+  const [startTime, setStartTime] = useState(event.startTime);
+  const [endTime, setEndTime] = useState(event.endTime);
+  const [location, setLocation] = useState(event.location);
+  const [type, setType] = useState<CalendarEvent['type']>(event.type);
+  const [error, setError] = useState('');
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+    const parsed = timeRangeToHourAndDuration(startTime, endTime);
+    if (!parsed) {
+      setError('O horário de término deve ser depois do início.');
+      return;
+    }
+    updateCalendarEvent(event.id, {
+      title: title.trim(),
+      date,
+      startTime,
+      endTime,
+      startHour: parsed.startHour,
+      durationMinutes: parsed.durationMinutes,
+      location,
+      type,
+    });
+    onClose();
+  };
+
+  const field =
+    'w-full px-3 py-2 rounded-[10px] bg-[#0d0e11] border border-white/[0.10] text-xs text-white focus:outline-none focus:border-white/30';
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150"
+      onClick={onClose}
+    >
+      <form
+        onClick={(e) => e.stopPropagation()}
+        onSubmit={handleSave}
+        className="w-full max-w-md rounded-[20px] bg-[#181920] border border-white/[0.12] shadow-2xl p-6 space-y-4 text-white"
+      >
+        <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+          <h3 className="text-base font-bold">Editar evento</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-[#8b8b90] block mb-1">Título</label>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} className={field} />
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-[#8b8b90] block mb-1">Data</label>
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={field} />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-medium text-[#8b8b90] block mb-1">Início</label>
+            <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className={field} />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-[#8b8b90] block mb-1">Término</label>
+            <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className={field} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-medium text-[#8b8b90] block mb-1">Tipo</label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value as CalendarEvent['type'])}
+              className={field}
+            >
+              {EVENT_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-[#8b8b90] block mb-1">Local</label>
+            <input value={location} onChange={(e) => setLocation(e.target.value)} className={field} />
+          </div>
+        </div>
+
+        {error && <p className="text-[11px] text-rose-400">{error}</p>}
+
+        <div className="flex items-center justify-between pt-3 border-t border-white/[0.08]">
+          <button
+            type="button"
+            onClick={() => {
+              deleteCalendarEvent(event.id);
+              onClose();
+            }}
+            className="px-3 py-2 rounded-full text-xs font-semibold text-rose-300 hover:text-white hover:bg-rose-500/20 transition-colors flex items-center gap-1.5"
+          >
+            <Trash2 size={13} /> Excluir
+          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-full text-xs font-medium text-[#8b8b90] hover:text-white"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2 rounded-full text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-md transition-all active:scale-95"
+            >
+              Salvar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
 
 interface CalendarDayCell {
   day: number;
@@ -40,6 +180,7 @@ export const CalendarView: React.FC = () => {
   const [selectedDateStr, setSelectedDateStr] = useState<string>(todayIso());
   const [viewDate, setViewDate] = useState<Date>(new Date());
   const [scheduleFilter, setScheduleFilter] = useState<'all' | 'events' | 'tasks'>('all');
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
 
   const TODAY = todayIso();
   const nowDecimalHour = new Date().getHours() + new Date().getMinutes() / 60;
@@ -74,7 +215,9 @@ export const CalendarView: React.FC = () => {
   };
 
   const getDayEvents = (dateStr: string) => {
-    return events.filter((e) => e.date === dateStr);
+    return events
+      .filter((e) => e.date === dateStr)
+      .sort((a, b) => a.startHour - b.startHour);
   };
 
   const getDayTasks = (dateStr: string) => {
@@ -506,7 +649,11 @@ export const CalendarView: React.FC = () => {
                       {dayEvs.map((ev) => (
                         <div
                           key={ev.id}
-                          className="p-1.5 rounded-[8px] bg-blue-500/10 border border-blue-500/20 text-[9.5px] text-white relative group"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingEvent(ev);
+                          }}
+                          className="p-1.5 rounded-[8px] bg-blue-500/10 border border-blue-500/20 text-[9.5px] text-white relative group cursor-pointer"
                         >
                           <div className="flex items-center justify-between">
                             <span className="font-bold text-blue-300">{ev.startTime}</span>
@@ -654,6 +801,14 @@ export const CalendarView: React.FC = () => {
                         </span>
 
                         <button
+                          onClick={() => setEditingEvent(ev)}
+                          className="p-1 rounded-lg text-[#8b8b90] hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+                          title="Editar este evento"
+                        >
+                          <Pencil size={12} />
+                        </button>
+
+                        <button
                           onClick={() => deleteCalendarEvent(ev.id)}
                           className="p-1 rounded-lg text-[#8b8b90] hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
                           title="Excluir este evento"
@@ -773,6 +928,10 @@ export const CalendarView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {editingEvent && (
+        <EventEditModal event={editingEvent} onClose={() => setEditingEvent(null)} />
+      )}
     </div>
   );
 };

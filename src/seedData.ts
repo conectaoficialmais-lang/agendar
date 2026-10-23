@@ -25,16 +25,16 @@ export const getRelativeIsoStr = (daysAgo: number, timeStr: string = '12:00:00Z'
 export const SEED_PROJECTS: Project[] = [
   {
     id: 'proj-orbit',
-    name: 'Orbit 2.0 launch',
+    name: 'Lançamento Orbit 2.0',
     slug: 'orbit',
-    description: 'Everything the public sees on launch day: site, film, press kit and the waitlist email.',
+    description: 'Tudo que o público vê no dia do lançamento: site, filme, kit de imprensa e o e-mail da lista de espera.',
     status: 'In progress',
     color: '#a855f7', // purple
     icon: 'rocket',
     dueDate: fromAnchor('2026-11-01'),
     dueDisplay: 'Nov 1',
     nextMilestone: {
-      title: 'Launch film final cut',
+      title: 'Corte final do filme de lançamento',
       dueDate: fromAnchor('2026-10-24'),
       dueDisplay: 'Oct 24 · in 4 days',
       progress: 45,
@@ -45,16 +45,16 @@ export const SEED_PROJECTS: Project[] = [
   },
   {
     id: 'proj-tide',
-    name: 'Tide mobile app',
+    name: 'App mobile Tide',
     slug: 'tide',
-    description: 'The 3.0 rebuild of the Tide app: new home, offline sync and a calmer onboarding.',
+    description: 'A reconstrução 3.0 do app Tide: nova home, sincronização offline e um onboarding mais tranquilo.',
     status: 'In progress',
     color: '#3b82f6', // blue
     icon: 'smartphone',
     dueDate: fromAnchor('2026-11-29'),
     dueDisplay: 'Nov 29',
     nextMilestone: {
-      title: 'Offline sync in beta',
+      title: 'Sincronização offline em beta',
       dueDate: fromAnchor('2026-10-26'),
       dueDisplay: 'Oct 26 · in 6 days',
       progress: 47,
@@ -65,16 +65,16 @@ export const SEED_PROJECTS: Project[] = [
   },
   {
     id: 'proj-facet',
-    name: 'Facet design system',
+    name: 'Design system Facet',
     slug: 'facet',
-    description: 'One set of tokens, components and docs for every Pane surface, light and dark.',
+    description: 'Um conjunto de tokens, componentes e documentação para toda a interface do Pane, no claro e no escuro.',
     status: 'In progress',
     color: '#ec4899', // pink
     icon: 'layout-grid',
     dueDate: fromAnchor('2026-12-19'),
     dueDisplay: 'Dec 19',
     nextMilestone: {
-      title: 'Docs site live',
+      title: 'Site de documentação no ar',
       dueDate: fromAnchor('2026-11-07'),
       dueDisplay: 'Nov 7 · in 18 days',
       progress: 50,
@@ -85,16 +85,16 @@ export const SEED_PROJECTS: Project[] = [
   },
   {
     id: 'proj-sprout',
-    name: 'Sprout onboarding',
+    name: 'Onboarding Sprout',
     slug: 'sprout',
-    description: 'A first-week path that gets new teams to their first finished project.',
+    description: 'Um roteiro de primeira semana que leva novos times ao primeiro projeto concluído.',
     status: 'In review',
     color: '#10b981', // green
     icon: 'sprout',
     dueDate: fromAnchor('2026-10-25'),
     dueDisplay: 'Oct 25',
     nextMilestone: {
-      title: 'Read-out to leadership',
+      title: 'Apresentação para a liderança',
       dueDate: fromAnchor('2026-10-25'),
       dueDisplay: 'Oct 25 · in 5 days',
       progress: 50,
@@ -105,16 +105,16 @@ export const SEED_PROJECTS: Project[] = [
   },
   {
     id: 'proj-q4brand',
-    name: 'Q4 brand campaign',
+    name: 'Campanha de marca Q4',
     slug: 'q4brand',
-    description: 'Out-of-home and social for the winter season, built around “work you can see through”.',
+    description: 'Mídia externa e redes sociais para a temporada de inverno, em torno de "trabalho que dá para ver através".',
     status: 'Planning',
     color: '#f97316', // orange
     icon: 'flame',
     dueDate: fromAnchor('2026-12-27'),
     dueDisplay: 'Dec 27',
     nextMilestone: {
-      title: 'Creative brief',
+      title: 'Briefing criativo',
       dueDate: fromAnchor('2026-10-30'),
       dueDisplay: 'Oct 30 · in 10 days',
       progress: 0,
@@ -125,16 +125,16 @@ export const SEED_PROJECTS: Project[] = [
   },
   {
     id: 'proj-northstar',
-    name: 'Northstar analytics',
+    name: 'Analytics Northstar',
     slug: 'northstar',
-    description: 'One trusted metric per team and a weekly digest everyone actually opens.',
+    description: 'Uma métrica confiável por time e um resumo semanal que todo mundo realmente abre.',
     status: 'Shipped',
     color: '#06b6d4', // cyan
     icon: 'compass',
     dueDate: fromAnchor('2026-10-08'),
     dueDisplay: 'Oct 8',
     nextMilestone: {
-      title: 'Every milestone met',
+      title: 'Todos os marcos atingidos',
       dueDate: fromAnchor('2026-10-08'),
       dueDisplay: 'Oct 8',
       progress: 100,

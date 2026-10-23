@@ -108,6 +108,7 @@ interface AppContextType {
 
   // Calendar actions
   addCalendarEvent: (event: Omit<CalendarEvent, 'id'>) => CalendarEvent;
+  updateCalendarEvent: (eventId: string, patch: Partial<CalendarEvent>) => void;
   deleteCalendarEvent: (eventId: string) => void;
 
   // Team & Member actions
@@ -224,12 +225,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.PROJECTS);
       if (saved) {
-        const parsed: Project[] = JSON.parse(saved);
-        if (parsed.some((p) => p.name === 'Aplicativo móvel Tide' || p.name === 'Lançamento Orbit 2.0')) {
-          localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(SEED_PROJECTS));
-          return SEED_PROJECTS;
-        }
-        return parsed;
+        return JSON.parse(saved) as Project[];
       }
       return SEED_PROJECTS;
     } catch {
@@ -666,6 +662,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newEv;
   };
 
+  const updateCalendarEvent = (eventId: string, patch: Partial<CalendarEvent>) => {
+    setEvents((prev) => prev.map((e) => (e.id === eventId ? { ...e, ...patch } : e)));
+  };
+
   const deleteCalendarEvent = (eventId: string) => {
     const ev = events.find((e) => e.id === eventId);
     setEvents((prev) => prev.filter((e) => e.id !== eventId));
@@ -900,6 +900,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteProject,
 
         addCalendarEvent,
+        updateCalendarEvent,
         deleteCalendarEvent,
         updateUserProfile,
         deleteTeamMember,

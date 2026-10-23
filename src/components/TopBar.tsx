@@ -40,10 +40,10 @@ export const TopBar: React.FC = () => {
         <button
           onClick={openCommandPalette}
           className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-[#8b8b90] hover:text-white transition-all text-xs"
-          title="Search (⌘K)"
+          title="Buscar (⌘K)"
         >
           <Search size={14} className="text-[#8b8b90]" />
-          <span className="text-[#8b8b90] text-xs">Search</span>
+          <span className="text-[#8b8b90] text-xs">Buscar</span>
           <kbd className="ml-2 px-1.5 py-0.5 text-[10px] font-mono bg-white/[0.08] rounded text-[#8b8b90]">
             ⌘K
           </kbd>
@@ -53,10 +53,10 @@ export const TopBar: React.FC = () => {
         <button
           onClick={() => openQuickAdd('task')}
           className="p-1.5 rounded-full text-[#8b8b90] hover:text-white hover:bg-white/[0.06] transition-colors"
-          title="Add new"
+          title="Adicionar"
         >
           <Plus size={16} />
-          <span className="sr-only">Add</span>
+          <span className="sr-only">Adicionar</span>
         </button>
 
         {/* Alternador de tema removido por ora: só o tema escuro está ligado (ver Ajustes › Aparência). */}
@@ -65,11 +65,11 @@ export const TopBar: React.FC = () => {
         <button
           onClick={() => setShowNotifications((prev) => !prev)}
           className="p-1.5 rounded-full text-[#8b8b90] hover:text-white hover:bg-white/[0.06] transition-colors relative"
-          title="Notifications"
+          title="Notificações"
         >
           <Bell size={16} />
           <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)] ring-2 ring-[#16171d]" />
-          <span className="sr-only">Notifications</span>
+          <span className="sr-only">Notificações</span>
         </button>
       </div>
 

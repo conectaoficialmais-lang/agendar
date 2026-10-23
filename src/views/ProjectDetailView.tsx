@@ -18,7 +18,8 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Project, Task } from '../types';
-import { fromAnchor, formatDueLabel } from '../dateUtils';
+import { fromAnchor, formatDueLabel, diffDays, todayIso } from '../dateUtils';
+import { statusLabel } from '../labels';
 
 interface ProjectDetailViewProps {
   projectId: string;
@@ -53,7 +54,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
   const defaultTideDoneTasks: Task[] = [
     {
       id: 'tide-task-1',
-      title: 'Offline cache schema & migrations',
+      title: 'Schema de cache offline e migrações',
       projectId: project.id,
       status: 'done',
       priority: 'Medium',
@@ -65,7 +66,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
     },
     {
       id: 'tide-task-2',
-      title: 'Touch targets audit for bottom navigation',
+      title: 'Auditoria de alvos de toque da navegação inferior',
       projectId: project.id,
       status: 'done',
       priority: 'Low',
@@ -77,7 +78,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
     },
     {
       id: 'tide-task-3',
-      title: 'Onboarding illustration assets',
+      title: 'Ilustrações do onboarding',
       projectId: project.id,
       status: 'done',
       priority: 'High',
@@ -108,7 +109,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
     members.find((m) => m.name.includes('Kwame')) || {
       id: 'user-kwame',
       name: 'Kwame Asante',
-      role: 'Lead · In a meeting',
+      role: 'Líder · Em reunião',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
       status: 'meeting',
     },
@@ -129,14 +130,14 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
     members.find((m) => m.name.includes('Omar')) || {
       id: 'user-omar',
       name: 'Omar Saleh',
-      role: 'In focus',
+      role: 'Em foco',
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
       status: 'focus',
     },
     members.find((m) => m.name.includes('Malik')) || {
       id: 'user-malik',
       name: 'Malik Johnson',
-      role: 'Away',
+      role: 'Ausente',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
       status: 'offline',
     },
@@ -149,32 +150,34 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
     },
   ];
 
-  const displayedMembers = isTide ? tideMembers : members.slice(0, 6);
+  const displayedMembers = isTide
+    ? tideMembers
+    : project.memberIds.map((id) => members.find((m) => m.id === id)).filter(Boolean);
 
   // Milestones padrão
   const defaultMilestones = [
     {
       id: 'ms-1',
-      title: 'Design freeze & token pass',
-      date: 'Oct 8',
+      title: 'Congelamento do design e tokens',
+      date: '8 out',
       status: 'done',
     },
     {
       id: 'ms-2',
-      title: 'Offline sync in beta',
-      date: 'Oct 26 · in 6 days',
+      title: 'Sincronização offline em beta',
+      date: '26 out',
       status: 'next',
     },
     {
       id: 'ms-3',
-      title: 'RC1 on TestFlight',
-      date: 'Nov 12',
+      title: 'RC1 no TestFlight',
+      date: '12 nov',
       status: 'upcoming',
     },
     {
       id: 'ms-4',
-      title: 'Store submission',
-      date: 'Nov 28',
+      title: 'Envio para a loja',
+      date: '28 nov',
       status: 'upcoming',
     },
   ];
@@ -260,8 +263,11 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
               onClick={() => toggleProjectStar(project.id)}
               className="px-4 py-2 rounded-full text-xs font-semibold bg-[#131417] hover:bg-white/[0.08] border border-white/[0.06] text-white shadow-sm transition-all flex items-center gap-1.5"
             >
-              <Star size={13} className="fill-amber-400 text-amber-400" />
-              <span>Pinned</span>
+              <Star
+                size={13}
+                className={project.starred ? 'fill-amber-400 text-amber-400' : 'text-[#8b8b90]'}
+              />
+              <span>{project.starred ? 'Fixado' : 'Fixar'}</span>
             </button>
 
             <button
@@ -269,7 +275,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
               className="px-4 py-2 rounded-full text-xs font-semibold bg-[#131417] hover:bg-white/[0.08] border border-white/[0.06] text-white shadow-sm transition-all flex items-center gap-1.5"
             >
               <Calendar size={13} className="text-[#8b8b90]" />
-              <span>New event</span>
+              <span>Novo evento</span>
             </button>
           </div>
         </div>
@@ -277,30 +283,30 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
         {/* 4 Stat Tiles */}
         <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none pt-1">
           <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
-            <span className="text-[11px] font-medium text-[#8b8b90] block">Progress</span>
+            <span className="text-[11px] font-medium text-[#8b8b90] block">Progresso</span>
             <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
               {progressPercent}%
             </div>
           </div>
 
           <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
-            <span className="text-[11px] font-medium text-[#8b8b90] block">Open tasks</span>
+            <span className="text-[11px] font-medium text-[#8b8b90] block">Tarefas abertas</span>
             <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
               {openCount}
             </div>
           </div>
 
           <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
-            <span className="text-[11px] font-medium text-[#8b8b90] block">Done</span>
+            <span className="text-[11px] font-medium text-[#8b8b90] block">Concluídas</span>
             <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
               {doneCount}
             </div>
           </div>
 
           <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
-            <span className="text-[11px] font-medium text-[#8b8b90] block">Days left</span>
+            <span className="text-[11px] font-medium text-[#8b8b90] block">Dias restantes</span>
             <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
-              {project.daysLeft || 41}
+              {Math.max(0, diffDays(todayIso(), project.dueDate))}
             </div>
           </div>
         </div>
@@ -312,12 +318,12 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
         <div className="lg:col-span-6 space-y-5">
           {/* Card: Overview */}
           <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-5">
-            <h3 className="text-sm font-bold text-white">Overview</h3>
+            <h3 className="text-sm font-bold text-white">Visão geral</h3>
 
             {/* Lead & Status sub-boxes */}
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04]">
-                <span className="text-[10px] font-medium text-[#8b8b90] block mb-1">Lead</span>
+                <span className="text-[10px] font-medium text-[#8b8b90] block mb-1">Líder</span>
                 <div
                   onClick={() => openMemberModal(leadMember.id)}
                   className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
@@ -335,7 +341,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                 <span className="text-[10px] font-medium text-[#8b8b90] block mb-1">Status</span>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-                  <span className="text-xs font-semibold text-white">In progress</span>
+                  <span className="text-xs font-semibold text-white">{statusLabel(project.status)}</span>
                 </div>
               </div>
             </div>
@@ -344,11 +350,11 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             <div className="pt-2">
               <div className="flex items-center justify-between text-xs text-[#8b8b90] mb-2.5">
                 <div>
-                  <span className="text-[10px] text-[#8b8b90]/70 block">Started</span>
+                  <span className="text-[10px] text-[#8b8b90]/70 block">Início</span>
                   <span className="font-bold text-white">{project.startDate ? formatDueLabel(project.startDate) : '—'}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] text-[#8b8b90]/70 block">Due</span>
+                  <span className="text-[10px] text-[#8b8b90]/70 block">Prazo</span>
                   <span className="font-bold text-white">{formatDueLabel(project.dueDate)}</span>
                 </div>
               </div>
@@ -361,7 +367,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                   style={{ left: '46%' }}
                 >
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-white text-neutral-900 shadow-md">
-                    Today
+                    Hoje
                   </span>
                   <span className="w-0.5 h-3 bg-white" />
                 </div>
@@ -407,7 +413,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             {/* People Section */}
             <div className="pt-2 border-t border-white/[0.04] space-y-3">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-white">People</span>
+                <span className="text-xs font-bold text-white">Pessoas</span>
                 <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-white/[0.08] text-[#8b8b90]">
                   {displayedMembers.length}
                 </span>
@@ -417,7 +423,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {displayedMembers.map((member: any) => {
                   const statusDot = getStatusDot(member.status);
-                  const displayRole = member.role || (member.status === 'online' ? 'Online' : 'Team');
+                  const displayRole = member.role || (member.status === 'online' ? 'Online' : 'Equipe');
 
                   return (
                     <div
@@ -453,8 +459,8 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
           {/* Card: Milestones */}
           <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
             <div>
-              <h3 className="text-sm font-bold text-white">Milestones</h3>
-              <p className="text-xs text-[#8b8b90] mt-0.5">1 of 4 reached</p>
+              <h3 className="text-sm font-bold text-white">Marcos</h3>
+              <p className="text-xs text-[#8b8b90] mt-0.5">1 de 4 atingidos</p>
             </div>
 
             {/* Vertical Stepper List */}
@@ -495,7 +501,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
 
                       {isNext && (
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
-                          Next
+                          Próximo
                         </span>
                       )}
                     </div>
@@ -513,11 +519,11 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="text-sm font-bold text-white">Burn-up</h3>
+                  <h3 className="text-sm font-bold text-white">Progresso acumulado</h3>
                   <ArrowUpRight size={14} className="text-[#8b8b90]" />
                 </div>
                 <p className="text-xs text-[#8b8b90] mt-0.5">
-                  Tasks done against the total, over the project's life
+                  Tarefas concluídas em relação ao total, ao longo do projeto
                 </p>
               </div>
             </div>
@@ -526,7 +532,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             <div className="flex items-center gap-4 text-xs text-[#8b8b90] pt-1">
               <div className="flex items-center gap-2">
                 <span className="w-3.5 h-0.5 bg-blue-400 rounded-full" />
-                <span className="text-[11px] font-medium text-white">Done</span>
+                <span className="text-[11px] font-medium text-white">Concluídas</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3.5 h-0.5 border-t border-dashed border-white/40" />
@@ -547,17 +553,17 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
 
                   <line x1="50" y1="25" x2="510" y2="25" stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
                   <text x="42" y="29" fill="rgba(255,255,255,0.3)" fontSize="9" textAnchor="end" fontFamily="monospace">
-                    5 tasks
+                    5 tarefas
                   </text>
 
                   <line x1="50" y1="75" x2="510" y2="75" stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
                   <text x="42" y="79" fill="rgba(255,255,255,0.3)" fontSize="9" textAnchor="end" fontFamily="monospace">
-                    3 tasks
+                    3 tarefas
                   </text>
 
                   <line x1="50" y1="150" x2="510" y2="150" stroke="rgba(255,255,255,0.08)" />
                   <text x="42" y="154" fill="rgba(255,255,255,0.3)" fontSize="9" textAnchor="end" fontFamily="monospace">
-                    0 tasks
+                    0 tarefas
                   </text>
 
                   <path
@@ -583,19 +589,19 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                   />
 
                   {[
-                    { label: 'Sep 19', x: 60 },
-                    { label: 'Sep 21', x: 95 },
-                    { label: 'Sep 24', x: 130 },
-                    { label: 'Sep 26', x: 165 },
-                    { label: 'Sep 29', x: 200 },
-                    { label: 'Oct 1', x: 235 },
-                    { label: 'Oct 4', x: 270 },
-                    { label: 'Oct 6', x: 305 },
-                    { label: 'Oct 9', x: 340 },
-                    { label: 'Oct 11', x: 375 },
-                    { label: 'Oct 14', x: 410 },
-                    { label: 'Oct 16', x: 445 },
-                    { label: 'Oct 19', x: 480 },
+                    { label: '19 set', x: 60 },
+                    { label: '21 set', x: 95 },
+                    { label: '24 set', x: 130 },
+                    { label: '26 set', x: 165 },
+                    { label: '29 set', x: 200 },
+                    { label: '1 out', x: 235 },
+                    { label: '4 out', x: 270 },
+                    { label: '6 out', x: 305 },
+                    { label: '9 out', x: 340 },
+                    { label: '11 out', x: 375 },
+                    { label: '14 out', x: 410 },
+                    { label: '16 out', x: 445 },
+                    { label: '19 out', x: 480 },
                   ].map((tick) => (
                     <text
                       key={tick.label}
@@ -617,9 +623,9 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
           <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.04]">
               <div>
-                <h3 className="text-sm font-bold text-white">Tasks</h3>
+                <h3 className="text-sm font-bold text-white">Tarefas</h3>
                 <p className="text-xs text-[#8b8b90] mt-0.5">
-                  {openCount} open · {doneCount} done
+                  {openCount} abertas · {doneCount} concluídas
                 </p>
               </div>
 
@@ -628,7 +634,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                 className="px-4 py-2 rounded-full text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-sm transition-all flex items-center gap-1.5"
               >
                 <Plus size={14} />
-                <span>Add task</span>
+                <span>Nova tarefa</span>
               </button>
             </div>
 
@@ -636,14 +642,14 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-xs font-bold text-[#8b8b90]">
                 <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                <span>To do</span>
+                <span>A fazer</span>
                 <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/[0.08] text-[#8b8b90]">
                   {displayedTodoTasks.length}
                 </span>
               </div>
 
               {displayedTodoTasks.length === 0 ? (
-                <p className="text-xs text-[#8b8b90]/60 py-1.5 pl-3">Nothing waiting.</p>
+                <p className="text-xs text-[#8b8b90]/60 py-1.5 pl-3">Nada pendente.</p>
               ) : (
                 <div className="space-y-2">
                   {displayedTodoTasks.map((t) => (
@@ -674,14 +680,14 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             <div className="space-y-2 pt-2 border-t border-white/[0.04]">
               <div className="flex items-center gap-2 text-xs font-bold text-[#8b8b90]">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                <span>In progress</span>
+                <span>Em andamento</span>
                 <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/[0.08] text-[#8b8b90]">
                   {displayedInProgressTasks.length}
                 </span>
               </div>
 
               {displayedInProgressTasks.length === 0 ? (
-                <p className="text-xs text-[#8b8b90]/60 py-1.5 pl-3">Nothing here.</p>
+                <p className="text-xs text-[#8b8b90]/60 py-1.5 pl-3">Nada por aqui.</p>
               ) : (
                 <div className="space-y-2">
                   {displayedInProgressTasks.map((t) => (
@@ -712,7 +718,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             <div className="space-y-2 pt-2 border-t border-white/[0.04]">
               <div className="flex items-center gap-2 text-xs font-bold text-[#8b8b90]">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span>Done</span>
+                <span>Concluídas</span>
                 <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/[0.08] text-[#8b8b90]">
                   {displayedDoneTasks.length}
                 </span>
@@ -721,7 +727,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
               <div className="space-y-2">
                 {displayedDoneTasks.map((task) => {
                   const assignee = members.find((m) => m.id === task.assigneeId) || {
-                    name: 'Team',
+                    name: 'Equipe',
                     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
                   };
 

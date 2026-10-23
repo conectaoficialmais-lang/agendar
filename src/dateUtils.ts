@@ -70,6 +70,23 @@ export function formatDueLabel(iso: string, today: string = todayIso()): string 
   return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
 }
 
+/**
+ * Converte um intervalo "HH:MM"–"HH:MM" em { startHour decimal, durationMinutes }.
+ * Devolve null se o horário for inválido ou o fim não for depois do início.
+ */
+export function timeRangeToHourAndDuration(
+  start: string,
+  end: string
+): { startHour: number; durationMinutes: number } | null {
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return null;
+  const startMin = sh * 60 + sm;
+  const endMin = eh * 60 + em;
+  if (endMin <= startMin) return null;
+  return { startHour: sh + sm / 60, durationMinutes: endMin - startMin };
+}
+
 /** Saudação conforme a hora do dia. */
 export function greeting(d: Date = new Date()): string {
   const h = d.getHours();

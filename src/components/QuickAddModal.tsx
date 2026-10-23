@@ -3,7 +3,7 @@ import { X, CheckSquare, Calendar, Folder, Plus } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Priority, TaskStatus } from '../types';
 import { ACCENTS } from '../themeUtils';
-import { todayIso, addDays, formatDueLabel } from '../dateUtils';
+import { todayIso, addDays, formatDueLabel, timeRangeToHourAndDuration } from '../dateUtils';
 
 export const QuickAddModal: React.FC = () => {
   const {
@@ -79,18 +79,19 @@ export const QuickAddModal: React.FC = () => {
     if (!eventTitle.trim()) return;
 
     // Deriva startHour e duração dos horários digitados (antes eram fixos em 11:00/45min).
-    const [sh, sm] = eventStartTime.split(':').map(Number);
-    const [eh, em] = eventEndTime.split(':').map(Number);
-    const startHour = sh + (sm || 0) / 60;
-    const durationMinutes = Math.max(15, eh * 60 + (em || 0) - (sh * 60 + (sm || 0)));
+    const parsed = timeRangeToHourAndDuration(eventStartTime, eventEndTime);
+    if (!parsed) {
+      alert('O horário de término deve ser depois do início.');
+      return;
+    }
 
     addCalendarEvent({
       title: eventTitle.trim(),
       date: eventDate,
       startTime: eventStartTime,
       endTime: eventEndTime,
-      startHour,
-      durationMinutes,
+      startHour: parsed.startHour,
+      durationMinutes: parsed.durationMinutes,
       type: eventType,
       location: eventLocation,
       attendeeIds: [currentUser.id],

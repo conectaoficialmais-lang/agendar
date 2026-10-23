@@ -14,6 +14,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { ACCENTS } from '../themeUtils';
 import { greeting, longDateLabel, todayIso, formatDueLabel } from '../dateUtils';
+import { statusLabel } from '../labels';
 
 export const HomeView: React.FC = () => {
   const {
@@ -75,6 +76,15 @@ export const HomeView: React.FC = () => {
   const todayTasks = tasks.filter(
     (t) => t.assigneeId === currentUser.id && t.dueDate === TODAY
   );
+  const todayOpenCount = todayTasks.filter((t) => t.status !== 'done').length;
+
+  // Metas diárias (alvos) e reuniões já realizadas hoje
+  const DAILY_TASK_GOAL = 8;
+  const DAILY_FOCUS_GOAL_H = 2;
+  const meetingsDone = todayEvents.filter(
+    (e) => e.startHour + e.durationMinutes / 60 <= nowDecimalHour
+  ).length;
+  const meetingsRatio = todayEvents.length > 0 ? meetingsDone / todayEvents.length : 0;
 
   return (
     <div className="space-y-6 pb-20 animate-in fade-in duration-300">
@@ -87,7 +97,7 @@ export const HomeView: React.FC = () => {
             {greeting()}, {currentUser.name.split(' ')[0]}
           </h1>
           <p className="text-[#8b8b90] text-sm mt-1.5 font-normal">
-            {longDateLabel()} · {todayEvents.length} reuniões e {openTasksCount} tarefas restantes hoje
+            {longDateLabel()} · {todayEvents.length} reuniões e {todayOpenCount} tarefas restantes hoje
           </p>
         </div>
 
@@ -98,7 +108,7 @@ export const HomeView: React.FC = () => {
             <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Concluídas</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
-                {doneTodayCount}/8
+                {doneTodayCount}/{DAILY_TASK_GOAL}
               </div>
             </div>
 
@@ -157,7 +167,7 @@ export const HomeView: React.FC = () => {
                 <p className="text-xs text-[#8b8b90]">Complete seus anéis de meta diária</p>
               </div>
               <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                {Math.round(((doneTodayCount / 8) * 0.4 + Math.min(1, focusedMinutesToday / 120) * 0.4 + 0.25 * 0.2) * 100)}% geral
+                {Math.round(((doneTodayCount / DAILY_TASK_GOAL) * 0.4 + Math.min(1, focusedMinutesToday / (DAILY_FOCUS_GOAL_H * 60)) * 0.4 + meetingsRatio * 0.2) * 100)}% geral
               </span>
             </div>
 
@@ -181,7 +191,7 @@ export const HomeView: React.FC = () => {
                     stroke="#3b82f6"
                     strokeWidth="8"
                     strokeDasharray="301.59"
-                    strokeDashoffset={301.59 * (1 - Math.min(1, doneTodayCount / 8))}
+                    strokeDashoffset={301.59 * (1 - Math.min(1, doneTodayCount / DAILY_TASK_GOAL))}
                     strokeLinecap="round"
                     fill="none"
                     className="transition-all duration-700 ease-out"
@@ -203,7 +213,7 @@ export const HomeView: React.FC = () => {
                     stroke="#f97316"
                     strokeWidth="8"
                     strokeDasharray="226.19"
-                    strokeDashoffset={226.19 * (1 - Math.min(1, focusedMinutesToday / 120))}
+                    strokeDashoffset={226.19 * (1 - Math.min(1, focusedMinutesToday / (DAILY_FOCUS_GOAL_H * 60)))}
                     strokeLinecap="round"
                     fill="none"
                     className="transition-all duration-700 ease-out"
@@ -226,11 +236,7 @@ export const HomeView: React.FC = () => {
                     strokeWidth="8"
                     strokeDasharray="150.79"
                     strokeDashoffset={
-                      150.79 *
-                      (1 -
-                        (todayEvents.length > 0
-                          ? Math.min(1, 1 / todayEvents.length)
-                          : 0))
+                      150.79 * (1 - meetingsRatio)
                     }
                     strokeLinecap="round"
                     fill="none"
@@ -249,7 +255,7 @@ export const HomeView: React.FC = () => {
                     <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]" />
                     <span className="text-white font-medium">Tarefas</span>
                   </div>
-                  <span className="font-bold text-white">{doneTodayCount}/8 concluídas</span>
+                  <span className="font-bold text-white">{doneTodayCount}/{DAILY_TASK_GOAL} concluídas</span>
                 </div>
 
                 <div className="flex items-center justify-between text-xs">
@@ -258,7 +264,7 @@ export const HomeView: React.FC = () => {
                     <span className="text-white font-medium">Foco</span>
                   </div>
                   <span className="font-bold text-white">
-                    {(focusedMinutesToday / 60).toFixed(1)}h / 2.0h
+                    {(focusedMinutesToday / 60).toFixed(1)}h / {DAILY_FOCUS_GOAL_H.toFixed(1)}h
                   </span>
                 </div>
 
@@ -267,7 +273,7 @@ export const HomeView: React.FC = () => {
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
                     <span className="text-white font-medium">Reuniões</span>
                   </div>
-                  <span className="font-bold text-white">1/{todayEvents.length || 1} realizadas</span>
+                  <span className="font-bold text-white">{meetingsDone}/{todayEvents.length} realizadas</span>
                 </div>
               </div>
             </div>
@@ -402,7 +408,7 @@ export const HomeView: React.FC = () => {
                           {proj.name}
                         </h4>
                         <p className="text-[11px] text-[#8b8b90] truncate mt-0.5">
-                          {proj.status} · {formatDueLabel(proj.dueDate)}
+                          {statusLabel(proj.status)} · {formatDueLabel(proj.dueDate)}
                         </p>
                       </div>
                     </div>
@@ -424,17 +430,23 @@ export const HomeView: React.FC = () => {
 
                       {/* Avatares */}
                       <div className="flex -space-x-1.5 shrink-0">
-                        {members.slice(0, 2).map((m) => (
-                          <img
-                            key={m.id}
-                            src={m.avatar}
-                            alt={m.name}
-                            className="w-5 h-5 rounded-full object-cover ring-2 ring-[#0d0e11]"
-                          />
-                        ))}
-                        <span className="w-5 h-5 rounded-full bg-white/10 ring-2 ring-[#0d0e11] text-[9px] font-bold text-white/80 flex items-center justify-center">
-                          +2
-                        </span>
+                        {proj.memberIds.slice(0, 3).map((id) => {
+                          const m = members.find((mm) => mm.id === id);
+                          if (!m) return null;
+                          return (
+                            <img
+                              key={id}
+                              src={m.avatar}
+                              alt={m.name}
+                              className="w-5 h-5 rounded-full object-cover ring-2 ring-[#0d0e11]"
+                            />
+                          );
+                        })}
+                        {proj.memberIds.length > 3 && (
+                          <span className="w-5 h-5 rounded-full bg-white/10 ring-2 ring-[#0d0e11] text-[9px] font-bold text-white/80 flex items-center justify-center">
+                            +{proj.memberIds.length - 3}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -559,14 +571,18 @@ export const HomeView: React.FC = () => {
 
                 <div className="flex items-center justify-between pt-1">
                   <div className="flex -space-x-1.5">
-                    {members.slice(0, 3).map((m) => (
-                      <img
-                        key={m.id}
-                        src={m.avatar}
-                        alt={m.name}
-                        className="w-5 h-5 rounded-full object-cover ring-2 ring-[#0d0e11]"
-                      />
-                    ))}
+                    {nextMeeting.attendeeIds.slice(0, 4).map((id) => {
+                      const m = members.find((mm) => mm.id === id);
+                      if (!m) return null;
+                      return (
+                        <img
+                          key={id}
+                          src={m.avatar}
+                          alt={m.name}
+                          className="w-5 h-5 rounded-full object-cover ring-2 ring-[#0d0e11]"
+                        />
+                      );
+                    })}
                   </div>
 
                   <a

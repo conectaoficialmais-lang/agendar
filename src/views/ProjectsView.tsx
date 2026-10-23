@@ -22,6 +22,7 @@ import { useApp } from '../context/AppContext';
 import { ProjectDetailView } from './ProjectDetailView';
 import { Project } from '../types';
 import { todayIso, addDays, formatDueLabel } from '../dateUtils';
+import { statusLabel } from '../labels';
 
 export const ProjectsView: React.FC = () => {
   const {
@@ -48,8 +49,8 @@ export const ProjectsView: React.FC = () => {
   const [newProjectIcon, setNewProjectIcon] = useState<'rocket' | 'smartphone' | 'grid' | 'sprout' | 'flame' | 'chart' | 'folder'>('smartphone');
   const [newProjectStatus, setNewProjectStatus] = useState<'In progress' | 'In review' | 'Planning' | 'Shipped'>('In progress');
   const [newProjectDueDate, setNewProjectDueDate] = useState(addDays(todayIso(), 30));
-  const [newProjectMilestoneTitle, setNewProjectMilestoneTitle] = useState('Beta Release');
-  const [newProjectMilestoneDue, setNewProjectMilestoneDue] = useState('Nov 10');
+  const [newProjectMilestoneTitle, setNewProjectMilestoneTitle] = useState('');
+  const [newProjectMilestoneDue, setNewProjectMilestoneDue] = useState('');
   const [newProjectSelectedMembers, setNewProjectSelectedMembers] = useState<string[]>([currentUser.id]);
 
   // Se houver um projeto selecionado, renderizar a visão detalhada do projeto
@@ -130,7 +131,7 @@ export const ProjectsView: React.FC = () => {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
           <Check size={11} strokeWidth={3} className="text-cyan-400" />
-          <span>Shipped</span>
+          <span>Entregue</span>
         </span>
       );
     }
@@ -139,7 +140,7 @@ export const ProjectsView: React.FC = () => {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-          <span>In review</span>
+          <span>Em revisão</span>
         </span>
       );
     }
@@ -148,7 +149,7 @@ export const ProjectsView: React.FC = () => {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/20">
           <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-          <span>Planning</span>
+          <span>Planejamento</span>
         </span>
       );
     }
@@ -156,7 +157,7 @@ export const ProjectsView: React.FC = () => {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-        <span>In progress</span>
+        <span>Em andamento</span>
       </span>
     );
   };
@@ -214,10 +215,10 @@ export const ProjectsView: React.FC = () => {
         {/* Título grande + Subtítulo */}
         <div>
           <h1 className="text-[38px] md:text-[42px] font-bold tracking-tight text-white leading-none">
-            Projects
+            Projetos
           </h1>
           <p className="text-[#8b8b90] text-sm mt-1.5 font-normal">
-            {activeCount} in flight · {shippedCount} shipped
+            {activeCount} em andamento · {shippedCount} {shippedCount === 1 ? 'entregue' : 'entregues'}
           </p>
         </div>
 
@@ -226,22 +227,22 @@ export const ProjectsView: React.FC = () => {
           {/* 4 mini-cards de métricas reais (stat tiles) */}
           <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none">
             <div className="px-5 py-3 rounded-[16px] bg-[#181920] border border-white/[0.06] min-w-[105px] shadow-sm">
-              <span className="text-[11px] font-medium text-[#8b8b90] block">Active</span>
+              <span className="text-[11px] font-medium text-[#8b8b90] block">Ativos</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">{activeCount}</div>
             </div>
 
             <div className="px-5 py-3 rounded-[16px] bg-[#181920] border border-white/[0.06] min-w-[105px] shadow-sm">
-              <span className="text-[11px] font-medium text-[#8b8b90] block">Shipped</span>
+              <span className="text-[11px] font-medium text-[#8b8b90] block">Entregues</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">{shippedCount}</div>
             </div>
 
             <div className="px-5 py-3 rounded-[16px] bg-[#181920] border border-white/[0.06] min-w-[105px] shadow-sm">
-              <span className="text-[11px] font-medium text-[#8b8b90] block">On track</span>
+              <span className="text-[11px] font-medium text-[#8b8b90] block">No prazo</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">{onTrackPercent}%</div>
             </div>
 
             <div className="px-5 py-3 rounded-[16px] bg-[#181920] border border-white/[0.06] min-w-[105px] shadow-sm">
-              <span className="text-[11px] font-medium text-[#8b8b90] block">Due this month</span>
+              <span className="text-[11px] font-medium text-[#8b8b90] block">Este mês</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">{dueThisMonthCount}</div>
             </div>
           </div>
@@ -260,7 +261,7 @@ export const ProjectsView: React.FC = () => {
                       : 'text-[#8b8b90] hover:text-white'
                   }`}
                 >
-                  {tab}
+                  {({ All: 'Todos', Active: 'Ativos', Planning: 'Planejamento', Shipped: 'Entregues' } as const)[tab]}
                 </button>
               ))}
             </div>
@@ -271,7 +272,7 @@ export const ProjectsView: React.FC = () => {
               className="px-4.5 py-2 rounded-full text-xs font-semibold text-[#0d0e12] bg-[#e2e4ea] hover:bg-white shadow-md transition-all flex items-center gap-1.5 active:scale-95"
             >
               <Plus size={15} strokeWidth={2.8} />
-              <span>+ New project</span>
+              <span>Novo projeto</span>
             </button>
           </div>
         </div>
@@ -410,10 +411,10 @@ export const ProjectsView: React.FC = () => {
                   {/* Informações do Milestone */}
                   <div className="min-w-0 flex-1">
                     <span className="text-[10px] font-medium text-[#8b8b90] block leading-tight">
-                      {proj.status === 'Shipped' || proj.status === 'Entregue' ? 'Shipped' : 'Next milestone'}
+                      {proj.status === 'Shipped' || proj.status === 'Entregue' ? 'Entregue' : 'Próximo marco'}
                     </span>
                     <h4 className="text-xs font-bold text-white truncate leading-tight mt-0.5">
-                      {proj.nextMilestone?.title || 'Launch milestone'}
+                      {proj.nextMilestone?.title || 'Marco de lançamento'}
                     </h4>
                     <span className="text-[11px] text-[#8b8b90] block leading-tight mt-0.5">
                       {formatDueLabel(proj.nextMilestone?.dueDate || proj.dueDate)}
@@ -443,7 +444,7 @@ export const ProjectsView: React.FC = () => {
 
                 {/* "X/Y tasks" dinâmico */}
                 <span className="text-[11px] text-[#8b8b90] font-medium">
-                  {totalTasks > 0 ? `${doneTasks}/${totalTasks} tasks` : '0/0 tasks'}
+                  {totalTasks > 0 ? `${doneTasks}/${totalTasks} tarefas` : '0/0 tarefas'}
                 </span>
 
                 {/* Calendário e Prazo */}
@@ -528,10 +529,10 @@ export const ProjectsView: React.FC = () => {
                     onChange={(e) => setNewProjectStatus(e.target.value as any)}
                     className="w-full px-3 py-2 rounded-[12px] bg-[#121318] border border-white/[0.10] text-xs text-white focus:outline-none focus:border-white/30"
                   >
-                    <option value="In progress">In progress (Em andamento)</option>
-                    <option value="Planning">Planning (Planejamento)</option>
-                    <option value="In review">In review (Em revisão)</option>
-                    <option value="Shipped">Shipped (Entregue)</option>
+                    <option value="In progress">Em andamento</option>
+                    <option value="Planning">Planejamento</option>
+                    <option value="In review">Em revisão</option>
+                    <option value="Shipped">Entregue</option>
                   </select>
                 </div>
 
@@ -584,11 +585,11 @@ export const ProjectsView: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-[#8b8b90] block mb-1.5">
-                    Próximo Milestone
+                    Próximo marco
                   </label>
                   <input
                     type="text"
-                    placeholder="Ex: Beta Launch"
+                    placeholder="Ex: Lançamento Beta"
                     value={newProjectMilestoneTitle}
                     onChange={(e) => setNewProjectMilestoneTitle(e.target.value)}
                     className="w-full px-3 py-2 rounded-[12px] bg-[#121318] border border-white/[0.10] text-xs text-white placeholder-white/30 focus:outline-none focus:border-white/30"
@@ -597,7 +598,7 @@ export const ProjectsView: React.FC = () => {
 
                 <div>
                   <label className="text-xs font-semibold text-[#8b8b90] block mb-1.5">
-                    Data Limite (Due Date)
+                    Data limite
                   </label>
                   <input
                     type="date"
