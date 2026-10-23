@@ -87,6 +87,12 @@ export function timeRangeToHourAndDuration(
   return { startHour: sh + sm / 60, durationMinutes: endMin - startMin };
 }
 
+/** Data curta, ex.: "23 out" (para eixos de gráfico). */
+export function shortDate(iso: string): string {
+  const d = parseIso(iso);
+  return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
+}
+
 /** Saudação conforme a hora do dia. */
 export function greeting(d: Date = new Date()): string {
   const h = d.getHours();

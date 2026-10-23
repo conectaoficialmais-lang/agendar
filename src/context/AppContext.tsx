@@ -27,6 +27,7 @@ const STORAGE_KEYS = {
   PREFERENCES: 'pane_prefs_pt_v3',
   NOTIFICATIONS: 'pane_notifications_pt_v3',
   FOCUS: 'pane_focus_pt_v3',
+  FOCUS_LOG: 'pane_focus_log_v1',
 };
 
 interface AppContextType {
@@ -131,6 +132,7 @@ interface AppContextType {
   focusTaskId: string | null;
   focusedMinutesToday: number;
   focusSessionsToday: number;
+  focusLog: Record<string, { minutes: number; sessions: number }>;
   startFocus: (duration?: number, taskId?: string | null) => void;
   pauseFocus: () => void;
   resetFocus: () => void;
@@ -291,6 +293,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [focusedMinutesToday, setFocusedMinutesToday] = useState<number>(() => readFocusStat('minutes'));
   const [focusSessionsToday, setFocusSessionsToday] = useState<number>(() => readFocusStat('sessions'));
 
+  // Histórico diário de foco — cresce conforme o uso e alimenta os Insights.
+  // Chave nova (v1) p/ não interferir no FOCUS de hoje; migra o registro atual uma vez.
+  const readFocusLog = (): Record<string, { minutes: number; sessions: number }> => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.FOCUS_LOG);
+      if (saved) return JSON.parse(saved);
+      const today = localStorage.getItem(STORAGE_KEYS.FOCUS);
+      if (today) {
+        const p = JSON.parse(today);
+        if (p?.date && (p.minutes || p.sessions)) {
+          return { [p.date]: { minutes: p.minutes || 0, sessions: p.sessions || 0 } };
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return {};
+  };
+  const [focusLog, setFocusLog] = useState<Record<string, { minutes: number; sessions: number }>>(
+    () => readFocusLog()
+  );
+
   // Modals state
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
@@ -324,6 +348,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   }, [focusedMinutesToday, focusSessionsToday]);
 
+  // Acumula o foco do dia num histórico (limitado a ~400 dias).
+  useEffect(() => {
+    const day = toIso(new Date());
+    setFocusLog((prev) => {
+      const next = { ...prev, [day]: { minutes: focusedMinutesToday, sessions: focusSessionsToday } };
+      const keys = Object.keys(next).sort();
+      if (keys.length > 400) keys.slice(0, keys.length - 400).forEach((k) => delete next[k]);
+      return next;
+    });
+  }, [focusedMinutesToday, focusSessionsToday]);
+  useEffect(() => {
+    persist(STORAGE_KEYS.FOCUS_LOG, focusLog);
+  }, [focusLog]);
+
   // Mantém o cronômetro em sincronia com a duração padrão escolhida nas Configurações.
   useEffect(() => {
     if (!isFocusRunning) {
@@ -350,8 +388,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
   const doneTodayCount = doneTodayTasks.length;
 
-  const doneThisWeekTasks = tasks.filter((t) => t.status === 'done');
-  const doneThisWeekCount = doneThisWeekTasks.length;
+  // Concluídas nos últimos 7 dias (pela data real de conclusão, não "todas as done").
+  const doneThisWeekCount = tasks.filter((t) => {
+    if (t.status !== 'done' || !t.completedAt) return false;
+    const d = diffDays(toIso(new Date(t.completedAt)), todayIso);
+    return d >= 0 && d <= 6;
+  }).length;
 
   // Tarefas em aberto com prazo entre hoje e os próximos 6 dias.
   const dueThisWeekCount = tasks.filter((t) => {
@@ -540,6 +582,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       subtasks: [],
       comments: [],
       daysOpen: 0,
+      createdAt: new Date().toISOString(),
       completedAt: taskData.status === 'done' ? new Date().toISOString() : undefined,
     };
 
@@ -793,6 +836,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNotifications(SEED_NOTIFICATIONS);
     setFocusedMinutesToday(0);
     setFocusSessionsToday(0);
+    setFocusLog({});
     setFocusDuration(DEFAULT_PREFERENCES.focusSessionMinutes * 60);
     setFocusRemaining(DEFAULT_PREFERENCES.focusSessionMinutes * 60);
     setIsFocusRunning(false);
@@ -917,6 +961,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         focusTaskId,
         focusedMinutesToday,
         focusSessionsToday,
+        focusLog,
         startFocus,
         pauseFocus,
         resetFocus,

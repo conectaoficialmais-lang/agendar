@@ -30,6 +30,7 @@ export interface Task {
   subtasks: Subtask[];
   comments: TaskComment[];
   completedAt?: string;
+  createdAt?: string; // quando a tarefa foi criada (para tempo de ciclo / idade)
   daysOpen?: number;
 }
 

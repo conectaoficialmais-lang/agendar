@@ -114,6 +114,12 @@
   box-shadow: 0 0 22px -4px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
+.accent-chip {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: color-mix(in srgb, var(--accent) 80%, white);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
 .font-display {
   font-family: var(--font-display);
   letter-spacing: -0.02em;
