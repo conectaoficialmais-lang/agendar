@@ -282,28 +282,28 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
 
         {/* 4 Stat Tiles */}
         <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none pt-1">
-          <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+          <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
             <span className="text-[11px] font-medium text-[#8b8b90] block">Progresso</span>
             <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
               {progressPercent}%
             </div>
           </div>
 
-          <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+          <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
             <span className="text-[11px] font-medium text-[#8b8b90] block">Tarefas abertas</span>
             <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
               {openCount}
             </div>
           </div>
 
-          <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+          <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
             <span className="text-[11px] font-medium text-[#8b8b90] block">Concluídas</span>
             <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
               {doneCount}
             </div>
           </div>
 
-          <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+          <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
             <span className="text-[11px] font-medium text-[#8b8b90] block">Dias restantes</span>
             <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
               {Math.max(0, diffDays(todayIso(), project.dueDate))}
@@ -317,12 +317,12 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
         {/* Left Column: Overview and Milestones */}
         <div className="lg:col-span-6 space-y-5">
           {/* Card: Overview */}
-          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-5">
+          <div className="p-5 rounded-[16px] panel shadow-sm space-y-5">
             <h3 className="text-sm font-bold text-white">Visão geral</h3>
 
             {/* Lead & Status sub-boxes */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04]">
+              <div className="p-3 rounded-[12px] panel-inset">
                 <span className="text-[10px] font-medium text-[#8b8b90] block mb-1">Líder</span>
                 <div
                   onClick={() => openMemberModal(leadMember.id)}
@@ -337,7 +337,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                 </div>
               </div>
 
-              <div className="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04]">
+              <div className="p-3 rounded-[12px] panel-inset">
                 <span className="text-[10px] font-medium text-[#8b8b90] block mb-1">Status</span>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
@@ -457,7 +457,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
           </div>
 
           {/* Card: Milestones */}
-          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
+          <div className="p-5 rounded-[16px] panel shadow-sm space-y-4">
             <div>
               <h3 className="text-sm font-bold text-white">Marcos</h3>
               <p className="text-xs text-[#8b8b90] mt-0.5">1 de 4 atingidos</p>
@@ -515,7 +515,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
         {/* Right Column: Burn-up Chart and Tasks */}
         <div className="lg:col-span-6 space-y-5">
           {/* Card: Burn-up */}
-          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
+          <div className="p-5 rounded-[16px] panel shadow-sm space-y-4">
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-1.5">
@@ -541,7 +541,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             </div>
 
             {/* SVG Burn-up Chart */}
-            <div className="pt-2 w-full p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04]">
+            <div className="pt-2 w-full p-3 rounded-[12px] panel-inset">
               <div className="relative w-full h-44">
                 <svg className="w-full h-full overflow-visible" viewBox="0 0 520 180">
                   <defs>
@@ -620,7 +620,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
           </div>
 
           {/* Card: Tasks */}
-          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
+          <div className="p-5 rounded-[16px] panel shadow-sm space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.04]">
               <div>
                 <h3 className="text-sm font-bold text-white">Tarefas</h3>

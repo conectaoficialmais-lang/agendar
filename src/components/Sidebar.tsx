@@ -43,7 +43,7 @@ export const Sidebar: React.FC = () => {
   return (
     <>
       {/* Desktop Fixed Left Sidebar (~220px) */}
-      <aside className="fixed left-4 top-4 bottom-4 w-[220px] z-40 hidden md:flex flex-col justify-between p-3.5 rounded-[22px] bg-[#16171d] border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
+      <aside className="fixed left-4 top-4 bottom-4 w-[220px] z-40 hidden md:flex flex-col justify-between p-3.5 rounded-[22px] bg-white/[0.05] border border-white/[0.1] shadow-[0_12px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
         <div className="space-y-4">
           {/* Top: Logo circular/squircle com ícone abstrato e texto Pane */}
           <button
@@ -66,7 +66,7 @@ export const Sidebar: React.FC = () => {
                 <line x1="12" y1="3" x2="12" y2="12" />
               </svg>
             </div>
-            <span className="font-bold text-[17px] text-white tracking-tight">Pane</span>
+            <span className="font-display font-bold text-[18px] text-white">Pane</span>
           </button>
 
           {/* Menu de navegação */}
@@ -148,7 +148,7 @@ export const Sidebar: React.FC = () => {
       </aside>
 
       {/* Mobile Floating Bottom Bar */}
-      <nav className="fixed bottom-3 left-4 right-4 z-40 md:hidden flex items-center justify-around py-2.5 px-3 rounded-2xl bg-[#121316]/95 backdrop-blur-2xl border border-white/[0.08] shadow-2xl">
+      <nav className="fixed bottom-3 left-4 right-4 z-40 md:hidden flex items-center justify-around py-2.5 px-3 rounded-2xl bg-white/[0.06] backdrop-blur-2xl border border-white/[0.1] shadow-2xl">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;

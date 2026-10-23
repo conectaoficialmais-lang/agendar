@@ -16,44 +16,34 @@ import { InsightsView } from './views/InsightsView';
 import { TeamView } from './views/TeamView';
 import { SettingsView } from './views/SettingsView';
 
-import { WALLPAPERS, ACCENTS } from './themeUtils';
+import { ACCENTS } from './themeUtils';
 
 const MainShell: React.FC = () => {
   const { activeTab, preferences } = useApp();
 
-  const currentWallpaper =
-    WALLPAPERS.find((w) => w.id === preferences.wallpaper) || WALLPAPERS[0];
-  const isLight = preferences.theme === 'light';
+  // A cor de destaque escolhida nas Configurações agora dirige toda a interface
+  // através da variável CSS --accent (aurora, foco, hovers, realces).
+  const accentHex = ACCENTS[preferences.accent]?.hex || ACCENTS.blue.hex;
 
   return (
     <div
-      className="min-h-screen text-white relative font-sans selection:bg-blue-500/30 selection:text-white"
-      style={{
-        background: '#0d0e12',
-        backgroundColor: '#0d0e12',
-      }}
+      className="min-h-screen text-white relative font-sans"
+      style={{ ['--accent' as string]: accentHex } as React.CSSProperties}
     >
-      {/* Pane subtle ambient depth */}
-      <div
-        className="fixed inset-0 pointer-events-none transition-opacity duration-700 opacity-60"
-        style={{
-          background: `
-            radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 255, 255, 0.03) 0%, transparent 60%),
-            radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.02) 0%, transparent 40%),
-            radial-gradient(circle at 90% 60%, rgba(59, 130, 246, 0.02) 0%, transparent 40%)
-          `,
-        }}
-      />
+      {/* Camada de atmosfera (aurora + grão) */}
+      <div className="app-aurora" />
 
-      {/* Global Left Rail (Sidebar) */}
+      {/* Trilho lateral */}
       <Sidebar />
 
-      {/* Global Floating Top Bar */}
+      {/* Barra superior flutuante */}
       <TopBar />
 
-      {/* Main Content Area */}
-      <main className="min-h-screen px-4 md:px-8 pl-4 md:pl-[244px] pt-4 md:pt-6 pb-24 md:pb-12 max-w-[1720px] mx-auto relative z-10">
-        {/* Overdue Task Alert Banner */}
+      {/* Conteúdo principal */}
+      <main
+        key={activeTab}
+        className="min-h-screen px-4 md:px-8 pl-4 md:pl-[244px] pt-4 md:pt-6 pb-24 md:pb-12 max-w-[1720px] mx-auto relative z-10 rise"
+      >
         <OverdueAlertBanner />
 
         {activeTab === 'home' && <HomeView />}
@@ -65,7 +55,7 @@ const MainShell: React.FC = () => {
         {activeTab === 'settings' && <SettingsView />}
       </main>
 
-      {/* Global Modals */}
+      {/* Modais globais */}
       <CommandPalette />
       <QuickAddModal />
       <TaskModal />

@@ -226,22 +226,22 @@ export const ProjectsView: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
           {/* 4 mini-cards de métricas reais (stat tiles) */}
           <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none">
-            <div className="px-5 py-3 rounded-[16px] bg-[#181920] border border-white/[0.06] min-w-[105px] shadow-sm">
+            <div className="px-5 py-3 rounded-[16px] panel min-w-[105px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Ativos</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">{activeCount}</div>
             </div>
 
-            <div className="px-5 py-3 rounded-[16px] bg-[#181920] border border-white/[0.06] min-w-[105px] shadow-sm">
+            <div className="px-5 py-3 rounded-[16px] panel min-w-[105px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Entregues</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">{shippedCount}</div>
             </div>
 
-            <div className="px-5 py-3 rounded-[16px] bg-[#181920] border border-white/[0.06] min-w-[105px] shadow-sm">
+            <div className="px-5 py-3 rounded-[16px] panel min-w-[105px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">No prazo</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">{onTrackPercent}%</div>
             </div>
 
-            <div className="px-5 py-3 rounded-[16px] bg-[#181920] border border-white/[0.06] min-w-[105px] shadow-sm">
+            <div className="px-5 py-3 rounded-[16px] panel min-w-[105px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Este mês</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">{dueThisMonthCount}</div>
             </div>
@@ -250,7 +250,7 @@ export const ProjectsView: React.FC = () => {
           {/* À direita: grupo de filtros em pílula + botão "+ New project" */}
           <div className="flex items-center gap-3 shrink-0 flex-wrap">
             {/* Grupo de filtros em pílula */}
-            <div className="flex items-center p-1 rounded-full bg-[#181920] border border-white/[0.06]">
+            <div className="flex items-center p-1 rounded-full panel">
               {(['All', 'Active', 'Planning', 'Shipped'] as const).map((tab) => (
                 <button
                   key={tab}
@@ -464,7 +464,7 @@ export const ProjectsView: React.FC = () => {
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-150">
           <div
-            className="w-full max-w-lg rounded-[24px] bg-[#181920] border border-white/[0.12] shadow-[0_20px_60px_rgba(0,0,0,0.8)] text-white p-6 space-y-5"
+            className="w-full max-w-lg rounded-[24px] bg-[#151722]/95 backdrop-blur-2xl border border-white/15 shadow-[0_20px_60px_rgba(0,0,0,0.8)] text-white p-6 space-y-5"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

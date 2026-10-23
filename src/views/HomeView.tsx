@@ -105,28 +105,28 @@ export const HomeView: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
           {/* 4 Mini Stat Tiles */}
           <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none">
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Concluídas</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {doneTodayCount}/{DAILY_TASK_GOAL}
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Foco hoje</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {(focusedMinutesToday / 60).toFixed(1)}h
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Em aberto</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {openTasksCount}
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Reuniões</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {todayEvents.length}
@@ -160,7 +160,7 @@ export const HomeView: React.FC = () => {
         {/* Coluna Esquerda (7 cols) */}
         <div className="lg:col-span-7 space-y-5">
           {/* Card dos Anéis de Atividade */}
-          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm">
+          <div className="p-5 rounded-[16px] panel shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-sm font-bold text-white">Hoje</h3>
@@ -171,7 +171,7 @@ export const HomeView: React.FC = () => {
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-[12px] bg-[#0d0e11] border border-white/[0.04]">
+            <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-[12px] panel-inset">
               {/* SVG dos Anéis Concêntricos */}
               <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
@@ -280,7 +280,7 @@ export const HomeView: React.FC = () => {
           </div>
 
           {/* Foco — Cronômetro Pomodoro */}
-          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm">
+          <div className="p-5 rounded-[16px] panel shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-sm font-bold text-white">Foco</h3>
@@ -288,7 +288,7 @@ export const HomeView: React.FC = () => {
               </div>
 
               {/* Seletor de Duração em pílula */}
-              <div className="flex items-center p-1 rounded-full bg-[#0d0e11] border border-white/[0.04]">
+              <div className="flex items-center p-1 rounded-full panel-inset">
                 {[15, 25, 50].map((mins) => (
                   <button
                     key={mins}
@@ -306,7 +306,7 @@ export const HomeView: React.FC = () => {
             </div>
 
             {/* Display do Timer & Controles */}
-            <div className="p-4 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="p-4 rounded-[12px] panel-inset flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="text-4xl md:text-5xl font-extrabold tracking-tight text-white font-mono leading-none">
                   {formatTime(focusRemaining)}
@@ -322,7 +322,7 @@ export const HomeView: React.FC = () => {
                 <select
                   value={focusTaskId || ''}
                   onChange={(e) => setFocusTaskId(e.target.value || null)}
-                  className="w-full text-xs px-3 py-2 rounded-xl bg-[#131417] border border-white/[0.06] text-white focus:outline-none cursor-pointer"
+                  className="w-full text-xs px-3 py-2 rounded-xl panel text-white focus:outline-none cursor-pointer"
                 >
                   <option value="">Nenhuma tarefa — apenas focar</option>
                   {tasks
@@ -367,7 +367,7 @@ export const HomeView: React.FC = () => {
           </div>
 
           {/* Visão Geral dos Projetos */}
-          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
+          <div className="p-5 rounded-[16px] panel shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-white">Projetos em andamento</h3>
@@ -394,7 +394,7 @@ export const HomeView: React.FC = () => {
                       openProjectDetail(proj.id);
                       setActiveTab('projects');
                     }}
-                    className="p-3.5 rounded-[12px] bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04] hover:border-white/[0.1] transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+                    className="p-3.5 rounded-[12px] panel-inset panel-hover transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div
@@ -459,7 +459,7 @@ export const HomeView: React.FC = () => {
         {/* Coluna Direita (5 cols) */}
         <div className="lg:col-span-5 space-y-5">
           {/* Minhas Tarefas — Para hoje e atrasadas */}
-          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
+          <div className="p-5 rounded-[16px] panel shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-white">Minhas tarefas</h3>
@@ -482,7 +482,7 @@ export const HomeView: React.FC = () => {
                 return (
                   <div
                     key={task.id}
-                    className="p-3 rounded-[12px] bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04] hover:border-white/[0.1] transition-all flex items-start gap-3 group"
+                    className="p-3 rounded-[12px] panel-inset panel-hover transition-all flex items-start gap-3 group"
                   >
                     <button
                       onClick={() => toggleTaskComplete(task.id)}
@@ -538,7 +538,7 @@ export const HomeView: React.FC = () => {
           </div>
 
           {/* Agenda de Reuniões */}
-          <div className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4">
+          <div className="p-5 rounded-[16px] panel shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-white">Reuniões de hoje</h3>
@@ -554,7 +554,7 @@ export const HomeView: React.FC = () => {
             </div>
 
             {nextMeeting ? (
-              <div className="p-3.5 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] space-y-3">
+              <div className="p-3.5 rounded-[12px] panel-inset space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20">
                     A seguir · {nextMeeting.startTime}
@@ -607,7 +607,7 @@ export const HomeView: React.FC = () => {
                 {otherTodayEvents.map((evt) => (
                   <div
                     key={evt.id}
-                    className="p-2.5 rounded-[10px] bg-[#0d0e11] border border-white/[0.04] flex items-center justify-between text-xs"
+                    className="p-2.5 rounded-[10px] panel-inset flex items-center justify-between text-xs"
                   >
                     <div>
                       <span className="font-bold text-white block">{evt.title}</span>

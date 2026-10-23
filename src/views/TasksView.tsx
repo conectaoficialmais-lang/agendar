@@ -139,28 +139,28 @@ export const TasksView: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
           {/* 4 Mini Stat Tiles */}
           <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none">
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Em aberto</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {openTasksCount}
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Esta semana</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {dueThisWeekCount}
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Atrasadas</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {overdueCount}
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Concluídas</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {doneThisWeekCount}
@@ -171,7 +171,7 @@ export const TasksView: React.FC = () => {
           {/* Alternador de Visão + Botão Nova Tarefa */}
           <div className="flex items-center gap-3 shrink-0">
             {/* Pílula Alternadora de Visão */}
-            <div className="flex items-center p-1 rounded-full bg-[#131417] border border-white/[0.06]">
+            <div className="flex items-center p-1 rounded-full panel">
               <button
                 onClick={() => setViewMode('board')}
                 className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
@@ -209,13 +209,13 @@ export const TasksView: React.FC = () => {
       </div>
 
       {/* Barra de Filtros */}
-      <div className="p-3 rounded-[14px] bg-[#131417] border border-white/[0.06] shadow-sm flex flex-wrap items-center gap-3">
+      <div className="p-3 rounded-[14px] panel shadow-sm flex flex-wrap items-center gap-3">
         {/* Dropdown Todos os projetos */}
         <div className="relative">
           <select
             value={selectedProjectId}
             onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="text-xs pl-3 pr-8 py-2 rounded-full bg-[#0d0e11] border border-white/[0.04] text-white font-medium focus:outline-none appearance-none cursor-pointer"
+            className="text-xs pl-3 pr-8 py-2 rounded-full panel-inset text-white font-medium focus:outline-none appearance-none cursor-pointer"
           >
             <option value="all">Todos os projetos</option>
             {projects.map((p) => (
@@ -236,7 +236,7 @@ export const TasksView: React.FC = () => {
           className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
             mineOnly
               ? 'bg-white/[0.15] text-white border border-white/[0.15]'
-              : 'bg-[#0d0e11] border border-white/[0.04] text-[#8b8b90] hover:text-white'
+              : 'panel-inset text-[#8b8b90] hover:text-white'
           }`}
         >
           <img
@@ -252,7 +252,7 @@ export const TasksView: React.FC = () => {
           <select
             value={selectedPriority}
             onChange={(e) => setSelectedPriority(e.target.value)}
-            className="text-xs pl-3 pr-8 py-2 rounded-full bg-[#0d0e11] border border-white/[0.04] text-white font-medium focus:outline-none appearance-none cursor-pointer"
+            className="text-xs pl-3 pr-8 py-2 rounded-full panel-inset text-white font-medium focus:outline-none appearance-none cursor-pointer"
           >
             <option value="all">Qualquer prioridade</option>
             <option value="Urgent">Urgente</option>
@@ -277,7 +277,7 @@ export const TasksView: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por título, projeto ou pessoa..."
-            className="w-full pl-9 pr-3 py-1.5 rounded-full bg-[#0d0e11] border border-white/[0.04] text-xs text-white placeholder-[#8b8b90] focus:outline-none focus:border-white/20"
+            className="w-full pl-9 pr-3 py-1.5 rounded-full panel-inset text-xs text-white placeholder-[#8b8b90] focus:outline-none focus:border-white/20"
           />
         </div>
       </div>
@@ -293,7 +293,7 @@ export const TasksView: React.FC = () => {
                 key={col.id}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, col.id)}
-                className="rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm p-4 flex flex-col min-h-[500px]"
+                className="rounded-[16px] panel shadow-sm p-4 flex flex-col min-h-[500px]"
               >
                 {/* Cabeçalho da Coluna */}
                 <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/[0.04]">
@@ -327,7 +327,7 @@ export const TasksView: React.FC = () => {
                         draggable
                         onDragStart={(e) => handleDragStart(e, task.id)}
                         onClick={() => openTaskModal(task.id)}
-                        className="p-3.5 rounded-[12px] bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04] hover:border-white/[0.1] shadow-sm cursor-pointer transition-all space-y-2.5 group"
+                        className="p-3.5 rounded-[12px] panel-inset panel-hover shadow-sm cursor-pointer transition-all space-y-2.5 group"
                       >
                         {/* Topo: Chip do Projeto & Prioridade */}
                         <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -412,7 +412,7 @@ export const TasksView: React.FC = () => {
         </div>
       ) : (
         /* Visão em Lista */
-        <div className="rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm p-5 space-y-5">
+        <div className="rounded-[16px] panel shadow-sm p-5 space-y-5">
           <div className="flex items-center justify-between pb-3 border-b border-white/[0.04]">
             <div>
               <h3 className="text-sm font-bold text-white">Todas as tarefas</h3>
@@ -420,7 +420,7 @@ export const TasksView: React.FC = () => {
             </div>
 
             {/* Alternador de Ordenação */}
-            <div className="flex items-center p-1 rounded-full bg-[#0d0e11] border border-white/[0.04]">
+            <div className="flex items-center p-1 rounded-full panel-inset">
               <button
                 onClick={() => setListSortBy('due')}
                 className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
@@ -476,7 +476,7 @@ export const TasksView: React.FC = () => {
                           return (
                             <div
                               key={task.id}
-                              className="p-3 rounded-[10px] bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04] hover:border-white/[0.08] transition-colors flex items-center justify-between gap-4 group cursor-pointer"
+                              className="p-3 rounded-[10px] panel-inset panel-hover transition-colors flex items-center justify-between gap-4 group cursor-pointer"
                               onClick={() => openTaskModal(task.id)}
                             >
                               <div className="flex items-center gap-3 min-w-0">

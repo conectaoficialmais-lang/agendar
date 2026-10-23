@@ -100,28 +100,28 @@ export const TeamView: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
           {/* 4 Mini Stat Tiles */}
           <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none">
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Membros</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {members.length}
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Online</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {onlineCount}
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Em foco</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {inFocusCount}
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Carga média</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {avgLoad}%
@@ -131,7 +131,7 @@ export const TeamView: React.FC = () => {
 
           {/* Filtros em Pílula + Botão Convidar */}
           <div className="flex items-center gap-3 shrink-0 flex-wrap">
-            <div className="flex items-center p-1 rounded-full bg-[#131417] border border-white/[0.06]">
+            <div className="flex items-center p-1 rounded-full panel">
               {(['Todos', 'Produto', 'Design', 'Engenharia', 'Marketing'] as const).map((dept) => (
                 <button
                   key={dept}
@@ -166,7 +166,7 @@ export const TeamView: React.FC = () => {
           return (
             <div
               key={member.id}
-              className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm hover:border-white/[0.12] transition-all space-y-4 flex flex-col justify-between"
+              className="p-5 rounded-[16px] panel shadow-sm hover:border-white/[0.12] transition-all space-y-4 flex flex-col justify-between"
             >
               <div>
                 {/* Linha Superior: Avatar + Nome + Badge */}
@@ -210,7 +210,7 @@ export const TeamView: React.FC = () => {
                 </div>
 
                 {/* Subcard de Status e Horário Local */}
-                <div className="p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] mt-3.5 space-y-2.5">
+                <div className="p-3 rounded-[12px] panel-inset mt-3.5 space-y-2.5">
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2 text-[#8b8b90]">
                       <span className={`w-2 h-2 rounded-full ${statusColors[member.status]}`} />
@@ -275,7 +275,7 @@ export const TeamView: React.FC = () => {
       {inviteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div
-            className="w-full max-w-md rounded-[18px] bg-[#131417] border border-white/[0.08] shadow-2xl text-white p-6 space-y-4"
+            className="w-full max-w-md rounded-[18px] bg-[#151722]/95 backdrop-blur-2xl border border-white/15 shadow-2xl text-white p-6 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">

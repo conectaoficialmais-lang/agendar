@@ -137,9 +137,9 @@ export const SettingsView: React.FC = () => {
       {/* Layout de 2 Colunas */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Menu Lateral em Cartão */}
-        <div className="lg:col-span-4 p-4 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-3 sticky top-6">
+        <div className="lg:col-span-4 p-4 rounded-[16px] panel shadow-sm space-y-3 sticky top-6">
           {/* Mini Banner do Usuário */}
-          <div className="flex items-center gap-3 p-3 rounded-[12px] bg-[#0d0e11] border border-white/[0.04]">
+          <div className="flex items-center gap-3 p-3 rounded-[12px] panel-inset">
             <div className="relative shrink-0">
               <img
                 src={currentUser.avatar}
@@ -186,7 +186,7 @@ export const SettingsView: React.FC = () => {
           {/* Seção: Perfil */}
           <div
             id="section-profile"
-            className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-5"
+            className="p-5 rounded-[16px] panel shadow-sm space-y-5"
           >
             <div>
               <h2 className="text-sm font-bold text-white">Perfil</h2>
@@ -194,7 +194,7 @@ export const SettingsView: React.FC = () => {
             </div>
 
             {/* Card com Foto de Perfil e Controles */}
-            <div className="p-4 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] space-y-4">
+            <div className="p-4 rounded-[12px] panel-inset space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="relative group shrink-0">
@@ -328,7 +328,7 @@ export const SettingsView: React.FC = () => {
           {/* Seção: Notificações */}
           <div
             id="section-notifications"
-            className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4"
+            className="p-5 rounded-[16px] panel shadow-sm space-y-4"
           >
             <div>
               <h2 className="text-sm font-bold text-white">Notificações</h2>
@@ -364,7 +364,7 @@ export const SettingsView: React.FC = () => {
                 return (
                   <div
                     key={item.key}
-                    className="p-3.5 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] flex items-center justify-between gap-4"
+                    className="p-3.5 rounded-[12px] panel-inset flex items-center justify-between gap-4"
                   >
                     <div>
                       <h4 className="text-xs font-bold text-white">{item.title}</h4>
@@ -400,7 +400,7 @@ export const SettingsView: React.FC = () => {
           {/* Seção: Aparência */}
           <div
             id="section-appearance"
-            className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-5"
+            className="p-5 rounded-[16px] panel shadow-sm space-y-5"
           >
             <div>
               <h2 className="text-sm font-bold text-white">Aparência</h2>
@@ -410,7 +410,7 @@ export const SettingsView: React.FC = () => {
             {/* Alternador de Tema — só o escuro está ligado por enquanto */}
             <div className="space-y-2">
               <label className="text-xs font-medium text-[#8b8b90] block">Tema do sistema</label>
-              <div className="flex items-center p-1 rounded-full bg-[#0d0e11] border border-white/[0.04] max-w-sm">
+              <div className="flex items-center p-1 rounded-full panel-inset max-w-sm">
                 {[
                   { id: 'dark' as const, label: 'Escuro', icon: Moon, ready: true },
                   { id: 'light' as const, label: 'Claro', icon: Sun, ready: false },
@@ -441,27 +441,24 @@ export const SettingsView: React.FC = () => {
               <p className="text-[11px] text-[#8b8b90]/70">Tema claro e automático chegam em breve.</p>
             </div>
 
-            {/* Cor de Destaque — desligada até a interface inteira usar tokens de cor */}
+            {/* Cor de Destaque — agora dirige toda a interface via --accent */}
             <div className="space-y-2 pt-2 border-t border-white/[0.04]">
-              <div className="flex items-center gap-2">
-                <label className="text-xs font-medium text-[#8b8b90]">Cor de destaque</label>
-                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-white/[0.08] text-[#8b8b90] uppercase tracking-wider">
-                  Em breve
-                </span>
-              </div>
-              <div className="flex items-center gap-2.5 pt-1 opacity-50">
+              <label className="text-xs font-medium text-[#8b8b90] block">Cor de destaque</label>
+              <div className="flex items-center gap-2.5 pt-1">
                 {(Object.keys(ACCENTS) as AccentId[]).map((accKey) => {
                   const acc = ACCENTS[accKey];
                   const isSel = preferences.accent === accKey;
                   return (
                     <button
                       key={accKey}
-                      disabled
-                      className={`w-8 h-8 rounded-full flex items-center justify-center cursor-not-allowed ${
-                        isSel ? 'ring-2 ring-white ring-offset-2 ring-offset-[#131417]' : ''
+                      onClick={() => updatePreferences({ accent: accKey })}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                        isSel
+                          ? 'scale-110 ring-2 ring-white ring-offset-2 ring-offset-[#0d0f17] shadow-lg'
+                          : 'opacity-75 hover:opacity-100 hover:scale-105'
                       }`}
                       style={{ backgroundColor: acc.hex }}
-                      title={`${acc.name} (em breve)`}
+                      title={acc.name}
                     >
                       {isSel && <Check size={14} strokeWidth={3} className="text-white" />}
                     </button>
@@ -469,7 +466,7 @@ export const SettingsView: React.FC = () => {
                 })}
               </div>
               <p className="text-[11px] text-[#8b8b90]/70">
-                Em breve a cor escolhida será aplicada em toda a interface.
+                Tinge a aurora, os realces e o foco em toda a interface.
               </p>
             </div>
           </div>
@@ -477,7 +474,7 @@ export const SettingsView: React.FC = () => {
           {/* Seção: Foco */}
           <div
             id="section-focus"
-            className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-5"
+            className="p-5 rounded-[16px] panel shadow-sm space-y-5"
           >
             <div>
               <h2 className="text-sm font-bold text-white">Foco</h2>
@@ -486,7 +483,7 @@ export const SettingsView: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-xs font-medium text-[#8b8b90] block">Duração da sessão de foco</label>
-              <div className="flex items-center p-1 rounded-full bg-[#0d0e11] border border-white/[0.04] max-w-xs">
+              <div className="flex items-center p-1 rounded-full panel-inset max-w-xs">
                 {[15, 25, 50].map((mins) => {
                   const isSel = preferences.focusSessionMinutes === mins;
                   return (
@@ -519,7 +516,7 @@ export const SettingsView: React.FC = () => {
           {/* Seção: Dados */}
           <div
             id="section-data"
-            className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-4"
+            className="p-5 rounded-[16px] panel shadow-sm space-y-4"
           >
             <div>
               <h2 className="text-sm font-bold text-white">Dados & Backup</h2>
@@ -527,7 +524,7 @@ export const SettingsView: React.FC = () => {
             </div>
 
             <div className="space-y-2.5">
-              <div className="p-3.5 rounded-[12px] bg-[#0d0e11] border border-white/[0.04] flex items-center justify-between">
+              <div className="p-3.5 rounded-[12px] panel-inset flex items-center justify-between">
                 <div>
                   <h4 className="text-xs font-bold text-white">Exportar tarefas (CSV)</h4>
                   <p className="text-[11px] text-[#8b8b90]">{tasks.length} tarefas cadastradas</p>
@@ -565,7 +562,7 @@ export const SettingsView: React.FC = () => {
       {showResetConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div
-            className="w-full max-w-sm rounded-[18px] bg-[#131417] border border-white/[0.08] p-6 text-white shadow-2xl space-y-4"
+            className="w-full max-w-sm rounded-[18px] bg-[#151722]/95 backdrop-blur-2xl border border-white/15 p-6 text-white shadow-2xl space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-base font-bold text-white">Restaurar workspace?</h3>

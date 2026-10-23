@@ -1,9 +1,18 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Pane — Sistema visual "vidro sobre aurora"
+   Base tinta profunda, painéis de vidro reais (backdrop-blur),
+   cor de destaque dirigida por --accent, grão sutil e tipografia
+   de display com caráter.
+   ============================================================ */
+
 @layer base {
   :root {
-    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --accent: #3b82f6; /* sobrescrito em runtime pela preferência do usuário */
     font-family: var(--font-sans);
     color-scheme: dark;
   }
@@ -11,86 +20,120 @@
   body {
     min-height: 100vh;
     overflow-x: hidden;
-    background-color: #0d0e12;
-    color: #ffffff;
+    background-color: #07080d;
+    color: #e8eaf1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-sans);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 35%, transparent);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 75%, transparent);
+    outline-offset: 2px;
+    border-radius: 8px;
   }
 }
 
-/* Vaulta / Pane Luxury Dark Theme Design System */
-.vaulta-bg {
-  background-color: #070a13;
-  background-image: 
-    radial-gradient(ellipse 90% 60% at 50% -15%, rgba(37, 99, 235, 0.28) 0%, rgba(56, 189, 248, 0.08) 45%, transparent 75%),
-    radial-gradient(circle at 10% 25%, rgba(30, 58, 138, 0.15) 0%, transparent 45%);
+/* Camada de atmosfera: aurora lenta + leve grão ------------- */
+.app-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 55% at 12% -8%, color-mix(in srgb, var(--accent) 32%, transparent) 0%, transparent 60%),
+    radial-gradient(62% 50% at 98% 8%, rgba(45, 212, 191, 0.16) 0%, transparent 55%),
+    radial-gradient(55% 48% at 85% 102%, rgba(251, 146, 60, 0.12) 0%, transparent 55%),
+    radial-gradient(60% 50% at 35% 115%, color-mix(in srgb, var(--accent) 18%, transparent) 0%, transparent 60%);
+  filter: saturate(118%);
+  animation: auroraDrift 26s ease-in-out infinite alternate;
 }
 
-.pane-card, .vaulta-card {
-  background: #0c1222;
-  border: 1px solid rgba(59, 130, 246, 0.12);
-  border-radius: 18px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+.app-aurora::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  mix-blend-mode: overlay;
 }
 
-.pane-card-glow, .vaulta-card-glow {
-  background: radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.12) 0%, transparent 60%), #0c1222;
-  border: 1px solid rgba(59, 130, 246, 0.14);
-  border-radius: 18px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+@keyframes auroraDrift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(0, -2%, 0) scale(1.05); }
 }
 
-.pane-subcard, .vaulta-subcard {
-  background: #080d1a;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 14px;
+@media (prefers-reduced-motion: reduce) {
+  .app-aurora { animation: none; }
+  .rise { animation: none; }
 }
 
-.pane-stat-tile, .vaulta-stat-tile {
-  background: #0c1222;
-  border: 1px solid rgba(59, 130, 246, 0.14);
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+/* Superfícies de vidro ------------------------------------- */
+.panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.022));
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.07),
+    0 20px 44px -26px rgba(0, 0, 0, 0.85);
 }
 
-.glass-pill, .vaulta-pill {
-  background: #0c1222;
-  border: 1px solid rgba(59, 130, 246, 0.15);
+.panel-inset {
+  background: rgba(8, 10, 17, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.055);
 }
 
-.vaulta-glow-blue {
-  box-shadow: 0 0 20px rgba(37, 99, 235, 0.45);
+.panel-hover {
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.24s ease,
+    box-shadow 0.24s ease;
 }
 
-.vaulta-glow-cyan {
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
-}
-
-.glass-card-hover {
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease;
-}
-
-.glass-card-hover:hover {
+.panel-hover:hover {
   transform: translateY(-2px);
-  border-color: rgba(59, 130, 246, 0.35);
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(37, 99, 235, 0.15);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.09),
+    0 28px 54px -24px rgba(0, 0, 0, 0.9),
+    0 0 34px -12px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
-/* Custom sleek scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.accent-ring {
+  box-shadow: 0 0 22px -4px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
+/* Entrada escalonada no carregamento ----------------------- */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+.rise { animation: riseIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Barra de rolagem --------------------------------------- */
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(59, 130, 246, 0.2);
+  background: color-mix(in srgb, var(--accent) 28%, rgba(255, 255, 255, 0.1));
   border-radius: 9999px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.4);
+  background: color-mix(in srgb, var(--accent) 50%, rgba(255, 255, 255, 0.1));
 }

@@ -35,7 +35,7 @@ export const TopBar: React.FC = () => {
       )}
 
       {/* Floating Glass Pill with Pane / image styling */}
-      <div className="flex items-center gap-1.5 p-1.5 pl-2.5 rounded-full bg-[#16171d]/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+      <div className="flex items-center gap-1.5 p-1.5 pl-2.5 rounded-full bg-white/[0.05] backdrop-blur-2xl border border-white/[0.1] shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
         {/* Barra de busca arredondada com lupa, Search e ⌘K */}
         <button
           onClick={openCommandPalette}

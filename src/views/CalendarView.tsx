@@ -65,7 +65,7 @@ const EventEditModal: React.FC<{ event: CalendarEvent; onClose: () => void }> = 
       <form
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleSave}
-        className="w-full max-w-md rounded-[20px] bg-[#181920] border border-white/[0.12] shadow-2xl p-6 space-y-4 text-white"
+        className="w-full max-w-md rounded-[20px] bg-[#151722]/95 backdrop-blur-2xl border border-white/15 shadow-2xl p-6 space-y-4 text-white"
       >
         <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
           <h3 className="text-base font-bold">Editar evento</h3>
@@ -373,7 +373,7 @@ export const CalendarView: React.FC = () => {
             </h1>
 
             {/* Setas de navegação */}
-            <div className="flex items-center gap-1 p-1 rounded-full bg-[#131417] border border-white/[0.06]">
+            <div className="flex items-center gap-1 p-1 rounded-full panel">
               <button
                 onClick={handlePrevMonth}
                 className="p-1.5 rounded-full hover:bg-white/[0.08] text-[#8b8b90] hover:text-white transition-colors"
@@ -400,28 +400,28 @@ export const CalendarView: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
           {/* 4 Mini Stat Tiles */}
           <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none">
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Eventos no mês</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {monthEventsCount}
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Tarefas no mês</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {monthTasksCount}
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Hoje</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {events.filter((e) => e.date === TODAY).length}
               </div>
             </div>
 
-            <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
+            <div className="px-4 py-2.5 rounded-[14px] panel min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Próximo</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
                 {nextEventToday ? nextEventToday.startTime : '—'}
@@ -440,7 +440,7 @@ export const CalendarView: React.FC = () => {
             </button>
 
             {/* Alternador Mês / Semana */}
-            <div className="flex items-center p-1 rounded-full bg-[#131417] border border-white/[0.06]">
+            <div className="flex items-center p-1 rounded-full panel">
               <button
                 onClick={() => setViewMode('month')}
                 className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
@@ -505,7 +505,7 @@ export const CalendarView: React.FC = () => {
       {/* Grade Principal: Grade à Esquerda + Painel de Agenda à Direita */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Grade do Calendário (Mês / Semana) */}
-        <div className="lg:col-span-7 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm p-5 overflow-hidden">
+        <div className="lg:col-span-7 rounded-[16px] panel shadow-sm p-5 overflow-hidden">
           {viewMode === 'month' ? (
             <div>
               {/* Cabeçalho dos dias Seg - Dom */}
@@ -643,7 +643,7 @@ export const CalendarView: React.FC = () => {
                           ? 'bg-blue-500/10 border border-blue-500/30'
                           : w.isToday
                           ? 'bg-[#0d0e11] border border-blue-500/20'
-                          : 'bg-[#0d0e11] border border-white/[0.04] hover:border-white/[0.1]'
+                          : 'panel-inset hover:border-white/[0.1]'
                       }`}
                     >
                       {dayEvs.map((ev) => (
@@ -710,7 +710,7 @@ export const CalendarView: React.FC = () => {
         </div>
 
         {/* Painel Direito: Agenda da Data Selecionada */}
-        <div className="lg:col-span-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm p-5 space-y-5">
+        <div className="lg:col-span-5 rounded-[16px] panel shadow-sm p-5 space-y-5">
           <div className="flex items-center justify-between pb-3 border-b border-white/[0.04]">
             <div>
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -727,7 +727,7 @@ export const CalendarView: React.FC = () => {
             </div>
 
             {/* Alternador de Filtro da Agenda */}
-            <div className="flex items-center p-1 rounded-full bg-[#0d0e11] border border-white/[0.04] text-xs">
+            <div className="flex items-center p-1 rounded-full panel-inset text-xs">
               <button
                 onClick={() => setScheduleFilter('all')}
                 className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${
@@ -763,7 +763,7 @@ export const CalendarView: React.FC = () => {
                 {selectedDateEvents.map((ev) => (
                   <div
                     key={ev.id}
-                    className="p-3.5 rounded-[12px] bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04] hover:border-white/[0.1] transition-all group"
+                    className="p-3.5 rounded-[12px] panel-inset panel-hover transition-all group"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
@@ -861,7 +861,7 @@ export const CalendarView: React.FC = () => {
                   return (
                     <div
                       key={task.id}
-                      className="p-3 rounded-[12px] bg-[#0d0e11] hover:bg-[#121316] border border-white/[0.04] hover:border-white/[0.1] transition-all flex items-center justify-between gap-3 group"
+                      className="p-3 rounded-[12px] panel-inset panel-hover transition-all flex items-center justify-between gap-3 group"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <button
@@ -918,7 +918,7 @@ export const CalendarView: React.FC = () => {
 
             {/* Estado Vazio */}
             {selectedDateEvents.length === 0 && selectedDateTasks.length === 0 && (
-              <div className="p-8 text-center rounded-[12px] bg-[#0d0e11] border border-white/[0.04]">
+              <div className="p-8 text-center rounded-[12px] panel-inset">
                 <CalendarIcon size={24} className="mx-auto text-[#8b8b90]/40 mb-2" />
                 <p className="text-xs text-[#8b8b90]">
                   Nenhum compromisso ou tarefa para {formattedSelectedDate}.
