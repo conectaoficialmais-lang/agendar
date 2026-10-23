@@ -12,6 +12,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { Priority, TaskStatus } from '../types';
 import { ACCENTS } from '../themeUtils';
+import { formatDueLabel } from '../dateUtils';
 
 export const TaskModal: React.FC = () => {
   const {
@@ -195,7 +196,7 @@ export const TaskModal: React.FC = () => {
                 onChange={(e) =>
                   updateTask(task.id, {
                     dueDate: e.target.value,
-                    dueDisplay: e.target.value === '2026-10-19' ? 'Hoje' : e.target.value,
+                    dueDisplay: formatDueLabel(e.target.value),
                   })
                 }
                 className="w-full bg-[#1c1f2e] border border-white/10 text-white rounded-lg px-2 py-1 focus:outline-none"

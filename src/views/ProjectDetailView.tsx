@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Project, Task } from '../types';
+import { fromAnchor, formatDueLabel } from '../dateUtils';
 
 interface ProjectDetailViewProps {
   projectId: string;
@@ -56,7 +57,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
       projectId: project.id,
       status: 'done',
       priority: 'Medium',
-      dueDate: '2026-10-06',
+      dueDate: fromAnchor('2026-10-06'),
       dueDisplay: 'Oct 6',
       assigneeId: 'user-kwame',
       subtasks: [],
@@ -68,7 +69,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
       projectId: project.id,
       status: 'done',
       priority: 'Low',
-      dueDate: '2026-10-04',
+      dueDate: fromAnchor('2026-10-04'),
       dueDisplay: 'Oct 4',
       assigneeId: 'user-elise',
       subtasks: [],
@@ -80,7 +81,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
       projectId: project.id,
       status: 'done',
       priority: 'High',
-      dueDate: '2026-09-29',
+      dueDate: fromAnchor('2026-09-29'),
       dueDisplay: 'Sep 29',
       assigneeId: 'user-lin',
       subtasks: [],
@@ -344,11 +345,11 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
               <div className="flex items-center justify-between text-xs text-[#8b8b90] mb-2.5">
                 <div>
                   <span className="text-[10px] text-[#8b8b90]/70 block">Started</span>
-                  <span className="font-bold text-white">{project.startDisplay || 'Sep 19'}</span>
+                  <span className="font-bold text-white">{project.startDate ? formatDueLabel(project.startDate) : '—'}</span>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] text-[#8b8b90]/70 block">Due</span>
-                  <span className="font-bold text-white">{project.dueDisplay || 'Nov 28'}</span>
+                  <span className="font-bold text-white">{formatDueLabel(project.dueDate)}</span>
                 </div>
               </div>
 
@@ -662,7 +663,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                         />
                         <span className="text-xs text-white truncate font-medium">{t.title}</span>
                       </div>
-                      <span className="text-[10px] text-[#8b8b90] shrink-0">{t.dueDisplay}</span>
+                      <span className="text-[10px] text-[#8b8b90] shrink-0">{formatDueLabel(t.dueDate)}</span>
                     </div>
                   ))}
                 </div>
@@ -700,7 +701,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                         />
                         <span className="text-xs text-white truncate font-medium">{t.title}</span>
                       </div>
-                      <span className="text-[10px] text-[#8b8b90] shrink-0">{t.dueDisplay}</span>
+                      <span className="text-[10px] text-[#8b8b90] shrink-0">{formatDueLabel(t.dueDate)}</span>
                     </div>
                   ))}
                 </div>

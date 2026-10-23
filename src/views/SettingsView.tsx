@@ -56,8 +56,9 @@ export const SettingsView: React.FC = () => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Por favor, escolha uma imagem de até 5MB.');
+    // Avatares são salvos em base64 no localStorage; limite baixo evita estourar a cota.
+    if (file.size > 1.5 * 1024 * 1024) {
+      alert('Por favor, escolha uma imagem de até 1,5 MB.');
       return;
     }
     const reader = new FileReader();
@@ -403,28 +404,32 @@ export const SettingsView: React.FC = () => {
           >
             <div>
               <h2 className="text-sm font-bold text-white">Aparência</h2>
-              <p className="text-xs text-[#8b8b90]">Visual refinado em dark mode</p>
+              <p className="text-xs text-[#8b8b90]">Tema e cor do Pane</p>
             </div>
 
-            {/* Alternador de Tema */}
+            {/* Alternador de Tema — só o escuro está ligado por enquanto */}
             <div className="space-y-2">
               <label className="text-xs font-medium text-[#8b8b90] block">Tema do sistema</label>
               <div className="flex items-center p-1 rounded-full bg-[#0d0e11] border border-white/[0.04] max-w-sm">
                 {[
-                  { id: 'dark' as const, label: 'Escuro', icon: Moon },
-                  { id: 'light' as const, label: 'Claro', icon: Sun },
-                  { id: 'auto' as const, label: 'Auto', icon: Laptop },
+                  { id: 'dark' as const, label: 'Escuro', icon: Moon, ready: true },
+                  { id: 'light' as const, label: 'Claro', icon: Sun, ready: false },
+                  { id: 'auto' as const, label: 'Auto', icon: Laptop, ready: false },
                 ].map((th) => {
                   const Icon = th.icon;
                   const isSel = preferences.theme === th.id;
                   return (
                     <button
                       key={th.id}
-                      onClick={() => updatePreferences({ theme: th.id })}
+                      disabled={!th.ready}
+                      onClick={() => th.ready && updatePreferences({ theme: th.id })}
+                      title={th.ready ? undefined : 'Em breve'}
                       className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
                         isSel
                           ? 'bg-white/[0.12] text-white shadow-sm'
-                          : 'text-[#8b8b90] hover:text-white'
+                          : th.ready
+                          ? 'text-[#8b8b90] hover:text-white'
+                          : 'text-[#8b8b90]/40 cursor-not-allowed'
                       }`}
                     >
                       <Icon size={13} />
@@ -433,33 +438,82 @@ export const SettingsView: React.FC = () => {
                   );
                 })}
               </div>
+              <p className="text-[11px] text-[#8b8b90]/70">Tema claro e automático chegam em breve.</p>
             </div>
 
-            {/* Cor de Destaque */}
+            {/* Cor de Destaque — desligada até a interface inteira usar tokens de cor */}
             <div className="space-y-2 pt-2 border-t border-white/[0.04]">
-              <label className="text-xs font-medium text-[#8b8b90] block">Cor de destaque (Accent)</label>
-              <div className="flex items-center gap-2.5 pt-1">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-[#8b8b90]">Cor de destaque</label>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-white/[0.08] text-[#8b8b90] uppercase tracking-wider">
+                  Em breve
+                </span>
+              </div>
+              <div className="flex items-center gap-2.5 pt-1 opacity-50">
                 {(Object.keys(ACCENTS) as AccentId[]).map((accKey) => {
                   const acc = ACCENTS[accKey];
                   const isSel = preferences.accent === accKey;
                   return (
                     <button
                       key={accKey}
-                      onClick={() => updatePreferences({ accent: accKey })}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                        isSel
-                          ? 'scale-110 ring-2 ring-white ring-offset-2 ring-offset-[#131417] shadow-lg'
-                          : 'opacity-70 hover:opacity-100 hover:scale-105'
+                      disabled
+                      className={`w-8 h-8 rounded-full flex items-center justify-center cursor-not-allowed ${
+                        isSel ? 'ring-2 ring-white ring-offset-2 ring-offset-[#131417]' : ''
                       }`}
                       style={{ backgroundColor: acc.hex }}
-                      title={acc.name}
+                      title={`${acc.name} (em breve)`}
                     >
                       {isSel && <Check size={14} strokeWidth={3} className="text-white" />}
                     </button>
                   );
                 })}
               </div>
+              <p className="text-[11px] text-[#8b8b90]/70">
+                Em breve a cor escolhida será aplicada em toda a interface.
+              </p>
             </div>
+          </div>
+
+          {/* Seção: Foco */}
+          <div
+            id="section-focus"
+            className="p-5 rounded-[16px] bg-[#131417] border border-white/[0.06] shadow-sm space-y-5"
+          >
+            <div>
+              <h2 className="text-sm font-bold text-white">Foco</h2>
+              <p className="text-xs text-[#8b8b90]">Durações padrão do cronômetro de foco</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-[#8b8b90] block">Duração da sessão de foco</label>
+              <div className="flex items-center p-1 rounded-full bg-[#0d0e11] border border-white/[0.04] max-w-xs">
+                {[15, 25, 50].map((mins) => {
+                  const isSel = preferences.focusSessionMinutes === mins;
+                  return (
+                    <button
+                      key={mins}
+                      onClick={() => updatePreferences({ focusSessionMinutes: mins })}
+                      className={`flex-1 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                        isSel ? 'bg-white/[0.12] text-white shadow-sm' : 'text-[#8b8b90] hover:text-white'
+                      }`}
+                    >
+                      {mins} min
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                startFocus(preferences.focusSessionMinutes);
+                setActiveTab('home');
+              }}
+              className="px-4 py-2 rounded-full text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-md transition-all flex items-center gap-1.5 active:scale-95"
+            >
+              <Play size={13} />
+              <span>Iniciar foco agora</span>
+            </button>
           </div>
 
           {/* Seção: Dados */}

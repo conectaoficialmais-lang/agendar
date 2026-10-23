@@ -21,6 +21,7 @@ import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import { ProjectDetailView } from './ProjectDetailView';
 import { Project } from '../types';
+import { todayIso, addDays, formatDueLabel } from '../dateUtils';
 
 export const ProjectsView: React.FC = () => {
   const {
@@ -46,7 +47,7 @@ export const ProjectsView: React.FC = () => {
   const [newProjectColor, setNewProjectColor] = useState('#3b82f6');
   const [newProjectIcon, setNewProjectIcon] = useState<'rocket' | 'smartphone' | 'grid' | 'sprout' | 'flame' | 'chart' | 'folder'>('smartphone');
   const [newProjectStatus, setNewProjectStatus] = useState<'In progress' | 'In review' | 'Planning' | 'Shipped'>('In progress');
-  const [newProjectDueDate, setNewProjectDueDate] = useState('2026-11-20');
+  const [newProjectDueDate, setNewProjectDueDate] = useState(addDays(todayIso(), 30));
   const [newProjectMilestoneTitle, setNewProjectMilestoneTitle] = useState('Beta Release');
   const [newProjectMilestoneDue, setNewProjectMilestoneDue] = useState('Nov 10');
   const [newProjectSelectedMembers, setNewProjectSelectedMembers] = useState<string[]>([currentUser.id]);
@@ -76,9 +77,10 @@ export const ProjectsView: React.FC = () => {
   }).length;
   const onTrackPercent = activeCount > 0 ? Math.round((onTrackActiveCount / activeCount) * 100) : 100;
 
-  // Due this month: projects due in October 2026
+  // Projetos com entrega no mês atual
+  const currentMonthPrefix = todayIso().slice(0, 7);
   const dueThisMonthCount = projects.filter(
-    (p) => p.dueDate && p.dueDate.startsWith('2026-10') && !['Shipped', 'Entregue'].includes(p.status)
+    (p) => p.dueDate && p.dueDate.startsWith(currentMonthPrefix) && !['Shipped', 'Entregue'].includes(p.status)
   ).length;
 
   // Filtragem dos cards
@@ -171,7 +173,7 @@ export const ProjectsView: React.FC = () => {
       color: newProjectColor,
       icon: newProjectIcon,
       dueDate: newProjectDueDate,
-      dueDisplay: newProjectDueDate,
+      dueDisplay: formatDueLabel(newProjectDueDate),
       nextMilestone: {
         title: newProjectMilestoneTitle.trim() || 'Primeira entrega',
         dueDate: newProjectDueDate,
@@ -414,7 +416,7 @@ export const ProjectsView: React.FC = () => {
                       {proj.nextMilestone?.title || 'Launch milestone'}
                     </h4>
                     <span className="text-[11px] text-[#8b8b90] block leading-tight mt-0.5">
-                      {proj.nextMilestone?.dueDisplay || proj.dueDisplay}
+                      {formatDueLabel(proj.nextMilestone?.dueDate || proj.dueDate)}
                     </span>
                   </div>
                 </div>
@@ -447,7 +449,7 @@ export const ProjectsView: React.FC = () => {
                 {/* Calendário e Prazo */}
                 <div className="flex items-center gap-1.5 text-[#8b8b90] text-[11px] shrink-0 font-medium">
                   <Calendar size={12} className="text-[#8b8b90]" />
-                  <span>{proj.dueDisplay}</span>
+                  <span>{formatDueLabel(proj.dueDate)}</span>
                 </div>
               </div>
             </div>

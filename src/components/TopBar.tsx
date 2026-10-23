@@ -59,15 +59,7 @@ export const TopBar: React.FC = () => {
           <span className="sr-only">Add</span>
         </button>
 
-        {/* Ícone de Sol (tema) */}
-        <button
-          onClick={toggleTheme}
-          className="p-1.5 rounded-full text-[#8b8b90] hover:text-white hover:bg-white/[0.06] transition-colors"
-          title={`Theme: ${preferences.theme}`}
-        >
-          <Sun size={16} />
-          <span className="sr-only">Toggle Theme</span>
-        </button>
+        {/* Alternador de tema removido por ora: só o tema escuro está ligado (ver Ajustes › Aparência). */}
 
         {/* Ícone de Sino com ponto de notificação vermelho */}
         <button

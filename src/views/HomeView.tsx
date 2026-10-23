@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ACCENTS } from '../themeUtils';
+import { greeting, longDateLabel, todayIso, formatDueLabel } from '../dateUtils';
 
 export const HomeView: React.FC = () => {
   const {
@@ -56,16 +57,23 @@ export const HomeView: React.FC = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Eventos de hoje dinâmicos
-  const todayEvents = events.filter((e) => e.date === '2026-10-19');
-  const nextMeeting = todayEvents[0];
-  const otherTodayEvents = todayEvents.slice(1);
+  // Eventos de hoje (ordenados) e o próximo compromisso real do dia
+  const TODAY = todayIso();
+  const nowDecimalHour = new Date().getHours() + new Date().getMinutes() / 60;
+  const todayEvents = events
+    .filter((e) => e.date === TODAY)
+    .sort((a, b) => a.startHour - b.startHour);
+  // Próximo compromisso ainda não encerrado (um em andamento ainda conta).
+  const isUpcoming = (e: (typeof todayEvents)[number]) =>
+    e.startHour + e.durationMinutes / 60 > nowDecimalHour;
+  const nextMeeting = todayEvents.find(isUpcoming);
+  const otherTodayEvents = todayEvents.filter(
+    (e) => e.id !== nextMeeting?.id && isUpcoming(e)
+  );
 
-  // Tarefas para hoje do usuário logado
+  // Tarefas de hoje do usuário logado
   const todayTasks = tasks.filter(
-    (t) =>
-      t.assigneeId === currentUser.id &&
-      (t.dueDisplay === 'Hoje' || t.dueDate === '2026-10-19' || t.dueDisplay === 'Today')
+    (t) => t.assigneeId === currentUser.id && t.dueDate === TODAY
   );
 
   return (
@@ -76,10 +84,10 @@ export const HomeView: React.FC = () => {
       <div className="space-y-4">
         <div>
           <h1 className="text-[38px] md:text-[42px] font-bold tracking-tight text-white leading-none">
-            Bom dia, {currentUser.name.split(' ')[0]}
+            {greeting()}, {currentUser.name.split(' ')[0]}
           </h1>
           <p className="text-[#8b8b90] text-sm mt-1.5 font-normal">
-            Segunda-feira, 19 de outubro · {todayEvents.length} reuniões e {openTasksCount} tarefas restantes hoje
+            {longDateLabel()} · {todayEvents.length} reuniões e {openTasksCount} tarefas restantes hoje
           </p>
         </div>
 
@@ -123,7 +131,7 @@ export const HomeView: React.FC = () => {
               className="px-4 py-2 rounded-full text-xs font-medium text-[#8b8b90] hover:text-white bg-[#131417] hover:bg-white/[0.08] border border-white/[0.06] transition-all flex items-center gap-2"
             >
               <Clock size={13} className="text-blue-400" />
-              <span>Próximo: 11:00</span>
+              <span>Próximo: {nextMeeting ? nextMeeting.startTime : '—'}</span>
             </button>
 
             <button
@@ -394,7 +402,7 @@ export const HomeView: React.FC = () => {
                           {proj.name}
                         </h4>
                         <p className="text-[11px] text-[#8b8b90] truncate mt-0.5">
-                          {proj.status} · {proj.dueDisplay}
+                          {proj.status} · {formatDueLabel(proj.dueDate)}
                         </p>
                       </div>
                     </div>
@@ -498,7 +506,7 @@ export const HomeView: React.FC = () => {
                             {proj.name}
                           </span>
                         )}
-                        <span className="text-[10px] text-[#8b8b90]">{task.dueDisplay}</span>
+                        <span className="text-[10px] text-[#8b8b90]">{formatDueLabel(task.dueDate)}</span>
                         {task.priority === 'Urgent' && (
                           <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
                             P Urgente

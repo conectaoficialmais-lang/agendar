@@ -17,6 +17,7 @@ import {
   SEED_PROJECTS,
   SEED_TASKS,
 } from '../seedData';
+import { toIso, diffDays } from '../dateUtils';
 
 const STORAGE_KEYS = {
   TASKS: 'pane_tasks_pt_v3',
@@ -273,12 +274,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   // Focus Timer State
-  const [focusDuration, setFocusDuration] = useState<number>(25 * 60);
-  const [focusRemaining, setFocusRemaining] = useState<number>(25 * 60);
+  const readFocusStat = (field: 'minutes' | 'sessions'): number => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.FOCUS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.date === toIso(new Date())) return parsed[field] || 0;
+      }
+    } catch {
+      // ignore
+    }
+    return 0;
+  };
+
+  const defaultFocusSeconds = (preferences.focusSessionMinutes || 25) * 60;
+  const [focusDuration, setFocusDuration] = useState<number>(defaultFocusSeconds);
+  const [focusRemaining, setFocusRemaining] = useState<number>(defaultFocusSeconds);
   const [isFocusRunning, setIsFocusRunning] = useState<boolean>(false);
   const [focusTaskId, setFocusTaskId] = useState<string | null>(null);
-  const [focusedMinutesToday, setFocusedMinutesToday] = useState<number>(66); // 1.1h initial
-  const [focusSessionsToday, setFocusSessionsToday] = useState<number>(2);
+  const [focusedMinutesToday, setFocusedMinutesToday] = useState<number>(() => readFocusStat('minutes'));
+  const [focusSessionsToday, setFocusSessionsToday] = useState<number>(() => readFocusStat('sessions'));
 
   // Modals state
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -287,34 +302,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
 
-  // Sync with LocalStorage
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
-  }, [tasks]);
+  // Sync with LocalStorage. Envolvido em try/catch porque um avatar grande em
+  // base64 pode estourar a cota do localStorage — antes isso derrubava o app.
+  const persist = (key: string, value: unknown) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      // Armazenamento cheio/indisponível — ignora para não quebrar a UI.
+    }
+  };
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
-  }, [projects]);
+  useEffect(() => { persist(STORAGE_KEYS.TASKS, tasks); }, [tasks]);
+  useEffect(() => { persist(STORAGE_KEYS.PROJECTS, projects); }, [projects]);
+  useEffect(() => { persist(STORAGE_KEYS.EVENTS, events); }, [events]);
+  useEffect(() => { persist(STORAGE_KEYS.MEMBERS, members); }, [members]);
+  useEffect(() => { persist(STORAGE_KEYS.PREFERENCES, preferences); }, [preferences]);
+  useEffect(() => { persist(STORAGE_KEYS.NOTIFICATIONS, notifications); }, [notifications]);
 
+  // Persiste as estatísticas de foco do dia (antes nada era salvo e zerava ao recarregar).
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
-  }, [events]);
+    persist(STORAGE_KEYS.FOCUS, {
+      date: toIso(new Date()),
+      minutes: focusedMinutesToday,
+      sessions: focusSessionsToday,
+    });
+  }, [focusedMinutesToday, focusSessionsToday]);
 
+  // Mantém o cronômetro em sincronia com a duração padrão escolhida nas Configurações.
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(members));
-  }, [members]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(preferences));
-  }, [preferences]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifications));
-  }, [notifications]);
+    if (!isFocusRunning) {
+      const secs = (preferences.focusSessionMinutes || 25) * 60;
+      setFocusDuration(secs);
+      setFocusRemaining(secs);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferences.focusSessionMinutes]);
 
   // Dynamic Metrics & Stats Synchronized with Tasks State
   const today = new Date();
-  const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const todayIso = toIso(today);
 
   const openTasks = tasks.filter((t) => t.status !== 'done');
   const openTasksCount = openTasks.length;
@@ -322,21 +348,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const doneTodayTasks = tasks.filter(
     (t) =>
       t.status === 'done' &&
-      ((t.completedAt && t.completedAt.startsWith(todayIso)) ||
-        t.dueDate === todayIso ||
-        t.dueDisplay === 'Hoje')
+      !!t.completedAt &&
+      // completedAt é um timestamp ISO (UTC); converte para a data LOCAL antes de comparar.
+      toIso(new Date(t.completedAt)) === todayIso
   );
   const doneTodayCount = doneTodayTasks.length;
 
   const doneThisWeekTasks = tasks.filter((t) => t.status === 'done');
   const doneThisWeekCount = doneThisWeekTasks.length;
 
-  const dueThisWeekCount = tasks.filter(
-    (t) =>
-      t.status !== 'done' &&
-      (t.dueDate.startsWith(todayIso.slice(0, 7)) ||
-        ['Hoje', 'Amanhã', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom', 'Today'].includes(t.dueDisplay))
-  ).length;
+  // Tarefas em aberto com prazo entre hoje e os próximos 6 dias.
+  const dueThisWeekCount = tasks.filter((t) => {
+    if (t.status === 'done' || !t.dueDate) return false;
+    const delta = diffDays(todayIso, t.dueDate);
+    return delta >= 0 && delta <= 6;
+  }).length;
 
   const CURRENT_DATE_STR = todayIso;
   const overdueTasks = tasks.filter(
@@ -765,10 +791,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setMembers(SEED_MEMBERS);
     setPreferences(DEFAULT_PREFERENCES);
     setNotifications(SEED_NOTIFICATIONS);
-    setFocusedMinutesToday(66);
-    setFocusSessionsToday(2);
-    setFocusDuration(25 * 60);
-    setFocusRemaining(25 * 60);
+    setFocusedMinutesToday(0);
+    setFocusSessionsToday(0);
+    setFocusDuration(DEFAULT_PREFERENCES.focusSessionMinutes * 60);
+    setFocusRemaining(DEFAULT_PREFERENCES.focusSessionMinutes * 60);
     setIsFocusRunning(false);
     setFocusTaskId(null);
     localStorage.clear();
@@ -789,14 +815,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         `"${m}"`,
       ].join(',');
     });
-    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    // Usa Blob em vez de data-URI: encodeURI n\u00E3o escapa "#", ent\u00E3o um t\u00EDtulo
+    // com "#" truncava o arquivo exportado.
+    const csvBody = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvBody], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `pane-tarefas-${new Date().toISOString().split('T')[0]}.csv`);
+    link.href = url;
+    link.download = `pane-tarefas-${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (

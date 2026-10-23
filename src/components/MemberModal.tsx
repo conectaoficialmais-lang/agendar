@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Clock, Briefcase, CheckSquare, Send, Sparkles, Trash2, AlertTriangle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { formatDueLabel } from '../dateUtils';
 
 export const MemberModal: React.FC = () => {
   const { selectedMemberId, closeMemberModal, members, tasks, openTaskModal, deleteTeamMember } = useApp();
@@ -133,7 +134,7 @@ export const MemberModal: React.FC = () => {
                     <CheckSquare size={13} className="text-white/40 shrink-0" />
                     <span className="truncate">{t.title}</span>
                   </div>
-                  <span className="text-[10px] text-white/40 shrink-0">{t.dueDisplay}</span>
+                  <span className="text-[10px] text-white/40 shrink-0">{formatDueLabel(t.dueDate)}</span>
                 </div>
               ))
             )}

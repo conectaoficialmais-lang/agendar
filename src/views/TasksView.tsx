@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Priority, TaskStatus } from '../types';
+import { formatDueLabel } from '../dateUtils';
 
 export const TasksView: React.FC = () => {
   const {
@@ -28,8 +29,6 @@ export const TasksView: React.FC = () => {
     dueThisWeekCount,
     overdueCount,
     doneThisWeekCount,
-    isTaskOverdue,
-    getTaskDaysOverdue,
   } = useApp();
 
   const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
@@ -383,7 +382,7 @@ export const TasksView: React.FC = () => {
                           <div className="flex items-center gap-3">
                             <span className="flex items-center gap-1 font-medium">
                               <CalendarIcon size={11} className="text-[#8b8b90]" />
-                              {task.dueDisplay}
+                              {formatDueLabel(task.dueDate)}
                             </span>
 
                             {task.comments.length > 0 && (
@@ -518,7 +517,7 @@ export const TasksView: React.FC = () => {
 
                                 <span className="text-[11px] text-[#8b8b90] flex items-center gap-1 font-medium">
                                   <CalendarIcon size={12} className="text-[#8b8b90]" />
-                                  {task.dueDisplay}
+                                  {formatDueLabel(task.dueDate)}
                                 </span>
 
                                 <div className="w-16">{priorityBadge(task.priority)}</div>

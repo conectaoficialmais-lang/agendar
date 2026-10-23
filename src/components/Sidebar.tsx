@@ -24,20 +24,21 @@ export const Sidebar: React.FC = () => {
     currentUser,
     projects,
     openProjectDetail,
+    openTasksCount,
   } = useApp();
 
   const NAV_ITEMS: NavItem[] = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: '7' },
-    { id: 'calendar', label: 'Calendar', icon: Calendar },
-    { id: 'projects', label: 'Projects', icon: Folder },
+    { id: 'home', label: 'Início', icon: Home },
+    { id: 'tasks', label: 'Tarefas', icon: CheckSquare, badge: openTasksCount || undefined },
+    { id: 'calendar', label: 'Agenda', icon: Calendar },
+    { id: 'projects', label: 'Projetos', icon: Folder },
     { id: 'insights', label: 'Insights', icon: BarChart2 },
-    { id: 'team', label: 'Team', icon: Users },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'team', label: 'Equipe', icon: Users },
+    { id: 'settings', label: 'Ajustes', icon: Settings },
   ];
 
-  const tideProject = projects.find((p) => p.slug === 'tide' || p.id === 'proj-tide');
-  const orbitProject = projects.find((p) => p.slug === 'orbit' || p.id === 'proj-orbit');
+  // Projetos fixados = os marcados com estrela (antes eram dois nomes fixos em inglês).
+  const starredProjects = projects.filter((p) => p.starred);
 
   return (
     <>
@@ -100,38 +101,29 @@ export const Sidebar: React.FC = () => {
             })}
           </nav>
 
-          {/* Separador */}
-          <div className="pt-2 border-t border-white/[0.06]">
-            {/* Seção PINNED */}
-            <span className="text-[10px] font-semibold text-[#8b8b90] uppercase tracking-wider px-3 mb-2 block">
-              PINNED
-            </span>
-            <div className="space-y-1">
-              {/* Tide mobile app (bullet azul) */}
-              <button
-                onClick={() => {
-                  if (tideProject) openProjectDetail(tideProject.id);
-                  setActiveTab('projects');
-                }}
-                className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all text-left truncate group"
-              >
-                <span className="w-2 h-2 rounded-full bg-[#3b82f6] shrink-0 group-hover:scale-125 transition-transform" />
-                <span className="truncate">Tide mobile app</span>
-              </button>
-
-              {/* Orbit 2.0 launch (bullet roxo) */}
-              <button
-                onClick={() => {
-                  if (orbitProject) openProjectDetail(orbitProject.id);
-                  setActiveTab('projects');
-                }}
-                className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all text-left truncate group"
-              >
-                <span className="w-2 h-2 rounded-full bg-[#a855f7] shrink-0 group-hover:scale-125 transition-transform" />
-                <span className="truncate">Orbit 2.0 launch</span>
-              </button>
+          {/* Seção Fixados — dinâmica a partir dos projetos marcados com estrela */}
+          {starredProjects.length > 0 && (
+            <div className="pt-2 border-t border-white/[0.06]">
+              <span className="text-[10px] font-semibold text-[#8b8b90] uppercase tracking-wider px-3 mb-2 block">
+                FIXADOS
+              </span>
+              <div className="space-y-1">
+                {starredProjects.map((proj) => (
+                  <button
+                    key={proj.id}
+                    onClick={() => openProjectDetail(proj.id)}
+                    className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all text-left truncate group"
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full shrink-0 group-hover:scale-125 transition-transform"
+                      style={{ backgroundColor: proj.color }}
+                    />
+                    <span className="truncate">{proj.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Rodapé: Usuário */}

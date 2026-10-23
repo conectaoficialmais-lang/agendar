@@ -3,6 +3,7 @@ import { X, CheckSquare, Calendar, Folder, Plus } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Priority, TaskStatus } from '../types';
 import { ACCENTS } from '../themeUtils';
+import { todayIso, addDays, formatDueLabel } from '../dateUtils';
 
 export const QuickAddModal: React.FC = () => {
   const {
@@ -33,12 +34,12 @@ export const QuickAddModal: React.FC = () => {
   const [taskProject, setTaskProject] = useState(projects[0]?.id || 'proj-tide');
   const [taskPriority, setTaskPriority] = useState<Priority>('Medium');
   const [taskStatus, setTaskStatus] = useState<TaskStatus>('todo');
-  const [taskDueDate, setTaskDueDate] = useState('2026-10-19');
+  const [taskDueDate, setTaskDueDate] = useState(todayIso());
   const [taskAssignee, setTaskAssignee] = useState(currentUser.id);
 
   // Event form state
   const [eventTitle, setEventTitle] = useState('');
-  const [eventDate, setEventDate] = useState('2026-10-19');
+  const [eventDate, setEventDate] = useState(todayIso());
   const [eventStartTime, setEventStartTime] = useState('11:00');
   const [eventEndTime, setEventEndTime] = useState('11:45');
   const [eventType, setEventType] = useState<'Reunião' | 'Revisão' | 'Equipe' | 'Bloco de foco'>('Reunião');
@@ -48,7 +49,7 @@ export const QuickAddModal: React.FC = () => {
   const [projectName, setProjectName] = useState('');
   const [projectDesc, setProjectDesc] = useState('');
   const [projectColor, setProjectColor] = useState('#3b82f6');
-  const [projectDueDate, setProjectDueDate] = useState('2026-11-30');
+  const [projectDueDate, setProjectDueDate] = useState(addDays(todayIso(), 30));
 
   if (!isQuickAddOpen) return null;
 
@@ -64,7 +65,7 @@ export const QuickAddModal: React.FC = () => {
       priority: taskPriority,
       status: taskStatus,
       dueDate: taskDueDate,
-      dueDisplay: taskDueDate === '2026-10-19' ? 'Hoje' : taskDueDate,
+      dueDisplay: formatDueLabel(taskDueDate),
       assigneeId: taskAssignee,
     });
 
@@ -77,13 +78,19 @@ export const QuickAddModal: React.FC = () => {
     e.preventDefault();
     if (!eventTitle.trim()) return;
 
+    // Deriva startHour e duração dos horários digitados (antes eram fixos em 11:00/45min).
+    const [sh, sm] = eventStartTime.split(':').map(Number);
+    const [eh, em] = eventEndTime.split(':').map(Number);
+    const startHour = sh + (sm || 0) / 60;
+    const durationMinutes = Math.max(15, eh * 60 + (em || 0) - (sh * 60 + (sm || 0)));
+
     addCalendarEvent({
       title: eventTitle.trim(),
       date: eventDate,
       startTime: eventStartTime,
       endTime: eventEndTime,
-      startHour: 11.0,
-      durationMinutes: 45,
+      startHour,
+      durationMinutes,
       type: eventType,
       location: eventLocation,
       attendeeIds: [currentUser.id],
@@ -105,7 +112,7 @@ export const QuickAddModal: React.FC = () => {
       color: projectColor,
       icon: 'folder',
       dueDate: projectDueDate,
-      dueDisplay: `Entrega ${projectDueDate.slice(5)}`,
+      dueDisplay: `Entrega ${formatDueLabel(projectDueDate)}`,
       nextMilestone: {
         title: 'Marco Inicial',
         dueDate: projectDueDate,

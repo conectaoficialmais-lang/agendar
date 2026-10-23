@@ -12,6 +12,7 @@ import {
   Check,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { todayIso } from '../dateUtils';
 
 interface CalendarDayCell {
   day: number;
@@ -36,9 +37,12 @@ export const CalendarView: React.FC = () => {
   } = useApp();
 
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
-  const [selectedDateStr, setSelectedDateStr] = useState<string>('2026-10-19');
-  const [viewDate, setViewDate] = useState<Date>(new Date(2026, 9, 19)); // Outubro 2026
+  const [selectedDateStr, setSelectedDateStr] = useState<string>(todayIso());
+  const [viewDate, setViewDate] = useState<Date>(new Date());
   const [scheduleFilter, setScheduleFilter] = useState<'all' | 'events' | 'tasks'>('all');
+
+  const TODAY = todayIso();
+  const nowDecimalHour = new Date().getHours() + new Date().getMinutes() / 60;
 
   const currentYear = viewDate.getFullYear();
   const currentMonth = viewDate.getMonth();
@@ -94,7 +98,7 @@ export const CalendarView: React.FC = () => {
         day: d,
         month: 'prev',
         dateStr,
-        isToday: dateStr === '2026-10-19',
+        isToday: dateStr === TODAY,
         isSelected: dateStr === selectedDateStr,
       });
     }
@@ -105,7 +109,7 @@ export const CalendarView: React.FC = () => {
         day: d,
         month: 'curr',
         dateStr,
-        isToday: dateStr === '2026-10-19',
+        isToday: dateStr === TODAY,
         isSelected: dateStr === selectedDateStr,
       });
     }
@@ -121,7 +125,7 @@ export const CalendarView: React.FC = () => {
         day: d,
         month: 'next',
         dateStr,
-        isToday: dateStr === '2026-10-19',
+        isToday: dateStr === TODAY,
         isSelected: dateStr === selectedDateStr,
       });
     }
@@ -146,7 +150,7 @@ export const CalendarView: React.FC = () => {
         name: weekNames[i],
         day: dayDate.getDate(),
         dateStr: str,
-        isToday: str === '2026-10-19',
+        isToday: str === TODAY,
         fullDate: dayDate,
       };
     });
@@ -177,9 +181,9 @@ export const CalendarView: React.FC = () => {
   };
 
   const handleGoToToday = () => {
-    const today = new Date(2026, 9, 19);
+    const today = new Date();
     setViewDate(today);
-    setSelectedDateStr('2026-10-19');
+    setSelectedDateStr(TODAY);
   };
 
   const calendarGrid = generateMonthGrid(currentYear, currentMonth);
@@ -190,21 +194,28 @@ export const CalendarView: React.FC = () => {
 
   const [selY, selM, selD] = selectedDateStr.split('-').map(Number);
   const formattedSelectedDate = `${selD} de ${MONTH_NAMES[selM - 1]} de ${selY}`;
-  const isSelectedDateToday = selectedDateStr === '2026-10-19';
+  const isSelectedDateToday = selectedDateStr === TODAY;
 
   const monthEventsCount = events.filter((e) => e.date.startsWith(currentMonthPrefix)).length;
   const monthTasksCount = tasks.filter(
     (t) => t.dueDate.startsWith(currentMonthPrefix) && t.status !== 'done'
   ).length;
 
-  const quickMonths = [
-    { label: 'Out 2026', year: 2026, month: 9 },
-    { label: 'Nov 2026', year: 2026, month: 10 },
-    { label: 'Dez 2026', year: 2026, month: 11 },
-    { label: 'Jan 2027', year: 2027, month: 0 },
-    { label: 'Fev 2027', year: 2027, month: 1 },
-    { label: 'Mar 2027', year: 2027, month: 2 },
-  ];
+  const quickMonths = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(new Date().getFullYear(), new Date().getMonth() + i, 1);
+    return {
+      label: `${MONTH_NAMES[d.getMonth()].slice(0, 3)} ${d.getFullYear()}`,
+      year: d.getFullYear(),
+      month: d.getMonth(),
+    };
+  });
+
+  const todayEventsSorted = events
+    .filter((e) => e.date === TODAY)
+    .sort((a, b) => a.startHour - b.startHour);
+  const nextEventToday = todayEventsSorted.find(
+    (e) => e.startHour + e.durationMinutes / 60 > nowDecimalHour
+  );
 
   return (
     <div className="space-y-6 pb-20 animate-in fade-in duration-300">
@@ -263,14 +274,14 @@ export const CalendarView: React.FC = () => {
             <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Hoje</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
-                {events.filter((e) => e.date === '2026-10-19').length}
+                {events.filter((e) => e.date === TODAY).length}
               </div>
             </div>
 
             <div className="px-4 py-2.5 rounded-[14px] bg-[#131417] border border-white/[0.06] min-w-[90px] shadow-sm">
               <span className="text-[11px] font-medium text-[#8b8b90] block">Próximo</span>
               <div className="text-[26px] font-bold text-white mt-0.5 leading-none">
-                11:00
+                {nextEventToday ? nextEventToday.startTime : '—'}
               </div>
             </div>
           </div>
@@ -280,7 +291,7 @@ export const CalendarView: React.FC = () => {
             <button
               onClick={handleGoToToday}
               className="px-3.5 py-1.5 rounded-full text-xs font-medium text-[#8b8b90] hover:text-white bg-[#131417] hover:bg-white/[0.08] border border-white/[0.06] transition-all"
-              title="Voltar para 19 de Outubro de 2026"
+              title="Voltar para hoje"
             >
               Hoje
             </button>

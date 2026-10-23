@@ -118,16 +118,6 @@ export const CommandPalette: React.FC = () => {
                   <Play size={15} className="text-blue-400" />
                   <span>Iniciar sessão de foco de 25 minutos</span>
                 </button>
-                <button
-                  onClick={() => {
-                    toggleTheme();
-                    closeCommandPalette();
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs hover:bg-white/10 text-white/90 text-left transition-colors"
-                >
-                  <Sun size={15} className="text-amber-400" />
-                  <span>Alternar tema Claro / Escuro</span>
-                </button>
               </div>
             </div>
           )}

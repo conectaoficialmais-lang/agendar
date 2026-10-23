@@ -12,6 +12,7 @@ import {
   Flame,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { todayIso, diffDays, formatDueLabel, longDateLabel } from '../dateUtils';
 
 export const OverdueAlertBanner: React.FC = () => {
   const {
@@ -35,16 +36,11 @@ export const OverdueAlertBanner: React.FC = () => {
     return null;
   }
 
-  // Calculate days overdue based on 2026-10-22
+  // Dias de atraso em relação a HOJE (antes usava new Date('2026-10-22'),
+  // que o JS interpreta como UTC e ainda estava congelado no tempo).
   const getDaysOverdue = (dueDate: string) => {
-    try {
-      const due = new Date(dueDate).getTime();
-      const today = new Date('2026-10-22').getTime();
-      const diffDays = Math.max(1, Math.round((today - due) / (1000 * 60 * 60 * 24)));
-      return diffDays;
-    } catch {
-      return 1;
-    }
+    if (!dueDate) return 1;
+    return Math.max(1, diffDays(dueDate, todayIso()));
   };
 
   return (
@@ -127,7 +123,7 @@ export const OverdueAlertBanner: React.FC = () => {
               <span className="font-semibold uppercase tracking-wider text-[10px]">
                 Tarefas pendentes fora do prazo ({overdueTasks.length})
               </span>
-              <span className="text-[11px] text-white/50">Data de referência: 22 de Outubro de 2026</span>
+              <span className="text-[11px] text-white/50">Data de referência: {longDateLabel()}</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -186,7 +182,7 @@ export const OverdueAlertBanner: React.FC = () => {
                           </div>
                         )}
                         <span>·</span>
-                        <span className="text-rose-400/90 font-medium">Prazo: {task.dueDisplay || task.dueDate}</span>
+                        <span className="text-rose-400/90 font-medium">Prazo: {formatDueLabel(task.dueDate)}</span>
                       </div>
                     </div>
 
@@ -202,7 +198,7 @@ export const OverdueAlertBanner: React.FC = () => {
                       </button>
 
                       <button
-                        onClick={() => rescheduleTask(task.id, '2026-10-22', 'Hoje')}
+                        onClick={() => rescheduleTask(task.id)}
                         className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 transition-all flex items-center gap-1"
                         title="Reagendar prazo para Hoje"
                       >
