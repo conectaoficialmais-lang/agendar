@@ -115,7 +115,7 @@ export const CommandPalette: React.FC = () => {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs hover:bg-white/10 text-white/90 text-left transition-colors"
                 >
-                  <Play size={15} className="text-blue-400" />
+                  <Play size={15} className="text-[var(--accent)]" />
                   <span>Iniciar sessão de foco de 25 minutos</span>
                 </button>
               </div>

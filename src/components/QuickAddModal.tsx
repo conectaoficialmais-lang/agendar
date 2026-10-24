@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { X, CheckSquare, Calendar, Folder, Plus } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Priority, TaskStatus } from '../types';
-import { ACCENTS } from '../themeUtils';
 import { todayIso, addDays, formatDueLabel, timeRangeToHourAndDuration } from '../dateUtils';
 import { useEscape } from '../a11y';
 
@@ -17,7 +16,6 @@ export const QuickAddModal: React.FC = () => {
     addCalendarEvent,
     addProject,
     currentUser,
-    preferences,
     openTaskModal,
   } = useApp();
 
@@ -55,8 +53,6 @@ export const QuickAddModal: React.FC = () => {
   const [projectDueDate, setProjectDueDate] = useState(addDays(todayIso(), 30));
 
   if (!isQuickAddOpen) return null;
-
-  const currentAccent = ACCENTS[preferences.accent] || ACCENTS.blue;
 
   const handleCreateTask = (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,7 +187,7 @@ export const QuickAddModal: React.FC = () => {
                   value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
                   placeholder="Ex.: Desenhar ilustração hero do lançamento"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[var(--accent)]"
                   autoFocus
                 />
               </div>
@@ -264,7 +260,7 @@ export const QuickAddModal: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className={`px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r ${currentAccent.gradient} shadow-lg ${currentAccent.activeNavGlow} hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5`}
+                  className="btn-accent px-5 py-2 text-xs"
                 >
                   <Plus size={14} />
                   Criar Tarefa
@@ -346,7 +342,7 @@ export const QuickAddModal: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className={`px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r ${currentAccent.gradient} shadow-lg ${currentAccent.activeNavGlow} hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5`}
+                  className="btn-accent px-5 py-2 text-xs"
                 >
                   <Plus size={14} />
                   Adicionar Evento
@@ -420,7 +416,7 @@ export const QuickAddModal: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className={`px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r ${currentAccent.gradient} shadow-lg ${currentAccent.activeNavGlow} hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5`}
+                  className="btn-accent px-5 py-2 text-xs"
                 >
                   <Plus size={14} />
                   Criar Projeto

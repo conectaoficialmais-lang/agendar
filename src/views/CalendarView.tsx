@@ -146,7 +146,7 @@ const EventEditModal: React.FC<{ event: CalendarEvent; onClose: () => void }> = 
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-full text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-md transition-all active:scale-95"
+              className="btn-accent px-5 py-2 text-xs"
             >
               Salvar
             </button>
@@ -544,7 +544,7 @@ export const CalendarView: React.FC = () => {
                       }}
                       className={`min-h-[82px] p-2 rounded-[12px] transition-all cursor-pointer flex flex-col justify-between group ${
                         isToday
-                          ? 'bg-blue-600/20 border border-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.25)]'
+                          ? 'cal-today'
                           : isSelected
                           ? 'bg-white/[0.12] border border-white/[0.2] shadow-sm'
                           : isCurrentMonthCell
@@ -556,7 +556,7 @@ export const CalendarView: React.FC = () => {
                         <span
                           className={`text-xs font-bold ${
                             isToday
-                              ? 'text-blue-400 font-extrabold'
+                              ? 'text-[var(--accent)] font-extrabold'
                               : isSelected
                               ? 'text-white font-extrabold'
                               : isCurrentMonthCell
@@ -579,10 +579,10 @@ export const CalendarView: React.FC = () => {
                         {dayEvents.slice(0, 2).map((ev) => (
                           <div
                             key={ev.id}
-                            className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] bg-blue-500/10 border border-blue-500/20 truncate"
+                            className="cal-chip flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] truncate"
                             title={`${ev.startTime} - ${ev.title}`}
                           >
-                            <span className="w-1.5 h-1.5 rounded-full shrink-0 bg-blue-400" />
+                            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: 'var(--accent)' }} />
                             <span className="text-white/90 truncate text-[8.5px] leading-tight font-medium">
                               {ev.title}
                             </span>
@@ -620,9 +620,9 @@ export const CalendarView: React.FC = () => {
                     onClick={() => setSelectedDateStr(item.dateStr)}
                     className={`p-2 rounded-[10px] cursor-pointer transition-all ${
                       selectedDateStr === item.dateStr
-                        ? 'bg-blue-500/20 text-white border border-blue-500/30'
+                        ? 'cal-sel text-white'
                         : item.isToday
-                        ? 'bg-white/[0.08] text-blue-400'
+                        ? 'bg-white/[0.08] text-[var(--accent)]'
                         : 'hover:bg-white/[0.04] text-[#8b8b90]'
                     }`}
                   >
@@ -643,9 +643,9 @@ export const CalendarView: React.FC = () => {
                       onClick={() => setSelectedDateStr(w.dateStr)}
                       className={`p-1.5 rounded-[12px] transition-all cursor-pointer flex flex-col gap-1.5 ${
                         selectedDateStr === w.dateStr
-                          ? 'bg-blue-500/10 border border-blue-500/30'
+                          ? 'cal-sel'
                           : w.isToday
-                          ? 'bg-[#0d0e11] border border-blue-500/20'
+                          ? 'bg-[#0d0e11] cal-chip'
                           : 'panel-inset hover:border-white/[0.1]'
                       }`}
                     >
@@ -656,10 +656,10 @@ export const CalendarView: React.FC = () => {
                             e.stopPropagation();
                             setEditingEvent(ev);
                           }}
-                          className="p-1.5 rounded-[8px] bg-blue-500/10 border border-blue-500/20 text-[9.5px] text-white relative group cursor-pointer"
+                          className="cal-chip p-1.5 rounded-[8px] text-[9.5px] text-white relative group cursor-pointer"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-blue-300">{ev.startTime}</span>
+                            <span className="font-bold text-[var(--accent)]">{ev.startTime}</span>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -719,7 +719,7 @@ export const CalendarView: React.FC = () => {
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <span>{formattedSelectedDate}</span>
                 {isSelectedDateToday && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  <span className="accent-chip px-2 py-0.5 rounded-full text-[10px] font-bold">
                     Hoje
                   </span>
                 )}
@@ -785,7 +785,7 @@ export const CalendarView: React.FC = () => {
                           <span className="flex items-center gap-1 text-[11px]">
                             {ev.location.toLowerCase().includes('vídeo') ||
                             ev.location.toLowerCase().includes('video') ? (
-                              <Video size={12} className="text-blue-400" />
+                              <Video size={12} className="text-[var(--accent)]" />
                             ) : (
                               <MapPin size={12} className="text-amber-400" />
                             )}
@@ -805,7 +805,7 @@ export const CalendarView: React.FC = () => {
 
                         <button
                           onClick={() => setEditingEvent(ev)}
-                          className="p-1 rounded-lg text-[#8b8b90] hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+                          className="p-1 rounded-lg text-[#8b8b90] hover:text-[var(--accent)] transition-colors"
                           title="Editar este evento"
                         >
                           <Pencil size={12} />
@@ -842,7 +842,7 @@ export const CalendarView: React.FC = () => {
                       {ev.location.toLowerCase().includes('vídeo') || ev.location.toLowerCase().includes('video') ? (
                         <button
                           onClick={() => alert(`Conectando à chamada "${ev.title}"...`)}
-                          className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-1 transition-all"
+                          className="btn-accent px-3 py-1 text-xs"
                         >
                           <Video size={11} />
                           <span>Entrar</span>
@@ -870,9 +870,10 @@ export const CalendarView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => toggleTaskComplete(task.id)}
+                          style={isDone ? { background: 'var(--accent)', color: 'var(--accent-ink)' } : undefined}
                           className={`w-4 h-4 rounded flex items-center justify-center transition-all shrink-0 ${
                             isDone
-                              ? 'bg-blue-500 text-white'
+                              ? ''
                               : 'border border-white/30 hover:border-white/60 text-transparent'
                           }`}
                           title={isDone ? 'Marcar como pendente' : 'Marcar como concluída'}
@@ -883,7 +884,7 @@ export const CalendarView: React.FC = () => {
                         <div className="truncate">
                           <h4
                             onClick={() => openTaskModal(task.id)}
-                            className={`text-xs font-semibold cursor-pointer truncate hover:text-blue-300 transition-colors ${
+                            className={`text-xs font-semibold cursor-pointer truncate hover:text-[var(--accent)] transition-colors ${
                               isDone ? 'line-through text-[#8b8b90]' : 'text-white'
                             }`}
                           >

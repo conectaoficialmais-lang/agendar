@@ -20,7 +20,7 @@ export const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({
       <div className="flex items-center justify-between pb-3 border-b border-white/10">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-sm">Notificações</span>
-          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">
+          <span className="accent-chip px-1.5 py-0.5 rounded-full text-[10px] font-bold">
             {notifications.filter((n) => !n.read).length} novas
           </span>
         </div>
@@ -57,7 +57,7 @@ export const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({
                 <div className="flex-1">
                   <div className="flex items-center gap-1.5">
                     {!notif.read && (
-                      <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: 'var(--accent)' }} />
                     )}
                     <h4 className="text-xs font-semibold text-white/90 leading-tight">
                       {notif.title}

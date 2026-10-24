@@ -90,7 +90,7 @@ export const OverdueAlertBanner: React.FC = () => {
 
             <button
               onClick={rescheduleAllOverdue}
-              className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 border border-blue-500/40 transition-all flex items-center gap-1.5 shadow-sm hover:text-white"
+              className="accent-chip px-3.5 py-1.5 rounded-full text-xs font-semibold hover:brightness-110 transition-all flex items-center gap-1.5 shadow-sm"
               title="Adia a data de entrega de todas as tarefas atrasadas para Hoje"
             >
               <Calendar size={13} />
@@ -163,7 +163,7 @@ export const OverdueAlertBanner: React.FC = () => {
                       {/* Task title */}
                       <h4
                         onClick={() => openTaskModal(task.id)}
-                        className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors cursor-pointer line-clamp-2 leading-snug"
+                        className="text-xs font-bold text-white group-hover:text-[var(--accent)] transition-colors cursor-pointer line-clamp-2 leading-snug"
                         title="Abrir detalhes da tarefa"
                       >
                         {task.title}
@@ -199,7 +199,7 @@ export const OverdueAlertBanner: React.FC = () => {
 
                       <button
                         onClick={() => rescheduleTask(task.id)}
-                        className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 transition-all flex items-center gap-1"
+                        className="accent-chip px-2.5 py-1 rounded-full text-[11px] font-semibold hover:brightness-110 transition-all flex items-center gap-1"
                         title="Reagendar prazo para Hoje"
                       >
                         <Calendar size={11} />

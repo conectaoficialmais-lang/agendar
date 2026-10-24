@@ -614,7 +614,7 @@ export const InsightsView: React.FC = () => {
                         <Check size={12} strokeWidth={3} />
                       </button>
                       <div {...clickable(() => openTaskModal(t.id))} className="truncate cursor-pointer flex-1">
-                        <h4 className="text-xs font-bold text-white truncate group-hover:text-blue-300 transition-colors">
+                        <h4 className="text-xs font-bold text-white truncate group-hover:text-[var(--accent)] transition-colors">
                           {t.title}
                         </h4>
                         <span className="flex items-center gap-1.5 text-[10px] text-[#8b8b90] mt-0.5">

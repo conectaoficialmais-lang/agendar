@@ -39,20 +39,21 @@ export const TopBar: React.FC = () => {
         {/* Barra de busca arredondada com lupa, Search e ⌘K */}
         <button
           onClick={openCommandPalette}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-[#8b8b90] hover:text-white transition-all text-xs"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-[var(--muted)] hover:text-white transition-all text-xs"
           title="Buscar (⌘K)"
         >
-          <Search size={14} className="text-[#8b8b90]" />
-          <span className="text-[#8b8b90] text-xs">Buscar</span>
-          <kbd className="ml-2 px-1.5 py-0.5 text-[10px] font-mono bg-white/[0.08] rounded text-[#8b8b90]">
+          <Search size={14} className="text-[var(--muted)]" />
+          <span className="text-[var(--muted)] text-xs">Buscar</span>
+          <kbd className="ml-2 px-1.5 py-0.5 text-[10px] font-mono bg-white/[0.08] rounded text-[var(--muted)]">
             ⌘K
           </kbd>
         </button>
 
-        {/* Ícone "+" */}
+        {/* Ação principal "+" em lima */}
         <button
           onClick={() => openQuickAdd('task')}
-          className="p-1.5 rounded-full text-[#8b8b90] hover:text-white hover:bg-white/[0.06] transition-colors"
+          style={{ background: 'var(--accent)', color: 'var(--accent-ink)' }}
+          className="p-1.5 rounded-full hover:brightness-110 active:scale-95 transition-all shadow-[0_6px_16px_-6px_var(--accent)]"
           title="Adicionar"
         >
           <Plus size={16} />
@@ -64,7 +65,7 @@ export const TopBar: React.FC = () => {
         {/* Ícone de Sino com ponto de notificação vermelho */}
         <button
           onClick={() => setShowNotifications((prev) => !prev)}
-          className="p-1.5 rounded-full text-[#8b8b90] hover:text-white hover:bg-white/[0.06] transition-colors relative"
+          className="p-1.5 rounded-full text-[var(--muted)] hover:text-white hover:bg-white/[0.06] transition-colors relative"
           title="Notificações"
         >
           <Bell size={16} />

@@ -476,7 +476,7 @@ export const TasksView: React.FC = () => {
                           className={`text-xs font-bold leading-snug ${
                             task.status === 'done'
                               ? 'line-through text-[#8b8b90]'
-                              : 'text-white group-hover:text-blue-300'
+                              : 'text-white group-hover:text-[var(--accent)]'
                           }`}
                         >
                           {task.title}
@@ -493,8 +493,9 @@ export const TasksView: React.FC = () => {
                             </div>
                             <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
                               <div
-                                className="h-full bg-blue-500 rounded-full"
+                                className="h-full rounded-full"
                                 style={{
+                                  background: 'var(--accent)',
                                   width: `${(completedSubtasks / task.subtasks.length) * 100}%`,
                                 }}
                               />
@@ -610,9 +611,10 @@ export const TasksView: React.FC = () => {
                                     e.stopPropagation();
                                     toggleTaskComplete(task.id);
                                   }}
+                                  style={isDone ? { background: 'var(--accent)', color: 'var(--accent-ink)' } : undefined}
                                   className={`w-4 h-4 rounded flex items-center justify-center transition-all shrink-0 ${
                                     isDone
-                                      ? 'bg-blue-500 text-white'
+                                      ? ''
                                       : 'border border-white/30 group-hover:border-white/60 text-transparent'
                                   }`}
                                   title={isDone ? 'Concluída' : 'Marcar como concluída'}

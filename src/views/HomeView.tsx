@@ -141,7 +141,7 @@ export const HomeView: React.FC = () => {
               onClick={() => setActiveTab('calendar')}
               className="px-4 py-2 rounded-full text-xs font-medium text-[#8b8b90] hover:text-white bg-[#131417] hover:bg-white/[0.08] border border-white/[0.06] transition-all flex items-center gap-2"
             >
-              <Clock size={13} className="text-blue-400" />
+              <Clock size={13} className="text-[var(--accent)]" />
               <span>Próximo: {nextMeeting ? nextMeeting.startTime : '—'}</span>
             </button>
 
@@ -167,7 +167,7 @@ export const HomeView: React.FC = () => {
                 <h3 className="text-sm font-bold text-white">Hoje</h3>
                 <p className="text-xs text-[#8b8b90]">Complete seus anéis de meta diária</p>
               </div>
-              <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <span className="accent-chip text-[11px] font-medium px-2.5 py-0.5 rounded-full">
                 {Math.round(((doneTodayCount / DAILY_TASK_GOAL) * 0.4 + Math.min(1, focusedMinutesToday / (DAILY_FOCUS_GOAL_H * 60)) * 0.4 + meetingsRatio * 0.2) * 100)}% geral
               </span>
             </div>
@@ -189,7 +189,7 @@ export const HomeView: React.FC = () => {
                     cx="60"
                     cy="60"
                     r="48"
-                    stroke="#3b82f6"
+                    stroke="var(--accent)"
                     strokeWidth="8"
                     strokeDasharray="301.59"
                     strokeDashoffset={301.59 * (1 - Math.min(1, doneTodayCount / DAILY_TASK_GOAL))}
@@ -253,7 +253,7 @@ export const HomeView: React.FC = () => {
               <div className="flex-1 w-full space-y-3">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]" />
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ background: 'var(--accent)', boxShadow: '0 0 8px var(--accent)' }} />
                     <span className="text-white font-medium">Tarefas</span>
                   </div>
                   <span className="font-bold text-white">{doneTodayCount}/{DAILY_TASK_GOAL} concluídas</span>
@@ -294,11 +294,7 @@ export const HomeView: React.FC = () => {
                   <button
                     key={mins}
                     onClick={() => setFocusDurationMinutes(mins)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                      Math.round(focusDuration / 60) === mins
-                        ? 'bg-white/[0.12] text-white shadow-sm font-bold'
-                        : 'text-[#8b8b90] hover:text-white'
-                    }`}
+                    className={`chip ${Math.round(focusDuration / 60) === mins ? 'chip-active' : ''}`}
                   >
                     {mins}m
                   </button>
@@ -376,7 +372,7 @@ export const HomeView: React.FC = () => {
               </div>
               <button
                 onClick={() => setActiveTab('projects')}
-                className="text-xs text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 transition-colors"
+                className="text-xs text-[var(--accent)] hover:opacity-80 font-medium flex items-center gap-1 transition-opacity"
               >
                 Ver todos
                 <ChevronRight size={14} />
@@ -405,7 +401,7 @@ export const HomeView: React.FC = () => {
                         <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: proj.color }} />
                       </div>
                       <div className="min-w-0">
-                        <h4 className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors truncate">
+                        <h4 className="text-xs font-bold text-white group-hover:text-[var(--accent)] transition-colors truncate">
                           {proj.name}
                         </h4>
                         <p className="text-[11px] text-[#8b8b90] truncate mt-0.5">
@@ -468,7 +464,7 @@ export const HomeView: React.FC = () => {
               </div>
               <button
                 onClick={() => setActiveTab('tasks')}
-                className="text-xs text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 transition-colors"
+                className="text-xs text-[var(--accent)] hover:opacity-80 font-medium flex items-center gap-1 transition-opacity"
               >
                 Todas
                 <ChevronRight size={14} />
@@ -487,9 +483,10 @@ export const HomeView: React.FC = () => {
                   >
                     <button
                       onClick={() => toggleTaskComplete(task.id)}
+                      style={isDone ? { background: 'var(--accent)', color: 'var(--accent-ink)' } : undefined}
                       className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center transition-all shrink-0 ${
                         isDone
-                          ? 'bg-blue-500 text-white'
+                          ? ''
                           : 'border border-white/30 group-hover:border-white/60 text-transparent'
                       }`}
                       title={isDone ? 'Concluída' : 'Marcar como concluída'}
@@ -547,7 +544,7 @@ export const HomeView: React.FC = () => {
               </div>
               <button
                 onClick={() => setActiveTab('calendar')}
-                className="text-xs text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 transition-colors"
+                className="text-xs text-[var(--accent)] hover:opacity-80 font-medium flex items-center gap-1 transition-opacity"
               >
                 Calendário
                 <ChevronRight size={14} />
@@ -557,7 +554,7 @@ export const HomeView: React.FC = () => {
             {nextMeeting ? (
               <div className="p-3.5 rounded-[12px] panel-inset space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20">
+                  <span className="accent-chip text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
                     A seguir · {nextMeeting.startTime}
                   </span>
                   <span className="text-[11px] text-[#8b8b90]">{nextMeeting.durationMinutes} min</span>
@@ -592,7 +589,7 @@ export const HomeView: React.FC = () => {
                       e.preventDefault();
                       alert('Entrando na chamada de vídeo...');
                     }}
-                    className="px-3 py-1 rounded-full text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-colors flex items-center gap-1.5"
+                    className="btn-accent px-3 py-1 text-xs"
                   >
                     <Video size={12} />
                     <span>Entrar</span>

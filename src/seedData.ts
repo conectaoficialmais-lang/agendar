@@ -1265,8 +1265,8 @@ export const SEED_NOTIFICATIONS: AppNotification[] = [
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'dark',
-  wallpaper: 'ash',
-  accent: 'blue',
+  wallpaper: 'grove',
+  accent: 'lime',
   glassStyle: 'clear',
   reduceTransparency: false,
   focusSessionMinutes: 25,

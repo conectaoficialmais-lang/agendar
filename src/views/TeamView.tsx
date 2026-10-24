@@ -194,7 +194,7 @@ export const TeamView: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <h3 className="text-sm font-bold text-white">{member.name}</h3>
                         {member.isCurrentUser && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                          <span className="accent-chip px-2 py-0.5 rounded-full text-[10px] font-bold">
                             Você
                           </span>
                         )}
@@ -244,9 +244,13 @@ export const TeamView: React.FC = () => {
                             ? 'bg-rose-500'
                             : member.workloadHours / member.maxWorkloadHours > 0.6
                             ? 'bg-amber-400'
-                            : 'bg-blue-500'
+                            : ''
                         }`}
                         style={{
+                          background:
+                            member.workloadHours / member.maxWorkloadHours <= 0.6
+                              ? 'var(--accent)'
+                              : undefined,
                           width: `${Math.min(
                             100,
                             Math.round((member.workloadHours / member.maxWorkloadHours) * 100)
@@ -285,7 +289,7 @@ export const TeamView: React.FC = () => {
           >
             <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <UserPlus size={18} className="text-blue-400" />
+                <UserPlus size={18} className="text-[var(--accent)]" />
                 <span>Convidar novo membro</span>
               </h3>
               <button
@@ -327,7 +331,7 @@ export const TeamView: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-full text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-md"
+                  className="btn-accent px-4 py-2 text-xs"
                 >
                   Enviar convite
                 </button>

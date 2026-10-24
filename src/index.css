@@ -12,7 +12,10 @@
     --font-display: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
     --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-    --accent: #3b82f6; /* sobrescrito em runtime pela preferência do usuário */
+    --accent: #c5f84a; /* lima — sobrescrito em runtime pela preferência */
+    --accent-ink: #07140a; /* texto legível sobre superfícies preenchidas com o destaque */
+    --muted: #8a968c; /* cinza levemente esverdeado para textos secundários */
+    --surface: #0a1510; /* verde-noite base dos cartões sólidos */
     font-family: var(--font-sans);
     color-scheme: dark;
   }
@@ -20,8 +23,13 @@
   body {
     min-height: 100vh;
     overflow-x: hidden;
-    background-color: #07080d;
-    color: #e8eaf1;
+    /* Canvas "verde-noite": base quase preta com leve brilho esmeralda/lima. */
+    background-color: #050a07;
+    background-image:
+      radial-gradient(90% 60% at 8% -10%, rgba(132, 204, 22, 0.1) 0%, transparent 55%),
+      radial-gradient(70% 55% at 100% 0%, rgba(16, 185, 129, 0.1) 0%, transparent 55%);
+    background-attachment: fixed;
+    color: #e6efe7;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-family: var(--font-sans);
@@ -51,11 +59,11 @@
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(70% 55% at 12% -8%, color-mix(in srgb, var(--accent) 32%, transparent) 0%, transparent 60%),
-    radial-gradient(62% 50% at 98% 8%, rgba(45, 212, 191, 0.16) 0%, transparent 55%),
-    radial-gradient(55% 48% at 85% 102%, rgba(251, 146, 60, 0.12) 0%, transparent 55%),
-    radial-gradient(60% 50% at 35% 115%, color-mix(in srgb, var(--accent) 18%, transparent) 0%, transparent 60%);
-  filter: saturate(118%);
+    radial-gradient(68% 54% at 10% -8%, color-mix(in srgb, var(--accent) 26%, transparent) 0%, transparent 60%),
+    radial-gradient(60% 50% at 98% 6%, rgba(16, 185, 129, 0.2) 0%, transparent 55%),
+    radial-gradient(56% 50% at 88% 104%, rgba(45, 212, 191, 0.14) 0%, transparent 55%),
+    radial-gradient(64% 52% at 30% 116%, color-mix(in srgb, var(--accent) 16%, transparent) 0%, transparent 62%);
+  filter: saturate(122%);
   animation: auroraDrift 26s ease-in-out infinite alternate;
 }
 
@@ -80,12 +88,14 @@
 
 /* Superfícies de vidro ------------------------------------- */
 .panel {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.022));
+  background:
+    linear-gradient(180deg, rgba(190, 242, 180, 0.055), rgba(190, 242, 180, 0.015)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.008));
   backdrop-filter: blur(18px) saturate(150%);
   -webkit-backdrop-filter: blur(18px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(190, 242, 180, 0.1);
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.07),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
     0 20px 44px -26px rgba(0, 0, 0, 0.85);
 }
 
@@ -149,4 +159,172 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--accent) 50%, rgba(255, 255, 255, 0.1));
+}
+
+/* ============================================================
+   Primitivas da identidade "lima sobre verde-noite"
+   Inspiradas nas referências fintech: pílulas lima com texto
+   escuro, chips segmentados, botões-ícone circulares de vidro,
+   números-herói grandes e cartão de destaque com brilho.
+   ============================================================ */
+
+/* Pílula primária: preenchida com o destaque, texto na tinta legível. */
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 70%, #000);
+  box-shadow: 0 10px 26px -12px color-mix(in srgb, var(--accent) 65%, transparent);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), filter 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.btn-accent:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 14px 32px -12px color-mix(in srgb, var(--accent) 80%, transparent);
+}
+.btn-accent:active {
+  transform: scale(0.97);
+}
+
+/* Pílula secundária: vidro claro com contorno, para pares tipo Sacar/Depositar. */
+.btn-soft {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.07);
+  color: #eef4ee;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+.btn-soft:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: color-mix(in srgb, var(--accent) 40%, rgba(255, 255, 255, 0.14));
+}
+.btn-soft:active {
+  transform: scale(0.97);
+}
+
+/* Chip de controle segmentado (7D/30D/90D, filtros, abas). */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: color 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+}
+.chip:hover {
+  color: #eef4ee;
+  background: rgba(255, 255, 255, 0.05);
+}
+.chip-active {
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 70%, #000);
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+/* Botão-ícone circular de vidro (sino, busca, mais). */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 9999px;
+  color: #dbe6dc;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease,
+    color 0.18s ease;
+}
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: color-mix(in srgb, var(--accent) 45%, rgba(255, 255, 255, 0.12));
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Número-herói: grande, tabular, com leve destaque. */
+.hero-number {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.95;
+}
+
+/* Cartão de destaque: brilho verde-lima, usado UMA vez por tela. */
+.spotlight {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, var(--accent) 24%, transparent) 0%, transparent 55%),
+    linear-gradient(160deg, rgba(16, 185, 129, 0.16), rgba(10, 21, 16, 0.6));
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, rgba(255, 255, 255, 0.08));
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 30px 60px -30px rgba(0, 0, 0, 0.9);
+}
+
+/* Rail lateral: rótulos que revelam ao expandir no hover -------- */
+.sidebar-label {
+  opacity: 0;
+  transform: translateX(-6px);
+  white-space: nowrap;
+  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sidebar-rail:hover .sidebar-label,
+.sidebar-rail:focus-within .sidebar-label {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.08s; /* começa a aparecer depois que a largura já cresceu */
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-rail,
+  .sidebar-label {
+    transition: none;
+  }
+}
+
+/* Estados do calendário (hoje / selecionado / chip de evento) em lima. */
+.cal-today {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+.cal-sel {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+}
+.cal-chip {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* Pílula de variação (delta) verde/vermelha. */
+.delta-up {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+}
+.delta-down {
+  color: #fca5a5;
+  background: rgba(248, 113, 113, 0.14);
+  border: 1px solid rgba(248, 113, 113, 0.3);
 }

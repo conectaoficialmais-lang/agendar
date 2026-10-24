@@ -114,7 +114,7 @@ export type WallpaperId =
   | 'grove'
   | 'dusk';
 
-export type AccentId = 'blue' | 'purple' | 'pink' | 'orange' | 'green' | 'gray';
+export type AccentId = 'lime' | 'blue' | 'purple' | 'pink' | 'orange' | 'green' | 'gray';
 
 export interface UserPreferences {
   theme: 'dark' | 'light' | 'auto';

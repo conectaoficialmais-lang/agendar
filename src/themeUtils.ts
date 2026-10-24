@@ -115,6 +115,18 @@ export interface AccentConfig {
 }
 
 export const ACCENTS: Record<AccentId, AccentConfig> = {
+  lime: {
+    id: 'lime',
+    name: 'Lima',
+    hex: '#c5f84a',
+    gradient: 'from-lime-300 to-lime-500',
+    glow: 'rgba(197, 248, 74, 0.45)',
+    textClass: 'text-lime-300',
+    bgClass: 'bg-lime-400',
+    borderClass: 'border-lime-400/40',
+    badgeClass: 'bg-lime-400/15 text-lime-200 border-lime-400/30',
+    activeNavGlow: 'shadow-[0_0_24px_rgba(197,248,74,0.4)]',
+  },
   blue: {
     id: 'blue',
     name: 'Azul',

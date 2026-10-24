@@ -40,20 +40,26 @@ export const Sidebar: React.FC = () => {
   // Projetos fixados = os marcados com estrela (antes eram dois nomes fixos em inglês).
   const starredProjects = projects.filter((p) => p.starred);
 
+  // Índice do item ativo para o indicador deslizante (−1 quando estamos numa
+  // tela fora do menu principal, ex.: detalhe de projeto — aí o indicador some).
+  const activeIndex = NAV_ITEMS.findIndex((i) => i.id === activeTab);
+  const NAV_STRIDE = 44; // altura do item (h-11) + gap (space-y-1 = 4px) → 48; usamos transform por índice
+  const NAV_GAP = 4;
+
   return (
     <>
-      {/* Desktop Fixed Left Sidebar (~220px) */}
-      <aside className="fixed left-4 top-4 bottom-4 w-[220px] z-40 hidden md:flex flex-col justify-between p-3.5 rounded-[22px] bg-white/[0.05] border border-white/[0.1] shadow-[0_12px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
-        <div className="space-y-4">
-          {/* Top: Logo circular/squircle com ícone abstrato e texto Pane */}
+      {/* Desktop: rail que expande no hover (ícone → ícone+texto) */}
+      <aside className="sidebar-rail group fixed left-4 top-4 bottom-4 w-[76px] hover:w-[244px] focus-within:w-[244px] z-40 hidden md:flex flex-col justify-between p-3 rounded-[24px] bg-white/[0.05] border border-white/[0.1] shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_24px_70px_rgba(0,0,0,0.72)] backdrop-blur-2xl overflow-hidden transition-[width,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]">
+        {/* min-w fixa o layout "expandido"; o overflow-hidden do aside recorta quando recolhido */}
+        <div className="space-y-4 min-w-[220px]">
+          {/* Topo: logo (ícone fixo) + marca "Pane" que revela ao expandir */}
           <button
             onClick={() => setActiveTab('home')}
-            className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-white/[0.04] transition-all text-left w-full group"
+            className="flex items-center gap-2.5 h-10 px-2 rounded-xl hover:bg-white/[0.04] transition-all text-left w-full group/logo"
           >
-            <div className="w-8 h-8 rounded-xl bg-white/[0.08] border border-white/10 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
-              {/* Ícone abstrato Pane idêntico à imagem */}
+            <div className="w-9 h-9 shrink-0 rounded-xl flex items-center justify-center text-[var(--accent-ink)] shadow-sm group-hover/logo:scale-105 transition-transform" style={{ background: 'var(--accent)' }}>
               <svg
-                className="w-4 h-4 text-white"
+                className="w-4 h-4"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -66,11 +72,24 @@ export const Sidebar: React.FC = () => {
                 <line x1="12" y1="3" x2="12" y2="12" />
               </svg>
             </div>
-            <span className="font-display font-bold text-[18px] text-white">Pane</span>
+            <span className="sidebar-label font-display font-bold text-[18px] text-white">Pane</span>
           </button>
 
-          {/* Menu de navegação */}
-          <nav className="space-y-1 w-full">
+          {/* Menu de navegação com indicador ativo deslizante */}
+          <nav className="relative space-y-1 w-full">
+            {/* Indicador deslizante — uma única pílula lima que anima entre os itens */}
+            {activeIndex >= 0 && (
+              <div
+                className="absolute left-0 right-0 top-0 h-11 rounded-xl pointer-events-none transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{
+                  transform: `translateY(${activeIndex * (NAV_STRIDE + NAV_GAP)}px)`,
+                  background: 'color-mix(in srgb, var(--accent) 16%, transparent)',
+                  border: '1px solid color-mix(in srgb, var(--accent) 35%, transparent)',
+                  boxShadow: 'inset 3px 0 0 0 var(--accent)',
+                }}
+              />
+            )}
+
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -78,21 +97,45 @@ export const Sidebar: React.FC = () => {
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all ${
+                  onClick={(e) => {
+                    setActiveTab(item.id);
+                    // Clique de mouse (e.detail > 0) tira o foco para o rail recolher;
+                    // ativação por teclado (Enter/Espaço, e.detail === 0) mantém o foco
+                    // e, portanto, o rail expandido para quem navega sem mouse.
+                    if (e.detail > 0) (e.currentTarget as HTMLButtonElement).blur();
+                  }}
+                  aria-current={isActive ? 'page' : undefined}
+                  title={item.label}
+                  className={`relative z-10 w-full h-11 flex items-center justify-between px-3 rounded-xl text-xs transition-colors group/navitem ${
                     isActive
-                      ? 'bg-white/[0.10] text-white font-semibold shadow-sm'
-                      : 'text-[#8b8b90] hover:text-white hover:bg-white/[0.04] font-medium'
+                      ? 'font-semibold'
+                      : 'text-[var(--muted)] hover:text-white font-medium'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Icon size={16} className={isActive ? 'text-white' : 'text-[#8b8b90]'} />
-                    <span>{item.label}</span>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Icon
+                      size={18}
+                      className={`shrink-0 transition-transform duration-200 group-hover/navitem:scale-110 ${
+                        isActive ? 'text-[var(--accent)]' : 'text-[var(--muted)] group-hover/navitem:text-white'
+                      }`}
+                    />
+                    <span className={`sidebar-label truncate ${isActive ? 'text-[var(--accent)]' : ''}`}>
+                      {item.label}
+                    </span>
                   </div>
 
-                  {/* Badge circular "7" à direita */}
+                  {/* Badge com a contagem — revela ao expandir */}
                   {item.badge !== undefined && (
-                    <span className="w-5 h-5 rounded-full bg-[#262730] text-[#8b8b90] text-[10px] font-bold flex items-center justify-center">
+                    <span
+                      style={
+                        isActive
+                          ? { background: 'var(--accent)', color: 'var(--accent-ink)' }
+                          : undefined
+                      }
+                      className={`sidebar-label w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center ${
+                        isActive ? '' : 'bg-white/[0.06] text-[var(--muted)]'
+                      }`}
+                    >
                       {item.badge}
                     </span>
                   )}
@@ -101,10 +144,10 @@ export const Sidebar: React.FC = () => {
             })}
           </nav>
 
-          {/* Seção Fixados — dinâmica a partir dos projetos marcados com estrela */}
+          {/* Seção Fixados — some quando recolhido (só faz sentido com rótulo) */}
           {starredProjects.length > 0 && (
-            <div className="pt-2 border-t border-white/[0.06]">
-              <span className="text-[10px] font-semibold text-[#8b8b90] uppercase tracking-wider px-3 mb-2 block">
+            <div className="sidebar-label pt-2 border-t border-white/[0.06]">
+              <span className="text-[10px] font-semibold text-[var(--muted)] uppercase tracking-wider px-3 mb-2 block">
                 FIXADOS
               </span>
               <div className="space-y-1">
@@ -112,10 +155,10 @@ export const Sidebar: React.FC = () => {
                   <button
                     key={proj.id}
                     onClick={() => openProjectDetail(proj.id)}
-                    className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs text-[#8b8b90] hover:text-white hover:bg-white/[0.04] transition-all text-left truncate group"
+                    className="w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs text-[var(--muted)] hover:text-white hover:bg-white/[0.04] transition-all text-left truncate group/pin"
                   >
                     <span
-                      className="w-2 h-2 rounded-full shrink-0 group-hover:scale-125 transition-transform"
+                      className="w-2 h-2 rounded-full shrink-0 group-hover/pin:scale-125 transition-transform"
                       style={{ backgroundColor: proj.color }}
                     />
                     <span className="truncate">{proj.name}</span>
@@ -126,24 +169,24 @@ export const Sidebar: React.FC = () => {
           )}
         </div>
 
-        {/* Rodapé: Usuário */}
+        {/* Rodapé: usuário — avatar fixo, nome/cargo revelam ao expandir */}
         <button
           type="button"
           onClick={() => setActiveTab('settings')}
-          className="w-full text-left flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/[0.04] transition-colors pt-3 border-t border-white/[0.06]"
+          className="w-full text-left flex items-center gap-3 p-2 rounded-xl hover:bg-white/[0.04] transition-colors border-t border-white/[0.06]"
           title={`${currentUser.name} · ${currentUser.role}`}
         >
           <div className="relative shrink-0">
             <img
               src={currentUser.avatar}
               alt={currentUser.name}
-              className="w-7 h-7 rounded-full object-cover ring-1 ring-white/10"
+              className="w-9 h-9 rounded-full object-cover ring-1 ring-white/10"
             />
-            <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 ring-1 ring-[#121316]" />
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0a0f0b]" />
           </div>
-          <div className="truncate">
+          <div className="sidebar-label truncate">
             <p className="text-xs font-semibold text-white truncate leading-tight">{currentUser.name}</p>
-            <p className="text-[10px] text-[#8b8b90] truncate leading-tight mt-0.5">{currentUser.role}</p>
+            <p className="text-[10px] text-[var(--muted)] truncate leading-tight mt-0.5">{currentUser.role}</p>
           </div>
         </button>
       </aside>
@@ -159,10 +202,13 @@ export const Sidebar: React.FC = () => {
               onClick={() => setActiveTab(item.id)}
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
-              className={`flex-1 min-w-0 flex flex-col items-center gap-0.5 py-1.5 rounded-xl transition-all ${
+              style={
                 isActive
-                  ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/20'
-                  : 'text-[#8b8b90] hover:text-white'
+                  ? { background: 'var(--accent)', color: 'var(--accent-ink)' }
+                  : undefined
+              }
+              className={`flex-1 min-w-0 flex flex-col items-center gap-0.5 py-1.5 rounded-xl transition-all ${
+                isActive ? 'font-semibold shadow-[0_8px_20px_-8px_var(--accent)]' : 'text-[var(--muted)] hover:text-white'
               }`}
             >
               <Icon size={17} className="shrink-0" />

@@ -333,7 +333,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                     alt={leadMember.name}
                     className="w-5 h-5 rounded-full object-cover ring-1 ring-white/10"
                   />
-                  <span className="text-xs font-bold text-blue-400 truncate">{leadMember.name}</span>
+                  <span className="text-xs font-bold text-[var(--accent)] truncate">{leadMember.name}</span>
                 </div>
               </div>
 
@@ -375,25 +375,26 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                 {/* Background track */}
                 <div className="w-full h-1.5 rounded-full bg-white/10 relative overflow-visible">
                   <div
-                    className="h-full rounded-full bg-blue-500 shadow-[0_0_12px_#3b82f6]"
-                    style={{ width: '46%' }}
+                    className="h-full rounded-full"
+                    style={{ width: '46%', background: 'var(--accent)', boxShadow: '0 0 12px var(--accent)' }}
                   />
 
                   {/* Dot at start */}
                   <div
-                    className="absolute top-1/2 left-0 w-2.5 h-2.5 rounded-full bg-blue-500 ring-2 ring-[#131417] transform -translate-y-1/2"
+                    className="absolute top-1/2 left-0 w-2.5 h-2.5 rounded-full ring-2 ring-[#131417] transform -translate-y-1/2"
+                    style={{ background: 'var(--accent)' }}
                   />
 
                   {/* Milestone dot 1 */}
                   <div
-                    className="absolute top-1/2 w-2 h-2 rounded-full bg-blue-400 ring-2 ring-[#131417] transform -translate-y-1/2"
-                    style={{ left: '16%' }}
+                    className="absolute top-1/2 w-2 h-2 rounded-full ring-2 ring-[#131417] transform -translate-y-1/2"
+                    style={{ left: '16%', background: 'color-mix(in srgb, var(--accent) 80%, white)' }}
                   />
 
                   {/* Milestone dot 2 */}
                   <div
-                    className="absolute top-1/2 w-2 h-2 rounded-full bg-blue-400 ring-2 ring-[#131417] transform -translate-y-1/2"
-                    style={{ left: '58%' }}
+                    className="absolute top-1/2 w-2 h-2 rounded-full ring-2 ring-[#131417] transform -translate-y-1/2"
+                    style={{ left: '58%', background: 'color-mix(in srgb, var(--accent) 80%, white)' }}
                   />
 
                   {/* Milestone dot 3 */}
@@ -404,7 +405,8 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
 
                   {/* Dot at end */}
                   <div
-                    className="absolute top-1/2 right-0 w-2.5 h-2.5 rounded-full bg-blue-500 ring-2 ring-[#131417] transform -translate-y-1/2"
+                    className="absolute top-1/2 right-0 w-2.5 h-2.5 rounded-full ring-2 ring-[#131417] transform -translate-y-1/2"
+                    style={{ background: 'var(--accent)' }}
                   />
                 </div>
               </div>
@@ -473,12 +475,12 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                   <div key={ms.id} className="flex items-start gap-3 relative group">
                     <div className="shrink-0 mt-0.5">
                       {isDone ? (
-                        <div className="w-4 h-4 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-sm">
+                        <div className="w-4 h-4 rounded-full flex items-center justify-center shadow-sm" style={{ background: 'var(--accent)', color: 'var(--accent-ink)' }}>
                           <Check size={10} strokeWidth={3} />
                         </div>
                       ) : isNext ? (
-                        <div className="w-4 h-4 rounded-full border-2 border-blue-400 bg-blue-500/20 flex items-center justify-center">
-                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                        <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ border: '2px solid color-mix(in srgb, var(--accent) 80%, white)', background: 'color-mix(in srgb, var(--accent) 20%, transparent)' }}>
+                          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'color-mix(in srgb, var(--accent) 80%, white)' }} />
                         </div>
                       ) : (
                         <div className="w-4 h-4 rounded-full border border-white/20 bg-white/5" />
@@ -500,7 +502,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                       </div>
 
                       {isNext && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
+                        <span className="accent-chip px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0">
                           Próximo
                         </span>
                       )}
@@ -531,7 +533,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             {/* Legend */}
             <div className="flex items-center gap-4 text-xs text-[#8b8b90] pt-1">
               <div className="flex items-center gap-2">
-                <span className="w-3.5 h-0.5 bg-blue-400 rounded-full" />
+                <span className="w-3.5 h-0.5 rounded-full" style={{ background: 'var(--accent)' }} />
                 <span className="text-[11px] font-medium text-white">Concluídas</span>
               </div>
               <div className="flex items-center gap-2">
@@ -546,8 +548,8 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                 <svg className="w-full h-full overflow-visible" viewBox="0 0 520 180">
                   <defs>
                     <linearGradient id="tideBurnupGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
-                      <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
+                      <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.3" />
+                      <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.0" />
                     </linearGradient>
                   </defs>
 
@@ -582,7 +584,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                   <path
                     d="M 60 150 L 200 150 L 235 125 L 270 100 L 305 75 L 500 75"
                     fill="none"
-                    stroke="#3b82f6"
+                    stroke="var(--accent)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -631,7 +633,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
 
               <button
                 onClick={() => openQuickAdd('task')}
-                className="px-4 py-2 rounded-full text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-sm transition-all flex items-center gap-1.5"
+                className="btn-accent px-4 py-2 text-xs"
               >
                 <Plus size={14} />
                 <span>Nova tarefa</span>
@@ -679,7 +681,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
             {/* In progress Section */}
             <div className="space-y-2 pt-2 border-t border-white/[0.04]">
               <div className="flex items-center gap-2 text-xs font-bold text-[#8b8b90]">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
                 <span>Em andamento</span>
                 <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/[0.08] text-[#8b8b90]">
                   {displayedInProgressTasks.length}
@@ -744,7 +746,8 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                             e.stopPropagation();
                             toggleTaskComplete(task.id);
                           }}
-                          className="w-4 h-4 rounded bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-sm"
+                          style={{ background: 'var(--accent)', color: 'var(--accent-ink)' }}
+                          className="w-4 h-4 rounded flex items-center justify-center shrink-0 shadow-sm"
                         >
                           <Check size={11} strokeWidth={3} />
                         </button>

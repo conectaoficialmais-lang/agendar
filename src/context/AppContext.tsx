@@ -28,6 +28,7 @@ const STORAGE_KEYS = {
   NOTIFICATIONS: 'pane_notifications_pt_v3',
   FOCUS: 'pane_focus_pt_v3',
   FOCUS_LOG: 'pane_focus_log_v1',
+  THEME_MIGRATION: 'pane_theme_v3',
 };
 
 interface AppContextType {
@@ -331,6 +332,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Armazenamento cheio/indisponível — ignora para não quebrar a UI.
     }
   };
+
+  // Migração única para a nova identidade visual (lima sobre verde-noite).
+  // Quem já usava o app ficou preso no azul padrão antigo; movemos uma vez
+  // para o lima e marcamos a flag — sem nunca sobrescrever uma escolha futura.
+  // Fica num useEffect (e não no inicializador do useState) para ser idempotente
+  // sob o StrictMode do React, que invoca inicializadores duas vezes em dev.
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem(STORAGE_KEYS.THEME_MIGRATION)) {
+        localStorage.setItem(STORAGE_KEYS.THEME_MIGRATION, '1');
+        setPreferences((p) => ({ ...p, accent: 'lime' }));
+      }
+    } catch {
+      // ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => { persist(STORAGE_KEYS.TASKS, tasks); }, [tasks]);
   useEffect(() => { persist(STORAGE_KEYS.PROJECTS, projects); }, [projects]);

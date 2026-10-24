@@ -259,14 +259,15 @@ export const SettingsView: React.FC = () => {
                         key={p.name}
                         type="button"
                         onClick={() => handleSelectPreset(p.url)}
+                        style={isSel ? { boxShadow: '0 0 0 2px var(--accent)' } : undefined}
                         className={`relative rounded-[10px] overflow-hidden transition-all ${
-                          isSel ? 'ring-2 ring-blue-500 scale-105' : 'opacity-70 hover:opacity-100'
+                          isSel ? 'scale-105' : 'opacity-70 hover:opacity-100'
                         }`}
                         title={p.name}
                       >
                         <img src={p.url} alt={p.name} className="w-full h-10 object-cover" />
                         {isSel && (
-                          <div className="absolute inset-0 bg-blue-500/30 flex items-center justify-center">
+                          <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'color-mix(in srgb, var(--accent) 30%, transparent)' }}>
                             <Check size={12} className="text-white font-bold" />
                           </div>
                         )}
@@ -321,7 +322,7 @@ export const SettingsView: React.FC = () => {
                 <div className="ml-auto">
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-full text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-all shadow-md active:scale-95"
+                    className="btn-accent px-5 py-2 text-xs"
                   >
                     Salvar perfil
                   </button>
@@ -389,8 +390,9 @@ export const SettingsView: React.FC = () => {
                           },
                         })
                       }
+                      style={isEnabled ? { background: 'var(--accent)' } : undefined}
                       className={`w-10 h-5 rounded-full transition-colors relative shrink-0 ${
-                        isEnabled ? 'bg-blue-600' : 'bg-white/15'
+                        isEnabled ? '' : 'bg-white/15'
                       }`}
                     >
                       <span
@@ -514,7 +516,7 @@ export const SettingsView: React.FC = () => {
                 startFocus(preferences.focusSessionMinutes);
                 setActiveTab('home');
               }}
-              className="px-4 py-2 rounded-full text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-md transition-all flex items-center gap-1.5 active:scale-95"
+              className="btn-accent px-4 py-2 text-xs"
             >
               <Play size={13} />
               <span>Iniciar foco agora</span>

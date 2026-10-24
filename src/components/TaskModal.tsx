@@ -80,9 +80,10 @@ export const TaskModal: React.FC = () => {
             {/* Complete Toggle Button */}
             <button
               onClick={() => toggleTaskComplete(task.id)}
+              style={isDone ? { background: 'var(--accent)', color: 'var(--accent-ink)' } : undefined}
               className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                 isDone
-                  ? 'bg-blue-500 text-white'
+                  ? ''
                   : 'border border-white/30 hover:border-white/60 text-transparent hover:text-white/20'
               }`}
               title={isDone ? 'Marcar como não concluída' : 'Marcar como concluída'}
@@ -119,7 +120,7 @@ export const TaskModal: React.FC = () => {
                 setActiveTab('home');
                 closeTaskModal();
               }}
-              className="px-3 py-1.5 rounded-xl text-xs font-medium bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-500/30 transition-all flex items-center gap-1.5"
+              className="accent-chip px-3 py-1.5 rounded-xl text-xs font-medium hover:brightness-110 transition-all flex items-center gap-1.5"
             >
               <Play size={12} fill="currentColor" />
               Focar agora
@@ -152,7 +153,7 @@ export const TaskModal: React.FC = () => {
               type="text"
               value={task.title}
               onChange={(e) => updateTask(task.id, { title: e.target.value })}
-              className={`w-full text-xl font-bold bg-transparent border-none outline-none text-white focus:ring-1 focus:ring-blue-500/50 rounded-lg p-1 ${
+              className={`w-full text-xl font-bold bg-transparent border-none outline-none text-white focus:ring-1 focus:ring-[var(--accent)] rounded-lg p-1 ${
                 isDone ? 'line-through text-white/50' : ''
               }`}
             />
@@ -232,8 +233,9 @@ export const TaskModal: React.FC = () => {
               {task.subtasks.length > 0 && (
                 <div className="w-28 h-1.5 rounded-full bg-white/10 overflow-hidden">
                   <div
-                    className="h-full bg-blue-500 rounded-full transition-all"
+                    className="h-full rounded-full transition-all"
                     style={{
+                      background: 'var(--accent)',
                       width: `${(completedSubtasks / task.subtasks.length) * 100}%`,
                     }}
                   />
@@ -249,7 +251,7 @@ export const TaskModal: React.FC = () => {
                   className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 cursor-pointer transition-colors"
                 >
                   {st.completed ? (
-                    <CheckCircle2 size={16} className="text-blue-400 shrink-0" />
+                    <CheckCircle2 size={16} className="text-[var(--accent)] shrink-0" />
                   ) : (
                     <Circle size={16} className="text-white/30 shrink-0" />
                   )}
@@ -292,7 +294,7 @@ export const TaskModal: React.FC = () => {
             <div className="space-y-3">
               {task.comments.map((comment) => (
                 <div key={comment.id} className="flex items-start gap-3 text-xs">
-                  <div className="w-7 h-7 rounded-full bg-blue-500/20 border border-white/10 flex items-center justify-center font-bold text-[10px] shrink-0 text-white">
+                  <div className="w-7 h-7 rounded-full border border-white/10 flex items-center justify-center font-bold text-[10px] shrink-0 text-white" style={{ background: 'color-mix(in srgb, var(--accent) 20%, transparent)' }}>
                     {comment.authorName[0]}
                   </div>
                   <div className="flex-1 p-3 rounded-2xl bg-white/5 border border-white/5">
@@ -312,12 +314,12 @@ export const TaskModal: React.FC = () => {
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder="Escreva um comentário ou anotação..."
-                  className="flex-1 px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder-white/30 focus:outline-none focus:border-blue-500"
+                  className="flex-1 px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder-white/30 focus:outline-none focus:border-[var(--accent)]"
                 />
                 <button
                   type="submit"
                   disabled={!commentText.trim()}
-                  className="px-3.5 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white text-xs font-semibold flex items-center gap-1.5 transition-all"
+                  className="btn-accent px-3.5 py-2 text-xs disabled:opacity-40"
                 >
                   <Send size={12} />
                   Publicar

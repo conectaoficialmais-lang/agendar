@@ -336,7 +336,7 @@ export const ProjectsView: React.FC = () => {
                     </div>
 
                     <div className="min-w-0">
-                      <h3 className="text-[14px] font-bold text-white group-hover:text-blue-300 transition-colors leading-tight truncate">
+                      <h3 className="text-[14px] font-bold text-white group-hover:text-[var(--accent)] transition-colors leading-tight truncate">
                         {proj.name}
                       </h3>
                       {/* Badge de status */}
