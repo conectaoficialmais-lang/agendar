@@ -92,6 +92,9 @@ export const ProjectsView: React.FC = () => {
 
   // Filtragem dos cards
   const displayedProjects = projects.filter((proj) => {
+    // A grade principal mostra só projetos de topo; subprojetos aparecem dentro
+    // do projeto-pai (na tela de detalhe).
+    if (proj.parentId) return false;
     const norm = proj.status.toLowerCase();
     if (filter === 'All') return true;
     if (filter === 'Active') return norm.includes('progress') || norm.includes('review') || norm.includes('andamento') || norm.includes('revisão');

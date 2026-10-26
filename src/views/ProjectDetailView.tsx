@@ -17,8 +17,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { Project, Task } from '../types';
-import { fromAnchor, formatDueLabel, diffDays, todayIso } from '../dateUtils';
+import { Project } from '../types';
+import { formatDueLabel, diffDays, todayIso, addDays, shortDate } from '../dateUtils';
 import { statusLabel } from '../labels';
 
 interface ProjectDetailViewProps {
@@ -32,155 +32,110 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
     members,
     currentUser,
     closeProjectDetail,
+    openProjectDetail,
     toggleProjectStar,
     toggleTaskComplete,
     openTaskModal,
     openMemberModal,
     openQuickAdd,
-    addTask,
   } = useApp();
 
   const project = projects.find((p) => p.id === projectId) || projects[0];
 
-  const isTide = project.slug === 'tide' || project.id === 'proj-tide';
-
-  // Tarefas deste projeto
+  // Tarefas REAIS deste projeto (nada de dados de exemplo injetados)
   const projectTasks = tasks.filter((t) => t.projectId === project.id);
   const todoTasks = projectTasks.filter((t) => t.status === 'todo');
   const inProgressTasks = projectTasks.filter((t) => t.status === 'in_progress' || t.status === 'in_review');
   const doneTasks = projectTasks.filter((t) => t.status === 'done');
 
-  // Valores padrão para Tide caso ainda não haja tarefas criadas
-  const defaultTideDoneTasks: Task[] = [
-    {
-      id: 'tide-task-1',
-      title: 'Schema de cache offline e migrações',
-      projectId: project.id,
-      status: 'done',
-      priority: 'Medium',
-      dueDate: fromAnchor('2026-10-06'),
-      dueDisplay: 'Oct 6',
-      assigneeId: 'user-kwame',
-      subtasks: [],
-      comments: [],
-    },
-    {
-      id: 'tide-task-2',
-      title: 'Auditoria de alvos de toque da navegação inferior',
-      projectId: project.id,
-      status: 'done',
-      priority: 'Low',
-      dueDate: fromAnchor('2026-10-04'),
-      dueDisplay: 'Oct 4',
-      assigneeId: 'user-elise',
-      subtasks: [],
-      comments: [],
-    },
-    {
-      id: 'tide-task-3',
-      title: 'Ilustrações do onboarding',
-      projectId: project.id,
-      status: 'done',
-      priority: 'High',
-      dueDate: fromAnchor('2026-09-29'),
-      dueDisplay: 'Sep 29',
-      assigneeId: 'user-lin',
-      subtasks: [],
-      comments: [],
-    },
-  ];
+  const openCount = todoTasks.length + inProgressTasks.length;
+  const doneCount = doneTasks.length;
+  const totalCount = projectTasks.length;
+  // Progresso REAL: 0% num projeto sem tarefas (antes começava fixo em 50%).
+  const progressPercent = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
 
-  const displayedDoneTasks = isTide && doneTasks.length === 0 ? defaultTideDoneTasks : doneTasks;
-  const displayedTodoTasks = isTide && todoTasks.length === 0 ? [] : todoTasks;
-  const displayedInProgressTasks = isTide && inProgressTasks.length === 0 ? [] : inProgressTasks;
-
-  const openCount = displayedTodoTasks.length + displayedInProgressTasks.length;
-  const doneCount = displayedDoneTasks.length;
-  const totalCount = openCount + doneCount;
-  const progressPercent = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : (isTide ? 100 : 50);
-
-  // Lead do projeto
-  const leadMember = members.find((m) => m.id === project.leadId) ||
-    members.find((m) => m.name.includes('Kwame')) ||
+  // Líder do projeto
+  const leadMember =
+    members.find((m) => m.id === project.leadId) ||
+    members.find((m) => m.id === currentUser.id) ||
     members[0];
 
-  // Membros do projeto
-  const tideMembers = [
-    members.find((m) => m.name.includes('Kwame')) || {
-      id: 'user-kwame',
-      name: 'Kwame Asante',
-      role: 'Líder · Em reunião',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-      status: 'meeting',
-    },
-    members.find((m) => m.name.includes('Elise')) || {
-      id: 'user-elise',
-      name: 'Elise Marchand',
-      role: 'Online',
-      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
-      status: 'online',
-    },
-    members.find((m) => m.name.includes('Haruto')) || {
-      id: 'user-haruto',
-      name: 'Haruto Sato',
-      role: 'Online',
-      avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
-      status: 'online',
-    },
-    members.find((m) => m.name.includes('Omar')) || {
-      id: 'user-omar',
-      name: 'Omar Saleh',
-      role: 'Em foco',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-      status: 'focus',
-    },
-    members.find((m) => m.name.includes('Malik')) || {
-      id: 'user-malik',
-      name: 'Malik Johnson',
-      role: 'Ausente',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-      status: 'offline',
-    },
-    members.find((m) => m.name.includes('Nia')) || {
-      id: 'user-nia',
-      name: 'Nia Adebayo',
-      role: 'Online',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
-      status: 'online',
-    },
-  ];
+  // Membros REAIS: líder + memberIds, sem duplicar, só os que existem.
+  const memberIds = Array.from(
+    new Set([project.leadId, ...(project.memberIds || [])].filter(Boolean))
+  );
+  const displayedMembers = memberIds
+    .map((id) => members.find((m) => m.id === id))
+    .filter((m): m is NonNullable<typeof m> => Boolean(m));
 
-  const displayedMembers = isTide
-    ? tideMembers
-    : project.memberIds.map((id) => members.find((m) => m.id === id)).filter(Boolean);
+  // Marcos REAIS — vazio quando o projeto ainda não tem marcos (nada inventado).
+  const milestones = project.milestones || [];
+  const milestonesDone = milestones.filter((m) => m.status === 'done').length;
 
-  // Milestones padrão
-  const defaultMilestones = [
-    {
-      id: 'ms-1',
-      title: 'Congelamento do design e tokens',
-      date: '8 out',
-      status: 'done',
-    },
-    {
-      id: 'ms-2',
-      title: 'Sincronização offline em beta',
-      date: '26 out',
-      status: 'next',
-    },
-    {
-      id: 'ms-3',
-      title: 'RC1 no TestFlight',
-      date: '12 nov',
-      status: 'upcoming',
-    },
-    {
-      id: 'ms-4',
-      title: 'Envio para a loja',
-      date: '28 nov',
-      status: 'upcoming',
-    },
-  ];
+  // Hierarquia: subprojetos deste projeto + o projeto-pai (breadcrumb/navegação).
+  const subprojects = projects.filter((p) => p.parentId === project.id);
+  const parentProject = project.parentId
+    ? projects.find((p) => p.id === project.parentId)
+    : null;
+  // Progresso de um projeto (para os cartões de subprojeto), a partir das tarefas.
+  const projectProgress = (pid: string) => {
+    const ts = tasks.filter((t) => t.projectId === pid);
+    if (ts.length === 0) return 0;
+    return Math.round((ts.filter((t) => t.status === 'done').length / ts.length) * 100);
+  };
+
+  // Linha do tempo REAL: início → prazo, com "Hoje" pela fração de tempo decorrida.
+  const isoRe = /^\d{4}-\d{2}-\d{2}/;
+  // Início = data informada do projeto; senão a 1ª atividade de tarefa; senão hoje
+  // (projeto novo e vazio começa hoje). Nunca uma data inventada.
+  const taskDateCandidates = projectTasks
+    .flatMap((t) => [t.createdAt?.slice(0, 10), t.completedAt?.slice(0, 10)])
+    .filter((d): d is string => !!d && isoRe.test(d));
+  const earliestTaskDate = taskDateCandidates.length
+    ? taskDateCandidates.reduce((m, d) => (diffDays(d, m) > 0 ? d : m))
+    : null;
+  const startIso = project.startDate || earliestTaskDate || todayIso();
+  const dueIso = project.dueDate;
+  const timelineSpan = Math.max(1, diffDays(startIso, dueIso));
+  const elapsed = Math.min(Math.max(0, diffDays(startIso, todayIso())), timelineSpan);
+  const todayPct = Math.round((elapsed / timelineSpan) * 100);
+  const milestonePct = (dateStr: string): number | null => {
+    if (!dateStr || !isoRe.test(dateStr)) return null;
+    const off = Math.min(Math.max(0, diffDays(startIso, dateStr)), timelineSpan);
+    return Math.round((off / timelineSpan) * 100);
+  };
+
+  // Progresso acumulado REAL (burn-up) a partir das datas de conclusão das tarefas.
+  const doneDates = doneTasks
+    .map((t) => (t.completedAt || '').slice(0, 10))
+    .filter((d) => isoRe.test(d))
+    .sort();
+
+  const buildBurnup = () => {
+    if (totalCount === 0) return null;
+    const endIso = todayIso();
+    // Eixo começa na data mais antiga entre o início e a 1ª conclusão.
+    let startAxis = [startIso, ...doneDates].reduce(
+      (m, d) => (diffDays(d, m) > 0 ? d : m),
+      endIso
+    );
+    if (diffDays(startAxis, endIso) < 0) startAxis = endIso;
+    let totalDays = diffDays(startAxis, endIso);
+    if (totalDays < 1) {
+      startAxis = addDays(endIso, -1);
+      totalDays = 1;
+    }
+    const steps = Math.min(totalDays, 12);
+    const pts: { iso: string; done: number }[] = [];
+    for (let i = 0; i <= steps; i++) {
+      const off = Math.round((totalDays * i) / steps);
+      const iso = addDays(startAxis, off);
+      const done = doneDates.filter((dd) => diffDays(dd, iso) >= 0).length;
+      pts.push({ iso, done });
+    }
+    return { pts, yMax: Math.max(totalCount, 1) };
+  };
+  const burnup = buildBurnup();
 
   const getProjectIcon = () => {
     switch (project.icon) {
@@ -248,6 +203,16 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
 
             {/* Title & Description */}
             <div>
+              {parentProject && (
+                <button
+                  onClick={() => openProjectDetail(parentProject.id)}
+                  className="flex items-center gap-1 text-xs font-semibold text-[var(--muted)] hover:text-[var(--accent)] transition-colors mb-1"
+                >
+                  <ChevronLeft size={12} />
+                  <span className="truncate max-w-[220px]">{parentProject.name}</span>
+                  <span className="text-[#8b8b90]/50">/ subprojeto</span>
+                </button>
+              )}
               <h1 className="text-[34px] md:text-[38px] font-bold tracking-tight text-white leading-none">
                 {project.name}
               </h1>
@@ -351,7 +316,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
               <div className="flex items-center justify-between text-xs text-[#8b8b90] mb-2.5">
                 <div>
                   <span className="text-[10px] text-[#8b8b90]/70 block">Início</span>
-                  <span className="font-bold text-white">{project.startDate ? formatDueLabel(project.startDate) : '—'}</span>
+                  <span className="font-bold text-white">{formatDueLabel(startIso)}</span>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] text-[#8b8b90]/70 block">Prazo</span>
@@ -361,10 +326,10 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
 
               {/* Slider Track with Milestone Dots and floating Today tag */}
               <div className="relative py-4">
-                {/* Floating "Today" Pill */}
+                {/* "Hoje" posicionado pela fração real de tempo decorrida */}
                 <div
                   className="absolute -top-1 z-10 flex flex-col items-center pointer-events-none transform -translate-x-1/2"
-                  style={{ left: '46%' }}
+                  style={{ left: `${todayPct}%` }}
                 >
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-white text-neutral-900 shadow-md">
                     Hoje
@@ -376,37 +341,39 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                 <div className="w-full h-1.5 rounded-full bg-white/10 relative overflow-visible">
                   <div
                     className="h-full rounded-full"
-                    style={{ width: '46%', background: 'var(--accent)', boxShadow: '0 0 12px var(--accent)' }}
+                    style={{ width: `${todayPct}%`, background: 'var(--accent)', boxShadow: '0 0 12px var(--accent)' }}
                   />
 
-                  {/* Dot at start */}
+                  {/* Início */}
                   <div
                     className="absolute top-1/2 left-0 w-2.5 h-2.5 rounded-full ring-2 ring-[#131417] transform -translate-y-1/2"
                     style={{ background: 'var(--accent)' }}
                   />
 
-                  {/* Milestone dot 1 */}
-                  <div
-                    className="absolute top-1/2 w-2 h-2 rounded-full ring-2 ring-[#131417] transform -translate-y-1/2"
-                    style={{ left: '16%', background: 'color-mix(in srgb, var(--accent) 80%, white)' }}
-                  />
+                  {/* Marcos reais com data — posicionados pela própria data */}
+                  {milestones.map((ms) => {
+                    const pct = milestonePct(ms.date);
+                    if (pct === null) return null;
+                    const reached = ms.status === 'done';
+                    return (
+                      <div
+                        key={ms.id}
+                        title={ms.title}
+                        className="absolute top-1/2 w-2 h-2 rounded-full ring-2 ring-[#131417] transform -translate-y-1/2 -translate-x-1/2"
+                        style={{
+                          left: `${pct}%`,
+                          background: reached
+                            ? 'var(--accent)'
+                            : 'color-mix(in srgb, var(--accent) 80%, white)',
+                        }}
+                      />
+                    );
+                  })}
 
-                  {/* Milestone dot 2 */}
-                  <div
-                    className="absolute top-1/2 w-2 h-2 rounded-full ring-2 ring-[#131417] transform -translate-y-1/2"
-                    style={{ left: '58%', background: 'color-mix(in srgb, var(--accent) 80%, white)' }}
-                  />
-
-                  {/* Milestone dot 3 */}
-                  <div
-                    className="absolute top-1/2 w-2 h-2 rounded-full bg-white/30 ring-2 ring-[#131417] transform -translate-y-1/2"
-                    style={{ left: '72%' }}
-                  />
-
-                  {/* Dot at end */}
+                  {/* Prazo */}
                   <div
                     className="absolute top-1/2 right-0 w-2.5 h-2.5 rounded-full ring-2 ring-[#131417] transform -translate-y-1/2"
-                    style={{ background: 'var(--accent)' }}
+                    style={{ background: 'color-mix(in srgb, var(--accent) 40%, white)' }}
                   />
                 </div>
               </div>
@@ -462,12 +429,21 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
           <div className="p-5 rounded-[16px] panel shadow-sm space-y-4">
             <div>
               <h3 className="text-sm font-bold text-white">Marcos</h3>
-              <p className="text-xs text-[#8b8b90] mt-0.5">1 de 4 atingidos</p>
+              <p className="text-xs text-[#8b8b90] mt-0.5">
+                {milestones.length === 0
+                  ? 'Nenhum marco definido'
+                  : `${milestonesDone} de ${milestones.length} atingidos`}
+              </p>
             </div>
 
-            {/* Vertical Stepper List */}
+            {/* Lista vertical de marcos reais (ou estado vazio honesto) */}
+            {milestones.length === 0 ? (
+              <p className="text-xs text-[#8b8b90]/60 py-1.5">
+                Este projeto ainda não tem marcos. Eles aparecem aqui conforme forem criados.
+              </p>
+            ) : (
             <div className="space-y-3 pt-1">
-              {defaultMilestones.map((ms) => {
+              {milestones.map((ms) => {
                 const isDone = ms.status === 'done';
                 const isNext = ms.status === 'next';
 
@@ -497,7 +473,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                           {ms.title}
                         </h4>
                         <p className="text-[11px] text-[#8b8b90]/70 mt-0.5 leading-tight">
-                          {ms.date}
+                          {isoRe.test(ms.date) ? formatDueLabel(ms.date) : ms.date}
                         </p>
                       </div>
 
@@ -511,6 +487,66 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                 );
               })}
             </div>
+            )}
+          </div>
+
+          {/* Card: Subprojetos */}
+          <div className="p-5 rounded-[16px] panel shadow-sm space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-bold text-white">Subprojetos</h3>
+                <p className="text-xs text-[#8b8b90] mt-0.5">
+                  {subprojects.length === 0
+                    ? 'Divida este projeto em frentes menores'
+                    : `${subprojects.length} ${subprojects.length === 1 ? 'subprojeto' : 'subprojetos'}`}
+                </p>
+              </div>
+              <button
+                onClick={() => openQuickAdd('project', project.id)}
+                className="btn-accent px-3.5 py-1.5 text-xs shrink-0"
+              >
+                <Plus size={13} />
+                <span>Novo subprojeto</span>
+              </button>
+            </div>
+
+            {subprojects.length === 0 ? (
+              <p className="text-xs text-[#8b8b90]/60 py-1.5">
+                Nenhum subprojeto ainda. Crie frentes menores dentro deste projeto.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {subprojects.map((sp) => {
+                  const pct = projectProgress(sp.id);
+                  return (
+                    <div
+                      key={sp.id}
+                      onClick={() => openProjectDetail(sp.id)}
+                      className="p-3 rounded-[12px] panel-inset panel-hover cursor-pointer flex items-center gap-3 group"
+                    >
+                      <div
+                        className="w-8 h-8 rounded-[10px] flex items-center justify-center shrink-0 text-xs font-bold"
+                        style={{ backgroundColor: `${sp.color}20`, color: sp.color, border: `1px solid ${sp.color}35` }}
+                      >
+                        {sp.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-xs font-bold text-white truncate group-hover:text-[var(--accent)] transition-colors">
+                          {sp.name}
+                        </h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex-1 h-1 rounded-full bg-white/10 overflow-hidden">
+                            <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--accent)' }} />
+                          </div>
+                          <span className="text-[10px] font-semibold text-[#8b8b90] shrink-0">{pct}%</span>
+                        </div>
+                      </div>
+                      <ArrowUpRight size={14} className="text-[#8b8b90] group-hover:text-[var(--accent)] transition-colors shrink-0" />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -542,83 +578,67 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
               </div>
             </div>
 
-            {/* SVG Burn-up Chart */}
-            <div className="pt-2 w-full p-3 rounded-[12px] panel-inset">
-              <div className="relative w-full h-44">
-                <svg className="w-full h-full overflow-visible" viewBox="0 0 520 180">
-                  <defs>
-                    <linearGradient id="tideBurnupGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.3" />
-                      <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.0" />
-                    </linearGradient>
-                  </defs>
+            {/* Burn-up REAL — concluídas acumuladas x total, a partir das datas */}
+            {burnup ? (
+              <div className="pt-2 w-full p-3 rounded-[12px] panel-inset">
+                <div className="relative w-full h-44">
+                  {(() => {
+                    const { pts, yMax } = burnup;
+                    const n = pts.length;
+                    const xAt = (i: number) => (n <= 1 ? 280 : 50 + (460 * i) / (n - 1));
+                    const yAt = (v: number) => 150 - (125 * v) / yMax;
+                    const line = pts
+                      .map((p, i) => `${i === 0 ? 'M' : 'L'} ${xAt(i).toFixed(1)} ${yAt(p.done).toFixed(1)}`)
+                      .join(' ');
+                    const area = `${line} L ${xAt(n - 1).toFixed(1)} 150 L ${xAt(0).toFixed(1)} 150 Z`;
+                    const mid = Math.round(yMax / 2);
+                    const yTicks = Array.from(new Set([0, mid, yMax])).sort((a, b) => a - b);
+                    const labelEvery = Math.max(1, Math.ceil(n / 7));
+                    return (
+                      <svg className="w-full h-full overflow-visible" viewBox="0 0 520 180">
+                        <defs>
+                          <linearGradient id="burnupGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.3" />
+                            <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.0" />
+                          </linearGradient>
+                        </defs>
 
-                  <line x1="50" y1="25" x2="510" y2="25" stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
-                  <text x="42" y="29" fill="rgba(255,255,255,0.3)" fontSize="9" textAnchor="end" fontFamily="monospace">
-                    5 tarefas
-                  </text>
+                        {yTicks.map((v) => (
+                          <g key={v}>
+                            <line x1="50" y1={yAt(v)} x2="510" y2={yAt(v)} stroke="rgba(255,255,255,0.07)" strokeDasharray="3 3" />
+                            <text x="42" y={yAt(v) + 3} fill="rgba(255,255,255,0.3)" fontSize="9" textAnchor="end" fontFamily="monospace">
+                              {v} {v === 1 ? 'tarefa' : 'tarefas'}
+                            </text>
+                          </g>
+                        ))}
 
-                  <line x1="50" y1="75" x2="510" y2="75" stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
-                  <text x="42" y="79" fill="rgba(255,255,255,0.3)" fontSize="9" textAnchor="end" fontFamily="monospace">
-                    3 tarefas
-                  </text>
+                        {/* Total (constante) — linha tracejada no topo */}
+                        <line x1="50" y1={yAt(yMax)} x2="510" y2={yAt(yMax)} stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeDasharray="4 3" />
 
-                  <line x1="50" y1="150" x2="510" y2="150" stroke="rgba(255,255,255,0.08)" />
-                  <text x="42" y="154" fill="rgba(255,255,255,0.3)" fontSize="9" textAnchor="end" fontFamily="monospace">
-                    0 tarefas
-                  </text>
+                        {/* Concluídas acumuladas */}
+                        <path d={area} fill="url(#burnupGrad)" />
+                        <path d={line} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx={xAt(n - 1)} cy={yAt(pts[n - 1].done)} r="3.5" fill="var(--accent)" />
 
-                  <path
-                    d="M 60 150 L 95 150 L 130 125 L 165 125 L 200 100 L 235 100 L 270 75 L 500 75"
-                    fill="none"
-                    stroke="rgba(255,255,255,0.3)"
-                    strokeWidth="1.5"
-                    strokeDasharray="4 3"
-                  />
-
-                  <path
-                    d="M 60 150 L 200 150 L 235 125 L 270 100 L 305 75 L 500 75 L 500 150 Z"
-                    fill="url(#tideBurnupGrad)"
-                  />
-
-                  <path
-                    d="M 60 150 L 200 150 L 235 125 L 270 100 L 305 75 L 500 75"
-                    fill="none"
-                    stroke="var(--accent)"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-
-                  {[
-                    { label: '19 set', x: 60 },
-                    { label: '21 set', x: 95 },
-                    { label: '24 set', x: 130 },
-                    { label: '26 set', x: 165 },
-                    { label: '29 set', x: 200 },
-                    { label: '1 out', x: 235 },
-                    { label: '4 out', x: 270 },
-                    { label: '6 out', x: 305 },
-                    { label: '9 out', x: 340 },
-                    { label: '11 out', x: 375 },
-                    { label: '14 out', x: 410 },
-                    { label: '16 out', x: 445 },
-                    { label: '19 out', x: 480 },
-                  ].map((tick) => (
-                    <text
-                      key={tick.label}
-                      x={tick.x}
-                      y="168"
-                      fill="rgba(255,255,255,0.3)"
-                      fontSize="8.5"
-                      textAnchor="middle"
-                    >
-                      {tick.label}
-                    </text>
-                  ))}
-                </svg>
+                        {pts.map((p, i) =>
+                          i % labelEvery === 0 || i === n - 1 ? (
+                            <text key={p.iso} x={xAt(i)} y="168" fill="rgba(255,255,255,0.3)" fontSize="8.5" textAnchor="middle">
+                              {shortDate(p.iso)}
+                            </text>
+                          ) : null
+                        )}
+                      </svg>
+                    );
+                  })()}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="pt-2 w-full p-6 rounded-[12px] panel-inset text-center">
+                <p className="text-xs text-[#8b8b90]/70 leading-relaxed">
+                  Sem dados ainda. Crie e conclua tarefas para acompanhar o progresso acumulado ao longo do projeto.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Card: Tasks */}
@@ -632,7 +652,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
               </div>
 
               <button
-                onClick={() => openQuickAdd('task')}
+                onClick={() => openQuickAdd('task', project.id)}
                 className="btn-accent px-4 py-2 text-xs"
               >
                 <Plus size={14} />
@@ -646,15 +666,15 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                 <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                 <span>A fazer</span>
                 <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/[0.08] text-[#8b8b90]">
-                  {displayedTodoTasks.length}
+                  {todoTasks.length}
                 </span>
               </div>
 
-              {displayedTodoTasks.length === 0 ? (
+              {todoTasks.length === 0 ? (
                 <p className="text-xs text-[#8b8b90]/60 py-1.5 pl-3">Nada pendente.</p>
               ) : (
                 <div className="space-y-2">
-                  {displayedTodoTasks.map((t) => (
+                  {todoTasks.map((t) => (
                     <div
                       key={t.id}
                       onClick={() => openTaskModal(t.id)}
@@ -684,15 +704,15 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
                 <span>Em andamento</span>
                 <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/[0.08] text-[#8b8b90]">
-                  {displayedInProgressTasks.length}
+                  {inProgressTasks.length}
                 </span>
               </div>
 
-              {displayedInProgressTasks.length === 0 ? (
+              {inProgressTasks.length === 0 ? (
                 <p className="text-xs text-[#8b8b90]/60 py-1.5 pl-3">Nada por aqui.</p>
               ) : (
                 <div className="space-y-2">
-                  {displayedInProgressTasks.map((t) => (
+                  {inProgressTasks.map((t) => (
                     <div
                       key={t.id}
                       onClick={() => openTaskModal(t.id)}
@@ -722,12 +742,15 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ projectId 
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 <span>Concluídas</span>
                 <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-white/[0.08] text-[#8b8b90]">
-                  {displayedDoneTasks.length}
+                  {doneTasks.length}
                 </span>
               </div>
 
               <div className="space-y-2">
-                {displayedDoneTasks.map((task) => {
+                {doneTasks.length === 0 ? (
+                  <p className="text-xs text-[#8b8b90]/60 py-1.5 pl-3">Nenhuma tarefa concluída ainda.</p>
+                ) : null}
+                {doneTasks.map((task) => {
                   const assignee = members.find((m) => m.id === task.assigneeId) || {
                     name: 'Equipe',
                     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',

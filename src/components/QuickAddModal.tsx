@@ -10,6 +10,7 @@ export const QuickAddModal: React.FC = () => {
     isQuickAddOpen,
     closeQuickAdd,
     quickAddType,
+    quickAddProjectId,
     projects,
     members,
     addTask,
@@ -27,8 +28,13 @@ export const QuickAddModal: React.FC = () => {
   React.useEffect(() => {
     if (isQuickAddOpen) {
       setActiveTab(quickAddType);
+      // Se abriu a partir de um projeto (ex.: "Nova tarefa" dentro do projeto),
+      // já deixa esse projeto selecionado para a tarefa cair no lugar certo.
+      if (quickAddProjectId) {
+        setTaskProject(quickAddProjectId);
+      }
     }
-  }, [isQuickAddOpen, quickAddType]);
+  }, [isQuickAddOpen, quickAddType, quickAddProjectId]);
 
   // Task form state
   const [taskTitle, setTaskTitle] = useState('');
@@ -108,6 +114,8 @@ export const QuickAddModal: React.FC = () => {
       name: projectName.trim(),
       slug: projectName.toLowerCase().replace(/\s+/g, '-'),
       description: projectDesc.trim() || 'Novo espaço de trabalho do projeto.',
+      // Quando aberto a partir de um projeto ("Novo subprojeto"), vira filho dele.
+      parentId: quickAddProjectId || undefined,
       status: 'Em andamento',
       color: projectColor,
       icon: 'folder',

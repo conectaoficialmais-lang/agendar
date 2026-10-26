@@ -46,6 +46,7 @@ export interface Project {
   name: string;
   slug: string;
   description: string;
+  parentId?: string; // projeto-pai, quando este é um subprojeto
   status: 'In progress' | 'In review' | 'Planning' | 'Shipped' | 'Em andamento' | 'Em revisão' | 'Planejamento' | 'Entregue';
   color: string;
   icon: string;

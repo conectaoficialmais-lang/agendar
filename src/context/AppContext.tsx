@@ -49,7 +49,8 @@ interface AppContextType {
 
   isQuickAddOpen: boolean;
   quickAddType: 'task' | 'event' | 'project';
-  openQuickAdd: (type?: 'task' | 'event' | 'project') => void;
+  quickAddProjectId: string | null;
+  openQuickAdd: (type?: 'task' | 'event' | 'project', projectId?: string | null) => void;
   closeQuickAdd: () => void;
 
   selectedTaskId: string | null;
@@ -320,6 +321,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [quickAddType, setQuickAddType] = useState<'task' | 'event' | 'project'>('task');
+  const [quickAddProjectId, setQuickAddProjectId] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
 
@@ -683,8 +685,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addProject = (projectData: Omit<Project, 'id'>): Project => {
+    const today = toIso(new Date());
     const newProj: Project = {
       ...projectData,
+      // Início real = dia da criação (antes a timeline não tinha origem e inventava
+      // uma posição). Só define se quem criou não informou um início próprio.
+      startDate: projectData.startDate || today,
+      startDisplay: projectData.startDisplay || 'Hoje',
       id: `proj-${Date.now()}`,
     };
     setProjects((prev) => [newProj, ...prev]);
@@ -697,7 +704,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const deleteProject = (projectId: string) => {
     const projToDelete = projects.find((p) => p.id === projectId);
-    setProjects((prev) => prev.filter((p) => p.id !== projectId));
+    setProjects((prev) =>
+      prev
+        .filter((p) => p.id !== projectId)
+        // Subprojetos do projeto excluído sobem um nível (herdam o pai dele),
+        // em vez de ficarem órfãos apontando para um projeto que não existe mais.
+        .map((p) =>
+          p.parentId === projectId ? { ...p, parentId: projToDelete?.parentId } : p
+        )
+    );
     // Cleanly remove associated tasks
     setTasks((prev) => prev.filter((t) => t.projectId !== projectId));
     setNotifications((prev) => [
@@ -910,8 +925,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         isQuickAddOpen,
         quickAddType,
-        openQuickAdd: (type = 'task') => {
+        quickAddProjectId,
+        openQuickAdd: (type = 'task', projectId = null) => {
           setQuickAddType(type);
+          setQuickAddProjectId(projectId);
           setIsQuickAddOpen(true);
         },
         closeQuickAdd: () => setIsQuickAddOpen(false),
